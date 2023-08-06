@@ -39,7 +39,7 @@ void Vm::execute() {
             getchar();
         }
         Instruction* instruction = Instruction::from_opcode(opcode);
-        instruction->read(program.data(), &ip);
+        instruction->read(program, &ip);
         instruction->execute(*this);
         delete instruction;
     }

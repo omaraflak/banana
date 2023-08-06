@@ -106,7 +106,7 @@ static std::map<std::string, uint8_t> OP_STRINGS_REV = {
 class Instruction {
     public:
     Instruction(const uint8_t& opcode);
-    virtual void read(const uint8_t* buffer, uint64_t* index);
+    virtual void read(const std::vector<uint8_t>& buffer, uint64_t* index);
     virtual void write(std::vector<uint8_t>& buffer);
     virtual void execute(Vm& vm) const;
     virtual void read_string(const std::vector<std::string>& strings);
@@ -186,7 +186,7 @@ class PushInstruction: public Instruction {
     public:
     PushInstruction();
     PushInstruction(const uint64_t& value);
-    void read(const uint8_t* buffer, uint64_t* index);
+    void read(const std::vector<uint8_t>& buffer, uint64_t* index);
     void write(std::vector<uint8_t>& buffer);
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
@@ -202,7 +202,7 @@ class JumpInstruction: public Instruction {
     JumpInstruction(const uint64_t& address);
     JumpInstruction(const uint8_t& opcode);
     JumpInstruction(const uint8_t& opcode, const uint64_t& address);
-    void read(const uint8_t* buffer, uint64_t* index);
+    void read(const std::vector<uint8_t>& buffer, uint64_t* index);
     void write(std::vector<uint8_t>& buffer);
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
@@ -230,7 +230,7 @@ class CallInstruction: public Instruction {
     public:
     CallInstruction();
     CallInstruction(const uint64_t& address, const uint64_t& param_count);
-    void read(const uint8_t* buffer, uint64_t* index);
+    void read(const std::vector<uint8_t>& buffer, uint64_t* index);
     void write(std::vector<uint8_t>& buffer);
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
@@ -315,7 +315,7 @@ class StoreInstruction: public Instruction {
     public:
     StoreInstruction();
     StoreInstruction(const uint64_t& address);
-    void read(const uint8_t* buffer, uint64_t* index);
+    void read(const std::vector<uint8_t>& buffer, uint64_t* index);
     void write(std::vector<uint8_t>& buffer);
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
@@ -329,7 +329,7 @@ class LoadInstruction: public Instruction {
     public:
     LoadInstruction();
     LoadInstruction(const uint64_t& address);
-    void read(const uint8_t* buffer, uint64_t* index);
+    void read(const std::vector<uint8_t>& buffer, uint64_t* index);
     void write(std::vector<uint8_t>& buffer);
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);

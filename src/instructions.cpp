@@ -5,7 +5,7 @@ Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
 }
 
-void Instruction::read(const uint8_t* buffer, uint64_t* index) {}
+void Instruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {}
 
 void Instruction::write(std::vector<uint8_t>& buffer) {
     buffer.push_back(opcode);
@@ -149,7 +149,7 @@ PushInstruction::PushInstruction(const uint64_t& value) : Instruction(OP_PUSH) {
     this->value = value;
 }
 
-void PushInstruction::read(const uint8_t* buffer, uint64_t* index) {
+void PushInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
     this->value = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -185,7 +185,7 @@ JumpInstruction::JumpInstruction(const uint8_t& opcode, const uint64_t& address)
     this->address = address;
 }
 
-void JumpInstruction::read(const uint8_t* buffer, uint64_t* index) {
+void JumpInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
     this->address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -236,7 +236,7 @@ CallInstruction::CallInstruction(const uint64_t& address, const uint64_t& param_
     this->param_count = param_count;
 }
 
-void CallInstruction::read(const uint8_t* buffer, uint64_t* index) {
+void CallInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
     this->address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
     this->param_count = bytes::read_long(buffer, *index);
@@ -328,7 +328,7 @@ StoreInstruction::StoreInstruction(const uint64_t& address) : Instruction(OP_STO
     this->address = address;
 }
 
-void StoreInstruction::read(const uint8_t* buffer, uint64_t* index) {
+void StoreInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
     this->address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -358,7 +358,7 @@ LoadInstruction::LoadInstruction(const uint64_t& address) : Instruction(OP_LOAD)
     this->address = address;
 }
 
-void LoadInstruction::read(const uint8_t* buffer, uint64_t* index) {
+void LoadInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
     this->address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
