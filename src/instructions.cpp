@@ -177,18 +177,22 @@ void JumpIfFalseInstruction::execute(Vm& vm) const {
 
 CallInstruction::CallInstruction() : Instruction(OP_CALL) {}
 
-CallInstruction::CallInstruction(const uint64_t& address) : Instruction(OP_CALL) {
+CallInstruction::CallInstruction(const uint64_t& address, const uint8_t& param_count) : Instruction(OP_CALL) {
     this->address = address;
+    this->param_count = param_count;
 }
 
 void CallInstruction::read(const uint8_t* buffer, uint64_t* index) {
     this->address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
+    this->param_count = bytes::read_byte(buffer, *index);
+    *index += SIZE_OF_BYTE;
 }
 
 void CallInstruction::write(std::vector<uint8_t>& buffer) {
     Instruction::write(buffer);
     bytes::push_long(buffer, this->address);
+    bytes::push_byte(buffer, this->param_count);
 }
 
 void CallInstruction::execute(Vm& vm) const {

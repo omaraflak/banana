@@ -16,7 +16,7 @@ std::vector<Instruction*> create_program() {
     return {
         new PushInstruction(50),
         new PushInstruction(20),
-        new CallInstruction(39),
+        new CallInstruction(40, 2),
         new PrintInstruction(),
         new PushInstruction(10),
         new PrintCharInstruction(),

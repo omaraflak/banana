@@ -158,13 +158,14 @@ class JumpIfFalseInstruction: public JumpInstruction {
 class CallInstruction: public Instruction {
     public:
     CallInstruction();
-    CallInstruction(const uint64_t& address);
+    CallInstruction(const uint64_t& address, const uint8_t& param_count);
     void read(const uint8_t* buffer, uint64_t* index);
     void write(std::vector<uint8_t>& buffer);
     void execute(Vm& vm) const;
 
     private:
     uint64_t address;
+    uint8_t param_count;
 };
 
 class RetInstruction: public Instruction {
