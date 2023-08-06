@@ -34,14 +34,6 @@ std::vector<std::string> trim_lines(const std::vector<std::string>& lines, const
     return result;
 }
 
-// uint64_t param_value(const std::string& param, std::vector<std::pair<std::string, uint64_t>>& labels, uint64_t label_index) {
-//     if (param[0] == '.') {
-//         labels.push_back(std::make_pair(param, label_index));
-//         return 0;
-//     }
-//     return stol(param);
-// }
-
 std::vector<uint8_t> to_binary(const std::vector<std::string>& lines) {
     std::vector<uint8_t> bytes;
     for (const std::string& line : lines) {
