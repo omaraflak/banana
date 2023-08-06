@@ -1,50 +1,27 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <string>
 #include "vm.h"
-#include "instructions.h"
 
-std::vector<Instruction*> create_program() {
-    // return {
-    //     new PushInstruction(400),
-    //     new PushInstruction(500),
-    //     new AddInstruction(),
-    //     new PrintInstruction(),
-    //     new PushInstruction(10),
-    //     new PrintCharInstruction(),
-    //     new HaltInstruction()
-    // };
-    return {
-        new PushInstruction(50),
-        new PushInstruction(20),
-        new CallInstruction(40, 2),
-        new PrintInstruction(),
-        new PushInstruction(10),
-        new PrintCharInstruction(),
-        new HaltInstruction(),
-        new AddInstruction(),
-        new RetInstruction(),
-    };
-}
-
-void delete_program(std::vector<Instruction*>& instructions) {
-    for (auto i : instructions) {
-        delete i;
+std::vector<uint8_t> read_file(const std::string& filename) {
+    std::ifstream is(filename.c_str(), std::ios::binary);
+    if (!is.is_open()) {
+        std::cout << "Could not open file: " << filename << std::endl;
+        exit(1);
     }
-}
-
-void write_program(std::vector<uint8_t>& program) {
-    std::vector<Instruction*> instructions = create_program();
-    for (auto i : instructions) {
-        i->write(program);
-    }
-    delete_program(instructions);
+    std::vector<uint8_t> contents((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+    is.close();
+    return contents;
 }
 
 int main(int argc, char** argv) {
-    std::vector<uint8_t> program;
-    write_program(program);
+    if (argc != 2) {
+        std::cout << "Syntax is: " << argv[0] << " [file.obj]" << std::endl;
+        exit(1);
+    }
+    std::vector<uint8_t> program = read_file(argv[1]);
     Vm vm(program.data());
-    // vm.debug = true;
     vm.execute();
     return 0;
 }
