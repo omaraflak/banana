@@ -1,4 +1,5 @@
 #include "instructions.h"
+#include <sstream>
 
 Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
@@ -10,7 +11,15 @@ void Instruction::write(std::vector<uint8_t>& buffer) {
     buffer.push_back(opcode);
 }
 
-Instruction* Instruction::get_instruction(const uint8_t& opcode) {
+void Instruction::execute(Vm& vm) const {}
+
+void Instruction::read_string(const std::vector<std::string>& strings) {}
+
+std::string Instruction::to_string() const {
+    return OP_STRINGS.at(opcode);
+}
+
+Instruction* Instruction::from_opcode(const uint8_t& opcode) {
     switch (opcode) {
         case OP_ADD:
             return new AddInstruction();
@@ -73,6 +82,31 @@ Instruction* Instruction::get_instruction(const uint8_t& opcode) {
     exit(1);
 }
 
+namespace instructions {
+std::vector<std::string> split_string(const std::string& str, const char& separator) {
+    std::stringstream ss(str);
+    std::vector<std::string> result;
+    std::string s;
+    while (getline(ss, s, separator)) {
+        result.push_back(s);
+    }
+    return result;
+}
+}
+
+Instruction* Instruction::from_string(const std::string& str) {
+    std::string opstring = str;
+    int index = str.find(" ");
+    if (index != -1) {
+        opstring = str.substr(0, index);
+    }
+    std::string rest = index == -1 ? "" : str.substr(index + 1);
+    uint8_t opcode = OP_STRINGS_REV.at(opstring);
+    Instruction* instruction = Instruction::from_opcode(opcode);
+    instruction->read_string(instructions::split_string(rest, ','));
+    return instruction;
+}
+
 BinaryOperationInstruction::BinaryOperationInstruction(const uint8_t& opcode, std::function<uint64_t(const uint64_t&, const uint64_t&)> operation) : Instruction(opcode) {
     this->operation = operation;
 }
@@ -122,11 +156,21 @@ void PushInstruction::read(const uint8_t* buffer, uint64_t* index) {
 
 void PushInstruction::write(std::vector<uint8_t>& buffer) {
     Instruction::write(buffer);
-    bytes::push_long(buffer, this->value);
+    bytes::push_long(buffer, value);
 }
     
 void PushInstruction::execute(Vm& vm) const {
     bytes::push_long(vm.stack, value);
+}
+
+void PushInstruction::read_string(const std::vector<std::string>& strings) {
+    value = stol(strings[0]);
+}
+
+std::string PushInstruction::to_string() const {
+    std::stringstream ss(Instruction::to_string());
+    ss << " " << value;
+    return ss.str();
 }
 
 JumpInstruction::JumpInstruction() : Instruction(OP_JUMP) {}
@@ -153,6 +197,16 @@ void JumpInstruction::write(std::vector<uint8_t>& buffer) {
 
 void JumpInstruction::execute(Vm& vm) const {
     vm.ip = this->address;
+}
+
+void JumpInstruction::read_string(const std::vector<std::string>& strings) {
+    address = stol(strings[0]);
+}
+
+std::string JumpInstruction::to_string() const {
+    std::stringstream ss(Instruction::to_string());
+    ss << " " << address;
+    return ss.str();
 }
 
 JumpIfInstruction::JumpIfInstruction() : JumpInstruction((uint8_t) OP_JUMP_IF) {}
@@ -198,6 +252,17 @@ void CallInstruction::write(std::vector<uint8_t>& buffer) {
 void CallInstruction::execute(Vm& vm) const {
     vm.call_stack.push_back(vm.ip);
     vm.ip = this->address;
+}
+
+void CallInstruction::read_string(const std::vector<std::string>& strings) {
+    address = stol(strings[0]);
+    param_count = stol(strings[1]);
+}
+
+std::string CallInstruction::to_string() const {
+    std::stringstream ss(Instruction::to_string());
+    ss << " " << address;
+    return ss.str();
 }
 
 RetInstruction::RetInstruction() : Instruction(OP_RET) {}
@@ -277,6 +342,16 @@ void StoreInstruction::execute(Vm& vm) const {
     bytes::write_long(vm.memory, this->address, bytes::pop_long(vm.stack));
 }
 
+void StoreInstruction::read_string(const std::vector<std::string>& strings) {
+    address = stol(strings[0]);
+}
+
+std::string StoreInstruction::to_string() const {
+    std::stringstream ss(Instruction::to_string());
+    ss << " " << address;
+    return ss.str();
+}
+
 LoadInstruction::LoadInstruction() : Instruction(OP_LOAD) {}
 
 LoadInstruction::LoadInstruction(const uint64_t& address) : Instruction(OP_LOAD) {
@@ -295,6 +370,16 @@ void LoadInstruction::write(std::vector<uint8_t>& buffer) {
 
 void LoadInstruction::execute(Vm& vm) const {
     bytes::push_long(vm.stack, bytes::read_long(vm.memory, this->address));
+}
+
+void LoadInstruction::read_string(const std::vector<std::string>& strings) {
+    address = stol(strings[0]);
+}
+
+std::string LoadInstruction::to_string() const {
+    std::stringstream ss(Instruction::to_string());
+    ss << " " << address;
+    return ss.str();
 }
 
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}
