@@ -13,7 +13,7 @@ void print(const std::vector<T>& stack, const std::string& name) {
 }
 }
 
-Vm::Vm(uint8_t* program) {
+Vm::Vm(std::vector<uint8_t> program) {
     this->program = program;
     this->memory = new uint8_t[MAX_MEMORY];
     this->ip = 0;
@@ -26,6 +26,9 @@ Vm::~Vm() {
 }
 
 void Vm::execute() {
+    if (debug) {
+        vm::print(program, "program");
+    }
     while (running) {
         uint8_t opcode = program[ip++];
         if (debug) {
@@ -36,7 +39,7 @@ void Vm::execute() {
             getchar();
         }
         Instruction* instruction = Instruction::from_opcode(opcode);
-        instruction->read(program, &ip);
+        instruction->read(program.data(), &ip);
         instruction->execute(*this);
         delete instruction;
     }

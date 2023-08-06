@@ -21,7 +21,8 @@ int main(int argc, char** argv) {
         exit(1);
     }
     std::vector<uint8_t> program = read_file(argv[1]);
-    Vm vm(program.data());
+    Vm vm(program);
+    // vm.debug = true;
     vm.execute();
     return 0;
 }
