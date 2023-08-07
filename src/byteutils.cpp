@@ -63,55 +63,55 @@ uint64_t pop_long(std::vector<uint8_t>& stack) {
     return ((uint64_t) pop_int(stack) << 32) | pop_int(stack);
 }
 
-uint8_t read_byte(const uint8_t* stack, uint32_t index) {
+uint8_t read_byte(const uint8_t* stack, uint64_t index) {
     return stack[index];
 }
 
-uint16_t read_short(const uint8_t* stack, uint32_t index) {
+uint16_t read_short(const uint8_t* stack, uint64_t index) {
     return ((uint16_t) read_byte(stack, index + 1) << 8) | read_byte(stack, index);
 }
 
-uint32_t read_int(const uint8_t* stack, uint32_t index) {
+uint32_t read_int(const uint8_t* stack, uint64_t index) {
     return ((uint32_t) read_short(stack, index + 2) << 16) | read_short(stack, index);
 }
 
-uint64_t read_long(const uint8_t* stack, uint32_t index) {
+uint64_t read_long(const uint8_t* stack, uint64_t index) {
     return ((uint64_t) read_int(stack, index + 4) << 32) | read_int(stack, index);
 }
 
-uint8_t read_byte(const std::vector<uint8_t>& stack, uint32_t index) {
+uint8_t read_byte(const std::vector<uint8_t>& stack, uint64_t index) {
     return bytes::read_byte(stack.data(), index);
 }
 
-uint16_t read_short(const std::vector<uint8_t>& stack, uint32_t index) {
+uint16_t read_short(const std::vector<uint8_t>& stack, uint64_t index) {
     return bytes::read_short(stack.data(), index);
 }
 
-uint32_t read_int(const std::vector<uint8_t>& stack, uint32_t index) {
+uint32_t read_int(const std::vector<uint8_t>& stack, uint64_t index) {
     return bytes::read_int(stack.data(), index);
 }
 
-uint64_t read_long(const std::vector<uint8_t>& stack, uint32_t index) {
+uint64_t read_long(const std::vector<uint8_t>& stack, uint64_t index) {
     return bytes::read_long(stack.data(), index);
 }
 
-void write_byte(uint8_t* stack, uint32_t index, uint8_t value) {
+void write_byte(uint8_t* stack, uint64_t index, uint8_t value) {
     stack[index] = value;
 }
 
-void write_short(uint8_t* stack, uint32_t index, uint16_t value) {
+void write_short(uint8_t* stack, uint64_t index, uint16_t value) {
     stack[index] = BYTE_0(value);
     stack[index + 1] = BYTE_1(value);    
 }
 
-void write_int(uint8_t* stack, uint32_t index, uint32_t value) {
+void write_int(uint8_t* stack, uint64_t index, uint32_t value) {
     stack[index] = BYTE_0(value);
     stack[index + 1] = BYTE_1(value);
     stack[index + 2] = BYTE_2(value);
     stack[index + 3] = BYTE_3(value);
 }
 
-void write_long(uint8_t* stack, uint32_t index, uint64_t value) {
+void write_long(uint8_t* stack, uint64_t index, uint64_t value) {
     stack[index] = BYTE_0(value);
     stack[index + 1] = BYTE_1(value);
     stack[index + 2] = BYTE_2(value);
@@ -122,19 +122,19 @@ void write_long(uint8_t* stack, uint32_t index, uint64_t value) {
     stack[index + 7] = BYTE_7(value);
 }
 
-void write_byte(std::vector<uint8_t>& stack, uint32_t index, uint8_t value) {
+void write_byte(std::vector<uint8_t>& stack, uint64_t index, uint8_t value) {
     bytes::write_byte(stack.data(), index, value);
 }
 
-void write_short(std::vector<uint8_t>& stack, uint32_t index, uint16_t value) {
+void write_short(std::vector<uint8_t>& stack, uint64_t index, uint16_t value) {
     bytes::write_short(stack.data(), index, value);
 }
 
-void write_int(std::vector<uint8_t>& stack, uint32_t index, uint32_t value) {
+void write_int(std::vector<uint8_t>& stack, uint64_t index, uint32_t value) {
     bytes::write_int(stack.data(), index, value);
 }
 
-void write_long(std::vector<uint8_t>& stack, uint32_t index, uint64_t value) {
+void write_long(std::vector<uint8_t>& stack, uint64_t index, uint64_t value) {
     bytes::write_long(stack.data(), index, value);
 }
 

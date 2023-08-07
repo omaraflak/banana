@@ -15,15 +15,10 @@ void print(const std::vector<T>& stack, const std::string& name) {
 
 Vm::Vm(std::vector<uint8_t> program) {
     this->program = program;
-    memory = new uint8_t[MAX_MEMORY];
     ip = 0;
     running = true;
     debug = false;
-    new_stack();
-}
-
-Vm::~Vm() {
-    delete this->memory;
+    new_frame();
 }
 
 void Vm::execute() {
@@ -53,12 +48,16 @@ void Vm::execute() {
     }
 }
 
-void Vm::new_stack() {
+void Vm::new_frame() {
     stacks.push_front(std::vector<uint8_t>());
     stack = &stacks.front();
+    heaps.push_front(std::vector<uint8_t>(MAX_MEMORY));
+    heap = &heaps.front();
 }
 
-void Vm::pop_stack() {
+void Vm::pop_frame() {
     stacks.pop_front();
     stack = &stacks.front();
+    heaps.pop_front();
+    heap = &heaps.front();
 }
