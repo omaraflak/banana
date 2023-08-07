@@ -1,4 +1,4 @@
-push 2
+push 10
 call .fibo 1
 print
 push 10

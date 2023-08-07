@@ -34,7 +34,14 @@ void Vm::execute() {
         uint8_t opcode = program[ip++];
         if (debug) {
             std::cout << "opcode: " << (int) opcode << std::endl;
-            vm::print(*stack, "stack");
+            stacks.reverse();
+            int indent = 0;
+            for (auto stack : stacks) {
+                std::cout << std::string(indent, ' ');
+                vm::print(stack, "stack");
+                indent++;
+            }
+            stacks.reverse();
             vm::print(call_stack, "call stack");
             std::cout << "Press any key to continue...\n";
             getchar();

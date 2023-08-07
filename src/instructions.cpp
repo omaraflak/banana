@@ -252,10 +252,10 @@ void CallInstruction::write(std::vector<uint8_t>& buffer) {
 void CallInstruction::execute(Vm& vm) const {
     vm.call_stack.push_back(vm.ip);
     vm.ip = address;
-    std::vector<uint8_t> old_stack = *vm.stack;
+    std::vector<uint8_t>* old_stack = vm.stack;
     vm.new_stack();
     for (int i = 0; i < param_count; i++) {
-        bytes::push_long(*vm.stack, bytes::pop_long(old_stack));
+        bytes::push_long(*vm.stack, bytes::pop_long(*old_stack));
     }
 }
 
