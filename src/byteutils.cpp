@@ -18,7 +18,6 @@ uint8_t gte_long(const uint64_t& a, const uint64_t& b) { return a >= b; }
 uint8_t eq_long(const uint64_t& a, const uint64_t& b) { return a == b; }
 uint8_t not_eq_long(const uint64_t& a, const uint64_t& b) { return a != b; }
 
-
 void push_byte(std::vector<uint8_t>& stack, const uint8_t& value) {
     stack.push_back(value);
 }

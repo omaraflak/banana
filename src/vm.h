@@ -3,6 +3,7 @@
 #define MAX_MEMORY (2 << 16)
 
 #include <vector>
+#include <forward_list>
 #include <stdint.h>
 
 class Vm {
@@ -11,10 +12,13 @@ class Vm {
     ~Vm();
 
     void execute();
-    
-    std::vector<uint8_t> stack;
+    void new_stack();
+    void pop_stack();
+
+    std::vector<uint8_t>* stack;
     std::vector<uint64_t> call_stack;
     std::vector<uint8_t> program;
+    std::forward_list<std::vector<uint8_t>> stacks;
     uint8_t* memory;
     uint64_t ip;
     bool running;

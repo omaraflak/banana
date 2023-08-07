@@ -78,7 +78,7 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
         case OP_HALT:
             return new HaltInstruction();
     }
-    std::cout << "Opcode not recognized: " << opcode << std::endl;
+    std::cout << "Opcode not recognized: " << (int) opcode << std::endl;
     exit(1);
 }
 
@@ -112,9 +112,9 @@ BinaryOperationInstruction::BinaryOperationInstruction(const uint8_t& opcode, st
 }
 
 void BinaryOperationInstruction::execute(Vm& vm) const {
-    uint64_t right = bytes::pop_long(vm.stack);
-    uint64_t left = bytes::pop_long(vm.stack);
-    bytes::push_long(vm.stack, operation(left, right));
+    uint64_t right = bytes::pop_long(*vm.stack);
+    uint64_t left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, operation(left, right));
 }
 
 AddInstruction::AddInstruction() : BinaryOperationInstruction(OP_ADD, bytes::add_long) {}
@@ -138,7 +138,7 @@ UnaryOperationInstruction::UnaryOperationInstruction(const uint8_t& opcode, std:
 }
 
 void UnaryOperationInstruction::execute(Vm& vm) const {
-    bytes::push_long(vm.stack, operation(bytes::pop_long(vm.stack)));
+    bytes::push_long(*vm.stack, operation(bytes::pop_long(*vm.stack)));
 }
 
 NotInstruction::NotInstruction() : UnaryOperationInstruction(OP_NOT, bytes::not_long) {}
@@ -160,7 +160,7 @@ void PushInstruction::write(std::vector<uint8_t>& buffer) {
 }
     
 void PushInstruction::execute(Vm& vm) const {
-    bytes::push_long(vm.stack, value);
+    bytes::push_long(*vm.stack, value);
 }
 
 void PushInstruction::read_string(const std::vector<std::string>& strings) {
@@ -214,7 +214,7 @@ JumpIfInstruction::JumpIfInstruction() : JumpInstruction((uint8_t) OP_JUMP_IF) {
 JumpIfInstruction::JumpIfInstruction(const uint64_t& address) : JumpInstruction(OP_JUMP_IF, address) {}
 
 void JumpIfInstruction::execute(Vm& vm) const {
-    if (bytes::pop_byte(vm.stack) == 1) {
+    if (bytes::pop_byte(*vm.stack) == 1) {
         vm.ip = address;
     }
 }
@@ -224,7 +224,7 @@ JumpIfFalseInstruction::JumpIfFalseInstruction() : JumpInstruction((uint8_t) OP_
 JumpIfFalseInstruction::JumpIfFalseInstruction(const uint64_t& address) : JumpInstruction(OP_JUMP_IF_FALSE, address) {}
 
 void JumpIfFalseInstruction::execute(Vm& vm) const {
-    if (bytes::pop_byte(vm.stack) == 0) {
+    if (bytes::pop_byte(*vm.stack) == 0) {
         vm.ip = address;
     }
 }
@@ -252,6 +252,11 @@ void CallInstruction::write(std::vector<uint8_t>& buffer) {
 void CallInstruction::execute(Vm& vm) const {
     vm.call_stack.push_back(vm.ip);
     vm.ip = address;
+    std::vector<uint8_t> old_stack = *vm.stack;
+    vm.new_stack();
+    for (int i = 0; i < param_count; i++) {
+        bytes::push_long(*vm.stack, bytes::pop_long(old_stack));
+    }
 }
 
 void CallInstruction::read_string(const std::vector<std::string>& strings) {
@@ -270,22 +275,25 @@ RetInstruction::RetInstruction() : Instruction(OP_RET) {}
 void RetInstruction::execute(Vm& vm) const {
     vm.ip = vm.call_stack.back();
     vm.call_stack.pop_back();
+    uint64_t value = bytes::pop_long(*vm.stack);
+    vm.pop_stack();
+    bytes::push_long(*vm.stack, value);
 }
 
 DupInstruction::DupInstruction() : Instruction(OP_DUP) {}
 
 void DupInstruction::execute(Vm& vm) const {
-    uint64_t value = bytes::read_long(vm.stack, vm.stack.size() - SIZE_OF_LONG);
-    bytes::push_long(vm.stack, value);
+    uint64_t value = bytes::read_long(*vm.stack, vm.stack->size() - SIZE_OF_LONG);
+    bytes::push_long(*vm.stack, value);
 }
 
 SwapInstruction::SwapInstruction() : Instruction(OP_SWAP) {}
 
 void SwapInstruction::execute(Vm& vm) const {
-    uint64_t a = bytes::pop_long(vm.stack);
-    uint64_t b = bytes::pop_long(vm.stack);
-    bytes::push_long(vm.stack, a);
-    bytes::push_long(vm.stack, b);
+    uint64_t a = bytes::pop_long(*vm.stack);
+    uint64_t b = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, a);
+    bytes::push_long(*vm.stack, b);
 }
 
 CompareInstruction::CompareInstruction(const uint8_t& opcode, std::function<uint8_t(const uint64_t&, const uint64_t&)> operation) : Instruction(opcode) {
@@ -293,9 +301,9 @@ CompareInstruction::CompareInstruction(const uint8_t& opcode, std::function<uint
 }
 
 void CompareInstruction::execute(Vm& vm) const {
-    uint64_t right = bytes::pop_long(vm.stack);
-    uint64_t left = bytes::pop_long(vm.stack);
-    bytes::push_byte(vm.stack, operation(left, right));
+    uint64_t right = bytes::pop_long(*vm.stack);
+    uint64_t left = bytes::pop_long(*vm.stack);
+    bytes::push_byte(*vm.stack, operation(left, right));
 }
 
 LtInstruction::LtInstruction() : CompareInstruction(OP_LT, bytes::lt_long) {}
@@ -313,13 +321,13 @@ NotEqInstruction::NotEqInstruction() : CompareInstruction(OP_NOT_EQ, bytes::not_
 PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}
 
 void PrintInstruction::execute(Vm& vm) const {
-    std::cout << bytes::pop_long(vm.stack);
+    std::cout << bytes::pop_long(*vm.stack);
 }
 
 PrintCharInstruction::PrintCharInstruction() : Instruction(OP_PRINT_C) {}
 
 void PrintCharInstruction::execute(Vm& vm) const {
-    std::cout << (char) bytes::pop_long(vm.stack);
+    std::cout << (char) bytes::pop_long(*vm.stack);
 }
 
 StoreInstruction::StoreInstruction() : Instruction(OP_STORE) {}
@@ -339,7 +347,7 @@ void StoreInstruction::write(std::vector<uint8_t>& buffer) {
 }
 
 void StoreInstruction::execute(Vm& vm) const {
-    bytes::write_long(vm.memory, address, bytes::pop_long(vm.stack));
+    bytes::write_long(vm.memory, address, bytes::pop_long(*vm.stack));
 }
 
 void StoreInstruction::read_string(const std::vector<std::string>& strings) {
@@ -369,7 +377,7 @@ void LoadInstruction::write(std::vector<uint8_t>& buffer) {
 }
 
 void LoadInstruction::execute(Vm& vm) const {
-    bytes::push_long(vm.stack, bytes::read_long(vm.memory, address));
+    bytes::push_long(*vm.stack, bytes::read_long(vm.memory, address));
 }
 
 void LoadInstruction::read_string(const std::vector<std::string>& strings) {
