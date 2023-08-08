@@ -2,7 +2,6 @@
 #include <vector>
 #include "ast.h"
 
-
 int main(int argc, char** argv) {
     LiteralNode zero(0);
     LiteralNode one(1);
@@ -41,7 +40,6 @@ int main(int argc, char** argv) {
     BlockNode all;
     all.add(&fib);
     all.add(&main);
-
 
     // assemble
 
