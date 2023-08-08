@@ -107,10 +107,11 @@ class Instruction {
     public:
     Instruction(const uint8_t& opcode);
     virtual void read(const std::vector<uint8_t>& buffer, uint64_t* index);
-    virtual void write(std::vector<uint8_t>& buffer);
+    virtual void write(std::vector<uint8_t>& buffer) const;
     virtual void execute(Vm& vm) const;
     virtual void read_string(const std::vector<std::string>& strings);
     virtual std::string to_string() const;
+    virtual uint8_t size() const;
 
     static Instruction* from_opcode(const uint8_t& opcode);
     static Instruction* from_string(const std::string& str);
@@ -187,10 +188,12 @@ class PushInstruction: public Instruction {
     PushInstruction();
     PushInstruction(const uint64_t& value);
     void read(const std::vector<uint8_t>& buffer, uint64_t* index);
-    void write(std::vector<uint8_t>& buffer);
+    void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
     std::string to_string() const;
+    uint8_t size() const;
+
 
     private:
     uint64_t value;
@@ -203,10 +206,12 @@ class JumpInstruction: public Instruction {
     JumpInstruction(const uint8_t& opcode);
     JumpInstruction(const uint8_t& opcode, const uint64_t& address);
     void read(const std::vector<uint8_t>& buffer, uint64_t* index);
-    void write(std::vector<uint8_t>& buffer);
+    void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
     std::string to_string() const;
+    void set_address(const uint64_t& address);
+    uint8_t size() const;
 
     protected:
     uint64_t address;
@@ -231,10 +236,11 @@ class CallInstruction: public Instruction {
     CallInstruction();
     CallInstruction(const uint64_t& address, const uint64_t& param_count);
     void read(const std::vector<uint8_t>& buffer, uint64_t* index);
-    void write(std::vector<uint8_t>& buffer);
+    void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
     std::string to_string() const;
+    uint8_t size() const;
 
     private:
     uint64_t address;
@@ -316,10 +322,11 @@ class StoreInstruction: public Instruction {
     StoreInstruction();
     StoreInstruction(const uint64_t& address);
     void read(const std::vector<uint8_t>& buffer, uint64_t* index);
-    void write(std::vector<uint8_t>& buffer);
+    void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
     std::string to_string() const;
+    uint8_t size() const;
 
     private:
     uint64_t address;
@@ -330,10 +337,11 @@ class LoadInstruction: public Instruction {
     LoadInstruction();
     LoadInstruction(const uint64_t& address);
     void read(const std::vector<uint8_t>& buffer, uint64_t* index);
-    void write(std::vector<uint8_t>& buffer);
+    void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
     void read_string(const std::vector<std::string>& strings);
     std::string to_string() const;
+    uint8_t size() const;
 
     private:
     uint64_t address;

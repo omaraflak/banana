@@ -7,7 +7,7 @@ Instruction::Instruction(const uint8_t& opcode) {
 
 void Instruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {}
 
-void Instruction::write(std::vector<uint8_t>& buffer) {
+void Instruction::write(std::vector<uint8_t>& buffer) const {
     buffer.push_back(opcode);
 }
 
@@ -17,6 +17,10 @@ void Instruction::read_string(const std::vector<std::string>& strings) {}
 
 std::string Instruction::to_string() const {
     return OP_STRINGS.at(opcode);
+}
+
+uint8_t Instruction::size() const {
+    return SIZE_OF_BYTE;
 }
 
 Instruction* Instruction::from_opcode(const uint8_t& opcode) {
@@ -154,7 +158,7 @@ void PushInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) 
     *index += SIZE_OF_LONG;
 }
 
-void PushInstruction::write(std::vector<uint8_t>& buffer) {
+void PushInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, value);
 }
@@ -168,9 +172,13 @@ void PushInstruction::read_string(const std::vector<std::string>& strings) {
 }
 
 std::string PushInstruction::to_string() const {
-    std::stringstream ss(Instruction::to_string());
-    ss << " " << value;
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << value;
     return ss.str();
+}
+
+uint8_t PushInstruction::size() const {
+    return SIZE_OF_BYTE + SIZE_OF_LONG;
 }
 
 JumpInstruction::JumpInstruction() : Instruction(OP_JUMP) {}
@@ -190,7 +198,7 @@ void JumpInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) 
     *index += SIZE_OF_LONG;
 }
 
-void JumpInstruction::write(std::vector<uint8_t>& buffer) {
+void JumpInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, address);
 }
@@ -204,9 +212,17 @@ void JumpInstruction::read_string(const std::vector<std::string>& strings) {
 }
 
 std::string JumpInstruction::to_string() const {
-    std::stringstream ss(Instruction::to_string());
-    ss << " " << address;
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << address;
     return ss.str();
+}
+
+uint8_t JumpInstruction::size() const {
+    return SIZE_OF_BYTE + SIZE_OF_LONG;
+}
+
+void JumpInstruction::set_address(const uint64_t& address) {
+    this->address = address;
 }
 
 JumpIfInstruction::JumpIfInstruction() : JumpInstruction((uint8_t) OP_JUMP_IF) {}
@@ -243,7 +259,7 @@ void CallInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) 
     *index += SIZE_OF_LONG;
 }
 
-void CallInstruction::write(std::vector<uint8_t>& buffer) {
+void CallInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, address);
     bytes::push_long(buffer, param_count);
@@ -265,9 +281,13 @@ void CallInstruction::read_string(const std::vector<std::string>& strings) {
 }
 
 std::string CallInstruction::to_string() const {
-    std::stringstream ss(Instruction::to_string());
-    ss << " " << address;
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << address << " " << param_count;
     return ss.str();
+}
+
+uint8_t CallInstruction::size() const {
+    return SIZE_OF_BYTE + 2 * SIZE_OF_LONG;
 }
 
 RetInstruction::RetInstruction() : Instruction(OP_RET) {}
@@ -341,7 +361,7 @@ void StoreInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index)
     *index += SIZE_OF_LONG;
 }
 
-void StoreInstruction::write(std::vector<uint8_t>& buffer) {
+void StoreInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, address);
 }
@@ -355,9 +375,13 @@ void StoreInstruction::read_string(const std::vector<std::string>& strings) {
 }
 
 std::string StoreInstruction::to_string() const {
-    std::stringstream ss(Instruction::to_string());
-    ss << " " << address;
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << address;
     return ss.str();
+}
+
+uint8_t StoreInstruction::size() const {
+    return SIZE_OF_BYTE + SIZE_OF_LONG;
 }
 
 LoadInstruction::LoadInstruction() : Instruction(OP_LOAD) {}
@@ -371,7 +395,7 @@ void LoadInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) 
     *index += SIZE_OF_LONG;
 }
 
-void LoadInstruction::write(std::vector<uint8_t>& buffer) {
+void LoadInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, address);
 }
@@ -385,9 +409,13 @@ void LoadInstruction::read_string(const std::vector<std::string>& strings) {
 }
 
 std::string LoadInstruction::to_string() const {
-    std::stringstream ss(Instruction::to_string());
-    ss << " " << address;
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << address;
     return ss.str();
+}
+
+uint8_t LoadInstruction::size() const {
+    return SIZE_OF_BYTE + SIZE_OF_LONG;
 }
 
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}
