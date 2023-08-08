@@ -3,44 +3,46 @@
 #include "ast.h"
 
 int main(int argc, char** argv) {
-    // BlockNode root(nullptr);
-    // LiteralNode five(5);
-    // LiteralNode six(6);
-    // LiteralNode eleven(11);
-    // VariableNode a(&root);
-    // VariableNode b(&root);
-    // AssignNode assign1(&a, &five);
-    // AssignNode assign2(&b, &six);
-    // BinaryOperationNode add(&a, &b, ADD);
-    // BinaryOperationNode check(&add, &eleven, EQ);
-    // PrintNode print(&add);
-    // IfNode branch(&check, &print, nullptr);
-    // HaltNode halt;
-
-    // root.add(&assign1);
-    // root.add(&assign2);
-    // root.add(&branch);
-    // root.add(&halt);
+    LiteralNode zero(0);
+    LiteralNode one(1);
+    LiteralNode two(2);
+    LiteralNode ten(10);
 
     BlockNode block;
-    VariableNode a(&block);
-    VariableNode b(&block);
-    BinaryOperationNode add(&a, &b, ADD);
-    ReturnNode ret(&add);
-    block.add(&ret);
-    FunctionNode fun(&block, {&a, &b});
+    VariableNode n(&block);
+    FunctionNode fib(&block, {&n});
+
+    BinaryOperationNode n_eq_zero(&n, &zero, EQ);
+    BinaryOperationNode n_eq_one(&n, &one, EQ);
+
+    ReturnNode return_n(&n);
+    IfNode if_zero(&n_eq_zero, &return_n);
+    IfNode if_one(&n_eq_one, &return_n);
+
+    BinaryOperationNode n_minus_one(&n, &one, SUB);
+    BinaryOperationNode n_minus_two(&n, &two, SUB);
+
+    CallNode fib_n_minus_one(&fib, {&n_minus_one});
+    CallNode fib_n_minus_two(&fib, {&n_minus_two});
+
+    BinaryOperationNode fib_result(&fib_n_minus_one, &fib_n_minus_two, ADD);
+    ReturnNode ret_result(&fib_result);
+
+    block.add(&if_zero);
+    block.add(&if_one);
+    block.add(&ret_result);
 
     BlockNode main;
-    LiteralNode l1(5);
-    LiteralNode l2(6);
-    CallNode call(&fun, {&l1, &l2});
-    PrintNode print(&call);
-    main.add(&print);
-
+    CallNode fib_ten(&fib, {&ten});
+    PrintNode print_fib_ten(&fib_ten);
+    main.add(&print_fib_ten);
 
     BlockNode all;
-    all.add(&fun);
+    all.add(&fib);
     all.add(&main);
+
+
+    // assemble
 
     for (auto pair : ast::to_asm(&all, &main)) {
         std::cout << pair.first << "\t" << pair.second << std::endl;
