@@ -14,7 +14,7 @@ class AbstractSyntaxTree {
 
     protected:
     const AbstractSyntaxTree* frame;
-    static inline std::map<const AbstractSyntaxTree*, uint64_t> LATEST_ADDRESS;
+    static inline std::map<const AbstractSyntaxTree*, uint64_t> latest_address;
     static inline uint64_t next_address(const AbstractSyntaxTree* frame);
 };
 
@@ -44,7 +44,7 @@ enum {
 
 class BinaryOperationNode: public AbstractSyntaxTree {
     public:
-    BinaryOperationNode(const AbstractSyntaxTree* frame, const AbstractSyntaxTree* left, const AbstractSyntaxTree* right, uint8_t operation);
+    BinaryOperationNode(const AbstractSyntaxTree* frame, const AbstractSyntaxTree* left, const AbstractSyntaxTree* right, const uint8_t& operation);
     void write(std::vector<const Instruction*>& instructions) const;
 
     private:

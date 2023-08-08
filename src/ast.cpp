@@ -9,11 +9,11 @@ uint64_t AbstractSyntaxTree::next_address(const AbstractSyntaxTree* frame) {
         std::cout << "Trying to get address without a frame" << std::endl;
         exit(1);
     }
-    if (LATEST_ADDRESS.find(frame) == LATEST_ADDRESS.end()) {
-        LATEST_ADDRESS[frame] = 0;
+    if (latest_address.find(frame) == latest_address.end()) {
+        latest_address[frame] = 0;
     }
-    uint64_t address = LATEST_ADDRESS[frame];
-    LATEST_ADDRESS[frame] += SIZE_OF_LONG;
+    uint64_t address = latest_address[frame];
+    latest_address[frame] += SIZE_OF_LONG;
     return address;
 }
 
@@ -67,7 +67,7 @@ BinaryOperationNode::BinaryOperationNode(
     const AbstractSyntaxTree* frame,
     const AbstractSyntaxTree* left,
     const AbstractSyntaxTree* right,
-    uint8_t operation
+    const uint8_t& operation
 ) : AbstractSyntaxTree(frame) {
     this->left = left;
     this->right = right;
