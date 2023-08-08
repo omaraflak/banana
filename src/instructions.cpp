@@ -292,12 +292,45 @@ uint8_t CallInstruction::size() const {
 
 RetInstruction::RetInstruction() : Instruction(OP_RET) {}
 
+RetInstruction::RetInstruction(const uint64_t& values_count) : Instruction(OP_RET) {
+    this->values_count = values_count;
+}
+
+void RetInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+    values_count = bytes::read_long(buffer, *index);
+    *index += SIZE_OF_LONG;
+}
+
+void RetInstruction::write(std::vector<uint8_t>& buffer) const {
+    Instruction::write(buffer);
+    bytes::push_long(buffer, values_count);
+}
+
 void RetInstruction::execute(Vm& vm) const {
     vm.ip = vm.call_stack.back();
     vm.call_stack.pop_back();
-    uint64_t value = bytes::pop_long(*vm.stack);
+    std::vector<uint64_t> values;
+    for (int i = 0; i < values_count; i++) {
+        values.push_back(bytes::pop_long(*vm.stack));
+    }
     vm.pop_frame();
-    bytes::push_long(*vm.stack, value);
+    for (auto value : values) {
+        bytes::push_long(*vm.stack, value);
+    }
+}
+
+void RetInstruction::read_string(const std::vector<std::string>& strings) {
+    values_count = stol(strings[0]);
+}
+
+std::string RetInstruction::to_string() const {
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << values_count;
+    return ss.str();
+}
+
+uint8_t RetInstruction::size() const {
+    return SIZE_OF_BYTE + SIZE_OF_LONG;
 }
 
 DupInstruction::DupInstruction() : Instruction(OP_DUP) {}

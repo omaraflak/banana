@@ -274,14 +274,16 @@ void CallNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new CallInstruction(function->get_program_address(), function->get_parameters_count()));
 }
 
-ReturnNode::ReturnNode(AbstractSyntaxTree* value) : AbstractSyntaxTree() {
-    this->value = value;
+ReturnNode::ReturnNode(const std::vector<AbstractSyntaxTree*>& values) : AbstractSyntaxTree() {
+    this->values = values;
 }
 
 void ReturnNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
-    value->write(instructions);
-    instructions.push_back(new RetInstruction());
+    for (auto value : values) {
+        value->write(instructions);
+    }
+    instructions.push_back(new RetInstruction(values.size()));
 }
 
 HaltNode::HaltNode() : AbstractSyntaxTree() {}

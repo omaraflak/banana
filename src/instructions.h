@@ -250,7 +250,16 @@ class CallInstruction: public Instruction {
 class RetInstruction: public Instruction {
     public:
     RetInstruction();
+    RetInstruction(const uint64_t& values_count);
+    void read(const std::vector<uint8_t>& buffer, uint64_t* index);
+    void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
+    void read_string(const std::vector<std::string>& strings);
+    std::string to_string() const;
+    uint8_t size() const;
+
+    private:
+    uint64_t values_count;
 };
 
 class DupInstruction: public Instruction {

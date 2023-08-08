@@ -166,11 +166,11 @@ class CallNode: public AbstractSyntaxTree {
 
 class ReturnNode: public AbstractSyntaxTree {
     public:
-    ReturnNode(AbstractSyntaxTree* value = nullptr);
+    ReturnNode(const std::vector<AbstractSyntaxTree*>& values = std::vector<AbstractSyntaxTree*>());
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    AbstractSyntaxTree* value;
+    std::vector<AbstractSyntaxTree*> values;
 };
 
 class HaltNode: public AbstractSyntaxTree {
