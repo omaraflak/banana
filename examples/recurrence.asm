@@ -7,7 +7,7 @@ dup
 push 0
 eq
 jump_if_false .continue
-ret
+ret 1
 .continue
 dup
 print
@@ -16,4 +16,4 @@ printc
 push 1
 sub
 call .test 1
-ret
+ret 1

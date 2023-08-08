@@ -29,4 +29,4 @@ call .fibo 1
 add
 
 .end
-ret
+ret 1
