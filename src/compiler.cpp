@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 
     BlockNode main;
     CallNode fib_ten(&fib, {&ten});
-    PrintNode print_fib_ten(&fib_ten, "\n");
+    PrintNode print_fib_ten(&fib_ten);
     main.add(&print_fib_ten);
 
     BlockNode all;

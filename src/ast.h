@@ -136,7 +136,7 @@ class PrintNode: public AbstractSyntaxTree {
 
 class PrintStringNode: public AbstractSyntaxTree {
     public:
-    PrintStringNode( const std::string& str);
+    PrintStringNode(const std::string& str);
     void write(std::vector<const Instruction*>& instructions);
     
     private:
