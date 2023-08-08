@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <memory>
 #include <stdint.h>
 #include "instructions.h"
 
@@ -179,8 +180,9 @@ class HaltNode: public AbstractSyntaxTree {
 
 namespace ast {
     uint64_t count_bytes(const std::vector<const Instruction*>& instructions);
-    std::vector<uint8_t> to_bytes(AbstractSyntaxTree* node, AbstractSyntaxTree* main = nullptr);
-    std::vector<std::pair<uint64_t, std::string>> to_asm(AbstractSyntaxTree* node, AbstractSyntaxTree* main = nullptr);
+    std::vector<std::unique_ptr<const Instruction>> to_instructions(AbstractSyntaxTree* root, AbstractSyntaxTree* main = nullptr);
+    std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
+    std::vector<std::pair<uint64_t, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
 };
 
 #endif // AST

@@ -2,6 +2,7 @@
 #include <vector>
 #include "ast.h"
 
+
 int main(int argc, char** argv) {
     LiteralNode zero(0);
     LiteralNode one(1);
@@ -44,11 +45,13 @@ int main(int argc, char** argv) {
 
     // assemble
 
-    for (auto pair : ast::to_asm(&all, &main)) {
+    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(&all, &main);
+
+    for (auto pair : ast::to_asm(instructions)) {
         std::cout << pair.first << "\t" << pair.second << std::endl;
     }
     std::cout << "------" << std::endl;
 
-    Vm vm(ast::to_bytes(&all, &main));
+    Vm vm(ast::to_bytes(instructions));
     vm.execute();
 }

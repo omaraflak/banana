@@ -297,50 +297,39 @@ uint64_t ast::count_bytes(const std::vector<const Instruction*>& instructions) {
     return size;
 }
 
-namespace ast {
-    std::vector<const Instruction*> create_instructions(AbstractSyntaxTree* root, AbstractSyntaxTree* main = nullptr) {
-        std::vector<const Instruction*> instructions;
-        if (main == nullptr) {
-            root->write(instructions);    
-        } else {
-            JumpInstruction* jump = new JumpInstruction((uint64_t) 0);
-            instructions.push_back(jump);
-            root->write(instructions);
-            jump->set_address(main->get_program_address());
-        }
-        instructions.push_back(new HaltInstruction());
-        return instructions;
+std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(AbstractSyntaxTree* root, AbstractSyntaxTree* main) {
+    std::vector<const Instruction*> instructions;
+    if (main == nullptr) {
+        root->write(instructions);    
+    } else {
+        JumpInstruction* jump = new JumpInstruction((uint64_t) 0);
+        instructions.push_back(jump);
+        root->write(instructions);
+        jump->set_address(main->get_program_address());
     }
-};
+    instructions.push_back(new HaltInstruction());
 
-std::vector<uint8_t> ast::to_bytes(AbstractSyntaxTree* node, AbstractSyntaxTree* main) {
-    std::vector<const Instruction*> instructions = create_instructions(node, main);
+    std::vector<std::unique_ptr<const Instruction>> instructions_ptr;
+    for (auto ptr : instructions) {
+        instructions_ptr.push_back(std::unique_ptr<const Instruction>(ptr));
+    }
+    return instructions_ptr;
+}
 
+std::vector<uint8_t> ast::to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
     std::vector<uint8_t> bytes;
-    for (const Instruction* instruction : instructions) {
+    for (const auto& instruction : instructions) {
         instruction->write(bytes);
     }
-
-    for (const Instruction* instruction : instructions) {
-        delete instruction;
-    }
-
     return bytes;
 }
 
-std::vector<std::pair<uint64_t, std::string>> ast::to_asm(AbstractSyntaxTree* node, AbstractSyntaxTree* main) {
-    std::vector<const Instruction*> instructions = create_instructions(node, main);
-
+std::vector<std::pair<uint64_t, std::string>> ast::to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
     std::vector<std::pair<uint64_t, std::string>> strings;
     uint64_t index = 0;
-    for (const Instruction* instruction : instructions) {
+    for (const auto& instruction : instructions) {
         strings.push_back(std::make_pair(index, instruction->to_string()));
         index += instruction->size();
     }
-
-    for (const Instruction* instruction : instructions) {
-        delete instruction;
-    }
-
     return strings;
 }
