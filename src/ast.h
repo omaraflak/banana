@@ -44,7 +44,12 @@ enum {
 
 class BinaryOperationNode: public AbstractSyntaxTree {
     public:
-    BinaryOperationNode(const AbstractSyntaxTree* frame, const AbstractSyntaxTree* left, const AbstractSyntaxTree* right, const uint8_t& operation);
+    BinaryOperationNode(
+        const AbstractSyntaxTree* frame,
+        const AbstractSyntaxTree* left,
+        const AbstractSyntaxTree* right,
+        const uint8_t& operation
+    );
     void write(std::vector<const Instruction*>& instructions) const;
 
     private:
@@ -75,7 +80,12 @@ class AssignNode: public AbstractSyntaxTree {
 
 class IfNode: public AbstractSyntaxTree {
     public:
-    IfNode(AbstractSyntaxTree* frame, const AbstractSyntaxTree* condition, const AbstractSyntaxTree* if_block, const AbstractSyntaxTree* else_block = nullptr);
+    IfNode(
+        const AbstractSyntaxTree* frame,
+        const AbstractSyntaxTree* condition,
+        const AbstractSyntaxTree* if_block,
+        const AbstractSyntaxTree* else_block = nullptr
+    );
     void write(std::vector<const Instruction*>& instructions) const;
 
     private:
@@ -96,7 +106,13 @@ class WhileNode: public AbstractSyntaxTree {
 
 class ForNode: public AbstractSyntaxTree {
     public:
-    ForNode(const AbstractSyntaxTree* frame, const AbstractSyntaxTree* init, const AbstractSyntaxTree* condition, const AbstractSyntaxTree* increment, const AbstractSyntaxTree* body);
+    ForNode(
+        const AbstractSyntaxTree* frame,
+        const AbstractSyntaxTree* init,
+        const AbstractSyntaxTree* condition,
+        const AbstractSyntaxTree* increment,
+        const AbstractSyntaxTree* body
+    );
     void write(std::vector<const Instruction*>& instructions) const;
 
     private:

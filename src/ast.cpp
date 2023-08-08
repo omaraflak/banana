@@ -127,7 +127,7 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) c
 }
 
 IfNode::IfNode(
-    AbstractSyntaxTree* frame,
+    const AbstractSyntaxTree* frame,
     const AbstractSyntaxTree* condition,
     const AbstractSyntaxTree* if_block,
     const AbstractSyntaxTree* else_block
