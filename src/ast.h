@@ -33,7 +33,6 @@ class VariableNode: public AbstractSyntaxTree {
     public:
     VariableNode(const AbstractSyntaxTree* frame);
     void write(std::vector<const Instruction*>& instructions);
-    uint64_t next_address();
     uint64_t get_address() const;
     
     private:
@@ -64,7 +63,7 @@ class BinaryOperationNode: public AbstractSyntaxTree {
 
 class BlockNode: public AbstractSyntaxTree {
     public:
-    BlockNode(const AbstractSyntaxTree* frame);
+    BlockNode();
     void write(std::vector<const Instruction*>& instructions);
     void add(AbstractSyntaxTree* node);
 

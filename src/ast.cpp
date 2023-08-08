@@ -62,7 +62,7 @@ void AssignNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new StoreInstruction(node->get_address()));
 }
 
-BlockNode::BlockNode(const AbstractSyntaxTree* frame) : AbstractSyntaxTree() {}
+BlockNode::BlockNode() : AbstractSyntaxTree() {}
 
 void BlockNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
@@ -232,12 +232,15 @@ FunctionNode::FunctionNode(
     AbstractSyntaxTree* body,
     const std::vector<VariableNode*>& parameters
 ) : AbstractSyntaxTree() {
-    std::copy(parameters.begin(), parameters.end(), this->parameters.begin());
     this->body = body;
+    this->parameters.insert(this->parameters.end(), parameters.begin(), parameters.end());
 }
 
 void FunctionNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
+    for (auto parameter : parameters) {
+        instructions.push_back(new StoreInstruction(parameter->get_address()));
+    }
     body->write(instructions);
 }
 
@@ -250,7 +253,7 @@ CallNode::CallNode(
     const std::vector<AbstractSyntaxTree*>& values
 ) : AbstractSyntaxTree() {
     this->function = function;
-    std::copy(values.begin(), values.end(), this->values.begin());
+    this->values.insert(this->values.end(), values.begin(), values.end());
 }
 
 void CallNode::write(std::vector<const Instruction*>& instructions) {
@@ -258,7 +261,14 @@ void CallNode::write(std::vector<const Instruction*>& instructions) {
         std::cout << "Trying to call a function not yet written (declared)." << std::endl;
         exit(1);
     }
+    if (values.size() != function->get_parameters_count()) {
+        std::cout << "Function accepts " << function->get_parameters_count() << " parameters, but " << values.size() << " were passed." << std::endl;
+        exit(1);
+    }
     AbstractSyntaxTree::write(instructions);
+    for (auto it = values.rbegin(); it < values.rend(); it++) {
+        (*it)->write(instructions);
+    }
     instructions.push_back(new CallInstruction(function->get_program_address(), function->get_parameters_count()));
 }
 
@@ -298,6 +308,7 @@ namespace ast {
             root->write(instructions);
             jump->set_address(main->get_program_address());
         }
+        instructions.push_back(new HaltInstruction());
         return instructions;
     }
 };
