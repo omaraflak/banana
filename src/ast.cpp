@@ -204,14 +204,16 @@ void ForNode::write(std::vector<const Instruction*>& instructions) {
     jump->set_address(ast::count_bytes(instructions));
 }
 
-PrintNode::PrintNode(AbstractSyntaxTree* expression) : AbstractSyntaxTree() {
+PrintNode::PrintNode(AbstractSyntaxTree* expression, const std::string& end) : AbstractSyntaxTree() {
     this->expression = expression;
+    this->end = end;
 }
 
 void PrintNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
     expression->write(instructions);
     instructions.push_back(new PrintInstruction());
+    PrintStringNode(end).write(instructions);
 }
 
 PrintStringNode::PrintStringNode(const std::string& str) : AbstractSyntaxTree() {

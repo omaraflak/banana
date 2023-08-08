@@ -126,11 +126,12 @@ class ForNode: public AbstractSyntaxTree {
 
 class PrintNode: public AbstractSyntaxTree {
     public:
-    PrintNode(AbstractSyntaxTree* expression);
+    PrintNode(AbstractSyntaxTree* expression, const std::string& end = "\n");
     void write(std::vector<const Instruction*>& instructions);
     
     private:
     AbstractSyntaxTree* expression;
+    std::string end;
 };
 
 class PrintStringNode: public AbstractSyntaxTree {
