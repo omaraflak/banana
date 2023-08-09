@@ -2,6 +2,27 @@
 #include <sstream>
 #include <map>
 
+namespace instructions {
+template <class K, class V> 
+std::map<V, K> reverse_map(const std::map<K, V>& m) {
+    std::map<V, K> reversed;
+    for (auto pair : m) {
+        reversed[pair.second] = pair.first;
+    }
+    return reversed;
+}
+
+std::vector<std::string> split_string(const std::string& str, const char& separator) {
+    std::stringstream ss(str);
+    std::vector<std::string> result;
+    std::string s;
+    while (getline(ss, s, separator)) {
+        result.push_back(s);
+    }
+    return result;
+}
+}
+
 const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_ADD, "add"},
     {OP_SUB, "sub"},
@@ -33,16 +54,7 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_HALT, "halt"},
 };
 
-template <class K, class V> 
-std::map<V, K> reverse_map(const std::map<K, V>& m) {
-    std::map<V, K> reversed;
-    for (auto pair : m) {
-        reversed[pair.second] = pair.first;
-    }
-    return reversed;
-}
-
-const std::map<std::string, uint8_t> OP_STRINGS_REV = reverse_map(OP_STRINGS);
+const std::map<std::string, uint8_t> OP_STRINGS_REV = instructions::reverse_map(OP_STRINGS);
 
 Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
@@ -127,18 +139,6 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
     }
     std::cout << "Opcode not recognized: " << (int) opcode << std::endl;
     exit(1);
-}
-
-namespace instructions {
-std::vector<std::string> split_string(const std::string& str, const char& separator) {
-    std::stringstream ss(str);
-    std::vector<std::string> result;
-    std::string s;
-    while (getline(ss, s, separator)) {
-        result.push_back(s);
-    }
-    return result;
-}
 }
 
 Instruction* Instruction::from_string(const std::string& str) {

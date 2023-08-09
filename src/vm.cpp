@@ -2,6 +2,7 @@
 #include "instructions.h"
 #include <string>
 
+namespace vm {
 template <class T>
 void print(const std::vector<T>& stack, const std::string& name) {
     std::cout << name << ": ";
@@ -24,6 +25,7 @@ void print_debug(Vm& vm) {
     std::cout << "Press any key to continue...\n";
     getchar();
 }
+}
 
 Vm::Vm(std::vector<uint8_t> program) {
     this->program = program;
@@ -35,13 +37,13 @@ Vm::Vm(std::vector<uint8_t> program) {
 
 void Vm::execute() {
     if (debug) {
-        print(program, "program");
+        vm::print(program, "program");
     }
     while (running) {
         uint8_t opcode = program[ip++];
         if (debug) {
             std::cout << "opcode: " << (int) opcode << std::endl;
-            print_debug(*this);
+            vm::print_debug(*this);
         }
         Instruction* instruction = Instruction::from_opcode(opcode);
         instruction->read(program, &ip);
