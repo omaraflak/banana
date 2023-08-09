@@ -43,8 +43,11 @@ class VariableNode: public AbstractSyntaxTree {
     static inline std::map<const AbstractSyntaxTree*, uint64_t> latest_address;
 };
 
-enum {
-    ADD, SUB, MUL, DIV, MOD, AND, OR, XOR, LT, LTE, GT, GTE, EQ, NOT_EQ
+enum AstBinaryOperation {
+    AST_ADD, AST_SUB, AST_MUL, AST_DIV,
+    AST_MOD, AST_AND, AST_OR, AST_XOR,
+    AST_LT, AST_LTE, AST_GT, AST_GTE,
+    AST_EQ, AST_NOT_EQ
 };
 
 class BinaryOperationNode: public AbstractSyntaxTree {
@@ -52,14 +55,14 @@ class BinaryOperationNode: public AbstractSyntaxTree {
     BinaryOperationNode(
         AbstractSyntaxTree* left,
         AbstractSyntaxTree* right,
-        const uint8_t& operation
+        const AstBinaryOperation& operation
     );
     void write(std::vector<const Instruction*>& instructions);
 
     private:
     AbstractSyntaxTree* left;
     AbstractSyntaxTree* right;
-    uint8_t operation;
+    AstBinaryOperation operation;
 };
 
 class BlockNode: public AbstractSyntaxTree {

@@ -12,20 +12,20 @@ int main(int argc, char** argv) {
     VariableNode n(&block);
     FunctionNode fib(&block, {&n});
 
-    BinaryOperationNode n_eq_zero(&n, &zero, EQ);
-    BinaryOperationNode n_eq_one(&n, &one, EQ);
+    BinaryOperationNode n_eq_zero(&n, &zero, AST_EQ);
+    BinaryOperationNode n_eq_one(&n, &one, AST_EQ);
 
     ReturnNode return_n({&n});
     IfNode if_zero(&n_eq_zero, &return_n);
     IfNode if_one(&n_eq_one, &return_n);
 
-    BinaryOperationNode n_minus_one(&n, &one, SUB);
-    BinaryOperationNode n_minus_two(&n, &two, SUB);
+    BinaryOperationNode n_minus_one(&n, &one, AST_SUB);
+    BinaryOperationNode n_minus_two(&n, &two, AST_SUB);
 
     CallNode fib_n_minus_one(&fib, {&n_minus_one});
     CallNode fib_n_minus_two(&fib, {&n_minus_two});
 
-    BinaryOperationNode fib_result(&fib_n_minus_one, &fib_n_minus_two, ADD);
+    BinaryOperationNode fib_result(&fib_n_minus_one, &fib_n_minus_two, AST_ADD);
     ReturnNode ret_result({&fib_result});
 
     block.add(&if_zero);

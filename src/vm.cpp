@@ -2,7 +2,6 @@
 #include "instructions.h"
 #include <string>
 
-namespace vm {
 template <class T>
 void print(const std::vector<T>& stack, const std::string& name) {
     std::cout << name << ": ";
@@ -11,6 +10,19 @@ void print(const std::vector<T>& stack, const std::string& name) {
     }
     std::cout << std::endl;
 }
+
+void print_debug(Vm& vm) {
+    vm.stacks.reverse();
+    int indent = 0;
+    for (auto stack : vm.stacks) {
+        std::cout << std::string(indent, ' ');
+        print(stack, "stack");
+        indent++;
+    }
+    vm.stacks.reverse();
+    print(vm.call_stack, "call stack");
+    std::cout << "Press any key to continue...\n";
+    getchar();
 }
 
 Vm::Vm(std::vector<uint8_t> program) {
@@ -23,23 +35,13 @@ Vm::Vm(std::vector<uint8_t> program) {
 
 void Vm::execute() {
     if (debug) {
-        vm::print(program, "program");
+        print(program, "program");
     }
     while (running) {
         uint8_t opcode = program[ip++];
         if (debug) {
             std::cout << "opcode: " << (int) opcode << std::endl;
-            stacks.reverse();
-            int indent = 0;
-            for (auto stack : stacks) {
-                std::cout << std::string(indent, ' ');
-                vm::print(stack, "stack");
-                indent++;
-            }
-            stacks.reverse();
-            vm::print(call_stack, "call stack");
-            std::cout << "Press any key to continue...\n";
-            getchar();
+            print_debug(*this);
         }
         Instruction* instruction = Instruction::from_opcode(opcode);
         instruction->read(program, &ip);

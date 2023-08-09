@@ -6,7 +6,6 @@
 #include <string>
 #include <stdint.h>
 #include <functional>
-#include <map>
 #include "byteutils.h"
 #include "vm.h"
 
@@ -39,68 +38,6 @@ enum {
     OP_STORE,
     OP_LOAD,
     OP_HALT
-};
-
-static std::map<uint8_t, std::string> OP_STRINGS = {
-    {OP_ADD, "add"},
-    {OP_SUB, "sub"},
-    {OP_MUL, "mul"},
-    {OP_DIV, "div"},
-    {OP_MOD, "mod"},
-    {OP_AND, "and"},
-    {OP_OR, "or"},
-    {OP_XOR, "xor"},
-    {OP_NOT, "not"},
-    {OP_PUSH, "push"},
-    {OP_JUMP, "jump"},
-    {OP_JUMP_IF, "jump_if"},
-    {OP_JUMP_IF_FALSE, "jump_if_false"},
-    {OP_CALL, "call"},
-    {OP_RET, "ret"},
-    {OP_DUP, "dup"},
-    {OP_SWAP, "swap"},
-    {OP_LT, "lt"},
-    {OP_LTE, "lte"},
-    {OP_GT, "gt"},
-    {OP_GTE, "gte"},
-    {OP_EQ, "eq"},
-    {OP_NOT_EQ, "not_eq"},
-    {OP_PRINT, "print"},
-    {OP_PRINT_C, "printc"},
-    {OP_STORE, "store"},
-    {OP_LOAD, "load"},
-    {OP_HALT, "halt"},
-};
-
-static std::map<std::string, uint8_t> OP_STRINGS_REV = {
-    {"add", OP_ADD},
-    {"sub", OP_SUB},
-    {"mul", OP_MUL},
-    {"div", OP_DIV},
-    {"mod", OP_MOD},
-    {"and", OP_AND},
-    {"or", OP_OR},
-    {"xor", OP_XOR},
-    {"not", OP_NOT},
-    {"push", OP_PUSH},
-    {"jump", OP_JUMP},
-    {"jump_if", OP_JUMP_IF},
-    {"jump_if_false", OP_JUMP_IF_FALSE},
-    {"call", OP_CALL},
-    {"ret", OP_RET},
-    {"dup", OP_DUP},
-    {"swap", OP_SWAP},
-    {"lt", OP_LT},
-    {"lte", OP_LTE},
-    {"gt", OP_GT},
-    {"gte", OP_GTE},
-    {"eq", OP_EQ},
-    {"not_eq", OP_NOT_EQ},
-    {"print", OP_PRINT},
-    {"printc", OP_PRINT_C},
-    {"store", OP_STORE},
-    {"load", OP_LOAD},
-    {"halt", OP_HALT},
 };
 
 class Instruction {

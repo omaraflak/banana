@@ -1,5 +1,48 @@
 #include "instructions.h"
 #include <sstream>
+#include <map>
+
+const std::map<uint8_t, std::string> OP_STRINGS = {
+    {OP_ADD, "add"},
+    {OP_SUB, "sub"},
+    {OP_MUL, "mul"},
+    {OP_DIV, "div"},
+    {OP_MOD, "mod"},
+    {OP_AND, "and"},
+    {OP_OR, "or"},
+    {OP_XOR, "xor"},
+    {OP_NOT, "not"},
+    {OP_PUSH, "push"},
+    {OP_JUMP, "jump"},
+    {OP_JUMP_IF, "jump_if"},
+    {OP_JUMP_IF_FALSE, "jump_if_false"},
+    {OP_CALL, "call"},
+    {OP_RET, "ret"},
+    {OP_DUP, "dup"},
+    {OP_SWAP, "swap"},
+    {OP_LT, "lt"},
+    {OP_LTE, "lte"},
+    {OP_GT, "gt"},
+    {OP_GTE, "gte"},
+    {OP_EQ, "eq"},
+    {OP_NOT_EQ, "not_eq"},
+    {OP_PRINT, "print"},
+    {OP_PRINT_C, "printc"},
+    {OP_STORE, "store"},
+    {OP_LOAD, "load"},
+    {OP_HALT, "halt"},
+};
+
+template <class K, class V> 
+std::map<V, K> reverse_map(const std::map<K, V>& m) {
+    std::map<V, K> reversed;
+    for (auto pair : m) {
+        reversed[pair.second] = pair.first;
+    }
+    return reversed;
+}
+
+const std::map<std::string, uint8_t> OP_STRINGS_REV = reverse_map(OP_STRINGS);
 
 Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;

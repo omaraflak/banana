@@ -78,7 +78,7 @@ void BlockNode::add(AbstractSyntaxTree* node) {
 BinaryOperationNode::BinaryOperationNode(
     AbstractSyntaxTree* left,
     AbstractSyntaxTree* right,
-    const uint8_t& operation
+    const AstBinaryOperation& operation
 ) : AbstractSyntaxTree() {
     this->left = left;
     this->right = right;
@@ -90,46 +90,46 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
     left->write(instructions);
     right->write(instructions);
     switch (operation) {
-        case ADD:
+        case AST_ADD:
             instructions.push_back(new AddInstruction());
             break;
-        case SUB:
+        case AST_SUB:
             instructions.push_back(new SubInstruction());
             break;
-        case MUL:
+        case AST_MUL:
             instructions.push_back(new MulInstruction());
             break;
-        case DIV:
+        case AST_DIV:
             instructions.push_back(new DivInstruction());
             break;
-        case MOD:
+        case AST_MOD:
             instructions.push_back(new ModInstruction());
             break;
-        case AND:
+        case AST_AND:
             instructions.push_back(new AndInstruction());
             break;
-        case OR:
+        case AST_OR:
             instructions.push_back(new OrInstruction());
             break;
-        case XOR:
+        case AST_XOR:
             instructions.push_back(new XorInstruction());
             break;
-        case LT:
+        case AST_LT:
             instructions.push_back(new LtInstruction());
             break;
-        case LTE:
+        case AST_LTE:
             instructions.push_back(new LteInstruction());
             break;
-        case GT:
+        case AST_GT:
             instructions.push_back(new GtInstruction());
             break;
-        case GTE:
+        case AST_GTE:
             instructions.push_back(new GteInstruction());
             break;
-        case EQ:
+        case AST_EQ:
             instructions.push_back(new EqInstruction());
             break;
-        case NOT_EQ:
+        case AST_NOT_EQ:
             instructions.push_back(new NotEqInstruction());
             break;
         default:
