@@ -57,7 +57,9 @@ std::map<std::string, uint64_t> create_labels_map(const std::vector<std::string>
             continue;
         }
         std::vector<std::string> words = split_string(line);
-        position += (SIZE_OF_BYTE + (words.size() - 1) * SIZE_OF_LONG);
+        Instruction* instruction = Instruction::from_opstring(words[0]);
+        position += instruction->size();
+        delete instruction;
     }
     return labels;
 }

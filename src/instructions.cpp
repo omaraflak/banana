@@ -141,6 +141,10 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
     exit(1);
 }
 
+Instruction* Instruction::from_opstring(const std::string& opstring) {
+    return Instruction::from_opcode(OP_STRINGS_REV.at(opstring));
+}
+
 Instruction* Instruction::from_string(const std::string& str) {
     std::string opstring = str;
     int index = str.find(" ");

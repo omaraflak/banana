@@ -51,6 +51,7 @@ class Instruction {
     virtual uint8_t size() const;
 
     static Instruction* from_opcode(const uint8_t& opcode);
+    static Instruction* from_opstring(const std::string& opstring);
     static Instruction* from_string(const std::string& str);
 
     private:
