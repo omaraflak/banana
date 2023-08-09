@@ -1,4 +1,5 @@
 main
 assembler
 compiler
+parser
 *.obj

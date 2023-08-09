@@ -26,6 +26,18 @@ std::vector<std::string> fileutils::read_lines(const std::string& filename) {
     return lines;
 }
 
+std::string fileutils::read_string(const std::string& filename) {
+    std::ifstream is(filename.c_str());
+    if (!is.is_open()) {
+        std::cout << "Could not open file: " << filename << std::endl;
+        exit(1);
+    }
+    std::stringstream buffer;
+    buffer << is.rdbuf();
+    is.close();
+    return buffer.str();
+}
+
 void fileutils::write_bytes(const std::vector<uint8_t>& bytes, const std::string& filename) {
     std::ofstream os(filename.c_str(), std::ios::binary);
     std::ostream_iterator<uint8_t> output_iterator(os);
