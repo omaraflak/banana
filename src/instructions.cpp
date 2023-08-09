@@ -221,7 +221,7 @@ std::string PushInstruction::to_string() const {
 }
 
 uint8_t PushInstruction::size() const {
-    return SIZE_OF_BYTE + SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG;
 }
 
 JumpInstruction::JumpInstruction() : Instruction(OP_JUMP) {}
@@ -261,7 +261,7 @@ std::string JumpInstruction::to_string() const {
 }
 
 uint8_t JumpInstruction::size() const {
-    return SIZE_OF_BYTE + SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG;
 }
 
 void JumpInstruction::set_address(const uint64_t& address) {
@@ -330,7 +330,7 @@ std::string CallInstruction::to_string() const {
 }
 
 uint8_t CallInstruction::size() const {
-    return SIZE_OF_BYTE + 2 * SIZE_OF_LONG;
+    return Instruction::size() + 2 * SIZE_OF_LONG;
 }
 
 RetInstruction::RetInstruction() : Instruction(OP_RET) {}
@@ -373,7 +373,7 @@ std::string RetInstruction::to_string() const {
 }
 
 uint8_t RetInstruction::size() const {
-    return SIZE_OF_BYTE + SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG;
 }
 
 DupInstruction::DupInstruction() : Instruction(OP_DUP) {}
@@ -457,7 +457,7 @@ std::string StoreInstruction::to_string() const {
 }
 
 uint8_t StoreInstruction::size() const {
-    return SIZE_OF_BYTE + SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG;
 }
 
 LoadInstruction::LoadInstruction() : Instruction(OP_LOAD) {}
@@ -491,7 +491,7 @@ std::string LoadInstruction::to_string() const {
 }
 
 uint8_t LoadInstruction::size() const {
-    return SIZE_OF_BYTE + SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG;
 }
 
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}
