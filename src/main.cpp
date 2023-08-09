@@ -2,8 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include "vm.h"
-#include "fileutils.h"
+#include "../lib/vm.h"
+#include "../lib/fileutils.h"
 
 int main(int argc, char** argv) {
     if (argc != 2) {

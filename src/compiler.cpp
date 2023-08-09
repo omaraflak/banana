@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "ast.h"
+#include "../lib/ast.h"
 
 int main(int argc, char** argv) {
     LiteralNode zero(0);
