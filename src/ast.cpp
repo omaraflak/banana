@@ -246,7 +246,7 @@ void FunctionNode::write(std::vector<const Instruction*>& instructions) {
     body->write(instructions);
 }
 
-uint64_t FunctionNode::get_parameters_count() const {
+uint8_t FunctionNode::get_parameters_count() const {
     return parameters.size();
 }
 
@@ -304,7 +304,7 @@ uint64_t ast::count_bytes(const std::vector<const Instruction*>& instructions) {
 std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(AbstractSyntaxTree* root, AbstractSyntaxTree* main) {
     std::vector<const Instruction*> instructions;
     if (main == nullptr) {
-        root->write(instructions);    
+        root->write(instructions);
     } else {
         JumpInstruction* jump = new JumpInstruction((uint64_t) 0);
         instructions.push_back(jump);

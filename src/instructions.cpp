@@ -294,7 +294,7 @@ void JumpIfFalseInstruction::execute(Vm& vm) const {
 
 CallInstruction::CallInstruction() : Instruction(OP_CALL) {}
 
-CallInstruction::CallInstruction(const uint64_t& address, const uint64_t& param_count) : Instruction(OP_CALL) {
+CallInstruction::CallInstruction(const uint64_t& address, const uint8_t& param_count) : Instruction(OP_CALL) {
     this->address = address;
     this->param_count = param_count;
 }
@@ -302,14 +302,14 @@ CallInstruction::CallInstruction(const uint64_t& address, const uint64_t& param_
 void CallInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
-    param_count = bytes::read_long(buffer, *index);
-    *index += SIZE_OF_LONG;
+    param_count = bytes::read_byte(buffer, *index);
+    *index += SIZE_OF_BYTE;
 }
 
 void CallInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, address);
-    bytes::push_long(buffer, param_count);
+    bytes::push_byte(buffer, param_count);
 }
 
 void CallInstruction::execute(Vm& vm) const {
@@ -334,23 +334,23 @@ std::string CallInstruction::to_string() const {
 }
 
 uint8_t CallInstruction::size() const {
-    return Instruction::size() + 2 * SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG + SIZE_OF_BYTE;
 }
 
 RetInstruction::RetInstruction() : Instruction(OP_RET) {}
 
-RetInstruction::RetInstruction(const uint64_t& values_count) : Instruction(OP_RET) {
+RetInstruction::RetInstruction(const uint8_t& values_count) : Instruction(OP_RET) {
     this->values_count = values_count;
 }
 
 void RetInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
-    values_count = bytes::read_long(buffer, *index);
-    *index += SIZE_OF_LONG;
+    values_count = bytes::read_byte(buffer, *index);
+    *index += SIZE_OF_BYTE;
 }
 
 void RetInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_long(buffer, values_count);
+    bytes::push_byte(buffer, values_count);
 }
 
 void RetInstruction::execute(Vm& vm) const {
@@ -377,7 +377,7 @@ std::string RetInstruction::to_string() const {
 }
 
 uint8_t RetInstruction::size() const {
-    return Instruction::size() + SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_BYTE;
 }
 
 DupInstruction::DupInstruction() : Instruction(OP_DUP) {}

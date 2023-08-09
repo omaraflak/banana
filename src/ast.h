@@ -150,7 +150,7 @@ class FunctionNode: public AbstractSyntaxTree {
     public:
     FunctionNode(AbstractSyntaxTree* body, const std::vector<VariableNode*>& parameters);
     void write(std::vector<const Instruction*>& instructions);
-    uint64_t get_parameters_count() const;
+    uint8_t get_parameters_count() const;
 
     private:
     AbstractSyntaxTree* body;
