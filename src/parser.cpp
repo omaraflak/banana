@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
     std::string content = fileutils::read_string(argv[1]);
-    std::vector<scanner::Token> tokens = scanner::scan(content.c_str());
+    std::vector<Token> tokens = scanner::scan(content.c_str());
     for (auto token : tokens) {
         std::cout << "token: ";
         for (int i = 0; i < token.length; i++) {
