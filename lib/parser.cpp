@@ -232,6 +232,14 @@ std::shared_ptr<AbstractSyntaxTree> if_statement(Parser& parser) {
     return std::shared_ptr<IfNode>(new IfNode(condition, if_block, else_block));
 }
 
+std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
+    consume(parser, TOKEN_LEFT_PAREN, "Missing '(' after 'while'.");
+    std::shared_ptr<AbstractSyntaxTree> condition = expression(parser);
+    consume(parser, TOKEN_RIGHT_PAREN, "Missing ')' after 'while' condition.");
+    std::shared_ptr<BlockNode> while_block = block(parser);
+    return std::shared_ptr<WhileNode>(new WhileNode(condition, while_block));
+}
+
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
@@ -247,6 +255,9 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     }
     if (match(parser, {TOKEN_IF})) {
         return if_statement(parser);
+    }
+    if (match(parser, {TOKEN_WHILE})) {
+        return while_statement(parser);
     }
     return expression_statement(parser);
 }
