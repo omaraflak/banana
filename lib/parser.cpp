@@ -110,10 +110,6 @@ void pop_scope(Parser& parser) {
 
 std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const std::string& name) {
     std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
-    if (parser.identifiers.find(scope) == parser.identifiers.end()) {
-        print_error(parser, "Could not find scope while accessing '" + name + "'!");
-        exit(1);
-    }
     const std::map<std::string, std::shared_ptr<VariableNode>>& mapping = parser.identifiers.at(scope);
     if (mapping.find(name) == mapping.end()) {
         print_error(parser, "Could not find '" + name + "' in current scope.");
