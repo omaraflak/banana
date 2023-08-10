@@ -12,16 +12,16 @@ compiler: bin/compiler.o bin/ast.o bin/vm.o bin/instructions.o bin/byteutils.o
 parser: bin/parser.o bin/scanner.o bin/fileutils.o
 	g++ -o parser bin/parser.o bin/scanner.o bin/fileutils.o -std=c++17
 
-bin/parser.o: src/parser.cpp
+bin/parser.o: src/parser.cpp lib/scanner.h lib/fileutils.h
 	g++ -c src/parser.cpp -o bin/parser.o -std=c++17
 
-bin/compiler.o: src/compiler.cpp
+bin/compiler.o: src/compiler.cpp lib/ast.h lib/vm.h lib/instructions.h lib/byteutils.h
 	g++ -c src/compiler.cpp -o bin/compiler.o -std=c++17
 
-bin/assembler.o: src/assember.cpp
+bin/assembler.o: src/assember.cpp lib/vm.h lib/instructions.h lib/byteutils.h lib/fileutils.h
 	g++ -c src/assember.cpp -o bin/assember.o -std=c++17
 
-bin/main.o: src/main.cpp
+bin/main.o: src/main.cpp lib/vm.h lib/instructions.h lib/byteutils.h lib/fileutils.h
 	g++ -c src/main.cpp -o bin/main.o -std=c++17
 
 bin/instructions.o: lib/instructions.cpp lib/instructions.h
