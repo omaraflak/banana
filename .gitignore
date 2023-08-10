@@ -3,3 +3,4 @@ assembler
 compiler
 parser
 *.obj
+bin
