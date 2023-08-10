@@ -36,15 +36,15 @@ class LiteralNode: public AbstractSyntaxTree {
 
 class VariableNode: public AbstractSyntaxTree {
     public:
-    VariableNode(const AbstractSyntaxTree* frame);
+    VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame);
     void write(std::vector<const Instruction*>& instructions);
     uint64_t get_address() const;
     
     private:
-    const AbstractSyntaxTree* frame;
+    std::shared_ptr<const AbstractSyntaxTree> frame;
     uint64_t address;
 
-    static inline std::map<const AbstractSyntaxTree*, uint64_t> latest_address;
+    static inline std::map<std::shared_ptr<const AbstractSyntaxTree>, uint64_t> latest_address;
 };
 
 enum AstBinaryOperation {
@@ -57,15 +57,15 @@ enum AstBinaryOperation {
 class BinaryOperationNode: public AbstractSyntaxTree {
     public:
     BinaryOperationNode(
-        AbstractSyntaxTree* left,
-        AbstractSyntaxTree* right,
+        const std::shared_ptr<AbstractSyntaxTree>& left,
+        const std::shared_ptr<AbstractSyntaxTree>& right,
         const AstBinaryOperation& operation
     );
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    AbstractSyntaxTree* left;
-    AbstractSyntaxTree* right;
+    std::shared_ptr<AbstractSyntaxTree> left;
+    std::shared_ptr<AbstractSyntaxTree> right;
     AstBinaryOperation operation;
 };
 
@@ -73,71 +73,71 @@ class BlockNode: public AbstractSyntaxTree {
     public:
     BlockNode();
     void write(std::vector<const Instruction*>& instructions);
-    void add(AbstractSyntaxTree* node);
+    void add(const std::shared_ptr<AbstractSyntaxTree>& node);
 
     private:
-    std::vector<AbstractSyntaxTree*> nodes;
+    std::vector<std::shared_ptr<AbstractSyntaxTree>> nodes;
 };
 
 class AssignNode: public AbstractSyntaxTree {
     public:
-    AssignNode(VariableNode* node, AbstractSyntaxTree* expression);
+    AssignNode(const std::shared_ptr<VariableNode>& node, const std::shared_ptr<AbstractSyntaxTree>& expression);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    VariableNode* node;
-    AbstractSyntaxTree* expression;
+    std::shared_ptr<VariableNode> node;
+    std::shared_ptr<AbstractSyntaxTree> expression;
 };
 
 class IfNode: public AbstractSyntaxTree {
     public:
     IfNode(
-        AbstractSyntaxTree* condition,
-        AbstractSyntaxTree* if_block,
-        AbstractSyntaxTree* else_block = nullptr
+        const std::shared_ptr<AbstractSyntaxTree>& condition,
+        const std::shared_ptr<AbstractSyntaxTree>& if_block,
+        const std::shared_ptr<AbstractSyntaxTree>& else_block = nullptr
     );
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    AbstractSyntaxTree* condition;
-    AbstractSyntaxTree* if_block;
-    AbstractSyntaxTree* else_block;
+    std::shared_ptr<AbstractSyntaxTree> condition;
+    std::shared_ptr<AbstractSyntaxTree> if_block;
+    std::shared_ptr<AbstractSyntaxTree> else_block;
 };
 
 class WhileNode: public AbstractSyntaxTree {
     public:
-    WhileNode( AbstractSyntaxTree* condition, AbstractSyntaxTree* body);
+    WhileNode(const std::shared_ptr<AbstractSyntaxTree>& condition, const std::shared_ptr<AbstractSyntaxTree>& body);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    AbstractSyntaxTree* condition;
-    AbstractSyntaxTree* body;
+    std::shared_ptr<AbstractSyntaxTree> condition;
+    std::shared_ptr<AbstractSyntaxTree> body;
 };
 
 class ForNode: public AbstractSyntaxTree {
     public:
     ForNode(
-        AbstractSyntaxTree* init,
-        AbstractSyntaxTree* condition,
-        AbstractSyntaxTree* increment,
-        AbstractSyntaxTree* body
+        const std::shared_ptr<AbstractSyntaxTree>& init,
+        const std::shared_ptr<AbstractSyntaxTree>& condition,
+        const std::shared_ptr<AbstractSyntaxTree>& increment,
+        const std::shared_ptr<AbstractSyntaxTree>& body
     );
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    AbstractSyntaxTree* init;
-    AbstractSyntaxTree* condition;
-    AbstractSyntaxTree* increment;
-    AbstractSyntaxTree* body;
+    std::shared_ptr<AbstractSyntaxTree> init;
+    std::shared_ptr<AbstractSyntaxTree> condition;
+    std::shared_ptr<AbstractSyntaxTree> increment;
+    std::shared_ptr<AbstractSyntaxTree> body;
 };
 
 class PrintNode: public AbstractSyntaxTree {
     public:
-    PrintNode(AbstractSyntaxTree* expression, const std::string& end = "\n");
+    PrintNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const std::string& end = "\n");
     void write(std::vector<const Instruction*>& instructions);
     
     private:
-    AbstractSyntaxTree* expression;
+    std::shared_ptr<AbstractSyntaxTree> expression;
     std::string end;
 };
 
@@ -152,32 +152,32 @@ class PrintStringNode: public AbstractSyntaxTree {
 
 class FunctionNode: public AbstractSyntaxTree {
     public:
-    FunctionNode(AbstractSyntaxTree* body, const std::vector<VariableNode*>& parameters);
+    FunctionNode(const std::shared_ptr<AbstractSyntaxTree>& body, const std::vector<std::shared_ptr<VariableNode>>& parameters);
     void write(std::vector<const Instruction*>& instructions);
     uint8_t get_parameters_count() const;
 
     private:
-    AbstractSyntaxTree* body;
-    std::vector<const VariableNode*> parameters;
+    std::shared_ptr<AbstractSyntaxTree> body;
+    std::vector<std::shared_ptr<const VariableNode>> parameters;
 };
 
 class CallNode: public AbstractSyntaxTree {
     public:
-    CallNode(FunctionNode* function, const std::vector<AbstractSyntaxTree*>& values);
+    CallNode(const std::shared_ptr<FunctionNode>& function, const std::vector<std::shared_ptr<AbstractSyntaxTree>>& values);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    FunctionNode* function;
-    std::vector<AbstractSyntaxTree*> values;
+    std::shared_ptr<FunctionNode> function;
+    std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
 };
 
 class ReturnNode: public AbstractSyntaxTree {
     public:
-    ReturnNode(const std::vector<AbstractSyntaxTree*>& values = std::vector<AbstractSyntaxTree*>());
+    ReturnNode(const std::vector<std::shared_ptr<AbstractSyntaxTree>>& values = std::vector<std::shared_ptr<AbstractSyntaxTree>>());
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    std::vector<AbstractSyntaxTree*> values;
+    std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
 };
 
 class HaltNode: public AbstractSyntaxTree {
@@ -188,7 +188,7 @@ class HaltNode: public AbstractSyntaxTree {
 
 namespace ast {
     uint64_t count_bytes(const std::vector<const Instruction*>& instructions);
-    std::vector<std::unique_ptr<const Instruction>> to_instructions(AbstractSyntaxTree* root);
+    std::vector<std::unique_ptr<const Instruction>> to_instructions(const std::shared_ptr<AbstractSyntaxTree>& root);
     std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
     std::vector<std::pair<uint64_t, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
 };

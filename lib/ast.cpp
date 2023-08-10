@@ -35,7 +35,7 @@ void LiteralNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new PushInstruction(value));
 }
 
-VariableNode::VariableNode(const AbstractSyntaxTree* frame) {
+VariableNode::VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame) {
     this->frame = frame;
     if (frame == nullptr) {
         std::cout << "Trying to get address without a frame" << std::endl;
@@ -58,8 +58,8 @@ uint64_t VariableNode::get_address() const {
 }
 
 AssignNode::AssignNode(
-    VariableNode* node,
-    AbstractSyntaxTree* expression
+    const std::shared_ptr<VariableNode>& node,
+    const std::shared_ptr<AbstractSyntaxTree>& expression
 ) : AbstractSyntaxTree() {
     this->node = node;
     this->expression = expression;
@@ -80,13 +80,13 @@ void BlockNode::write(std::vector<const Instruction*>& instructions) {
     }
 }
 
-void BlockNode::add(AbstractSyntaxTree* node) {
+void BlockNode::add(const std::shared_ptr<AbstractSyntaxTree>& node) {
     nodes.push_back(node);
 }
 
 BinaryOperationNode::BinaryOperationNode(
-    AbstractSyntaxTree* left,
-    AbstractSyntaxTree* right,
+    const std::shared_ptr<AbstractSyntaxTree>& left,
+    const std::shared_ptr<AbstractSyntaxTree>& right,
     const AstBinaryOperation& operation
 ) : AbstractSyntaxTree() {
     this->left = left;
@@ -148,9 +148,9 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
 }
 
 IfNode::IfNode(
-    AbstractSyntaxTree* condition,
-    AbstractSyntaxTree* if_block,
-    AbstractSyntaxTree* else_block
+    const std::shared_ptr<AbstractSyntaxTree>& condition,
+    const std::shared_ptr<AbstractSyntaxTree>& if_block,
+    const std::shared_ptr<AbstractSyntaxTree>& else_block
 ) : AbstractSyntaxTree() {
     this->condition = condition;
     this->if_block = if_block;
@@ -170,8 +170,8 @@ void IfNode::write(std::vector<const Instruction*>& instructions) {
 }
 
 WhileNode::WhileNode(
-    AbstractSyntaxTree* condition,
-    AbstractSyntaxTree* body
+    const std::shared_ptr<AbstractSyntaxTree>& condition,
+    const std::shared_ptr<AbstractSyntaxTree>& body
 ) : AbstractSyntaxTree() {
     this->condition = condition;
     this->body = body;
@@ -189,10 +189,10 @@ void WhileNode::write(std::vector<const Instruction*>& instructions) {
 }
 
 ForNode::ForNode(
-    AbstractSyntaxTree* init,
-    AbstractSyntaxTree* condition,
-    AbstractSyntaxTree* increment,
-    AbstractSyntaxTree* body
+    const std::shared_ptr<AbstractSyntaxTree>& init,
+    const std::shared_ptr<AbstractSyntaxTree>& condition,
+    const std::shared_ptr<AbstractSyntaxTree>& increment,
+    const std::shared_ptr<AbstractSyntaxTree>& body
 ) : AbstractSyntaxTree() {
     this->init = init;
     this->condition = condition;
@@ -213,7 +213,7 @@ void ForNode::write(std::vector<const Instruction*>& instructions) {
     jump->set_address(ast::count_bytes(instructions));
 }
 
-PrintNode::PrintNode(AbstractSyntaxTree* expression, const std::string& end) : AbstractSyntaxTree() {
+PrintNode::PrintNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const std::string& end) : AbstractSyntaxTree() {
     this->expression = expression;
     this->end = end;
 }
@@ -240,8 +240,8 @@ void PrintStringNode::write(std::vector<const Instruction*>& instructions) {
 }
 
 FunctionNode::FunctionNode(
-    AbstractSyntaxTree* body,
-    const std::vector<VariableNode*>& parameters
+    const std::shared_ptr<AbstractSyntaxTree>& body,
+    const std::vector<std::shared_ptr<VariableNode>>& parameters
 ) : AbstractSyntaxTree() {
     this->body = body;
     this->parameters.insert(this->parameters.end(), parameters.begin(), parameters.end());
@@ -260,8 +260,8 @@ uint8_t FunctionNode::get_parameters_count() const {
 }
 
 CallNode::CallNode(
-    FunctionNode* function,
-    const std::vector<AbstractSyntaxTree*>& values
+    const std::shared_ptr<FunctionNode>& function,
+    const std::vector<std::shared_ptr<AbstractSyntaxTree>>& values
 ) : AbstractSyntaxTree() {
     this->function = function;
     this->values.insert(this->values.end(), values.begin(), values.end());
@@ -283,7 +283,7 @@ void CallNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new CallInstruction(function->get_program_address(), function->get_parameters_count()));
 }
 
-ReturnNode::ReturnNode(const std::vector<AbstractSyntaxTree*>& values) : AbstractSyntaxTree() {
+ReturnNode::ReturnNode(const std::vector<std::shared_ptr<AbstractSyntaxTree>>& values) : AbstractSyntaxTree() {
     this->values = values;
 }
 
@@ -310,7 +310,7 @@ uint64_t ast::count_bytes(const std::vector<const Instruction*>& instructions) {
     return size;
 }
 
-std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(AbstractSyntaxTree* root) {
+std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(const std::shared_ptr<AbstractSyntaxTree>& root) {
     std::vector<const Instruction*> instructions;
     if (root->get_main() == nullptr) {
         root->write(instructions);
