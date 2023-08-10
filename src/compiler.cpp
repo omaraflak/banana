@@ -33,7 +33,7 @@ std::shared_ptr<FunctionNode> make_fibonacci() {
     return fib;
 }
 
-int main(int argc, char** argv) {
+std::shared_ptr<AbstractSyntaxTree> make_program() {
     auto ten = std::shared_ptr<LiteralNode>(new LiteralNode(10));
     auto fib = make_fibonacci();
 
@@ -47,7 +47,12 @@ int main(int argc, char** argv) {
     all->add(fib);
     all->add(main);
 
-    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(all);
+    return all;
+}
+
+int main(int argc, char** argv) {
+    std::shared_ptr<AbstractSyntaxTree> program = make_program();
+    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(program);
 
     for (auto pair : ast::to_asm(instructions)) {
         std::cout << pair.first << "\t" << pair.second << std::endl;
