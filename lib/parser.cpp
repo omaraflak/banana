@@ -28,6 +28,7 @@ typedef struct {
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 void print_error(const Parser& parser, const std::string& message);
+std::shared_ptr<BlockNode> block(Parser& parser);
 
 std::string token_as_string(const Token& token) {
     std::stringstream ss;
@@ -218,6 +219,19 @@ std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
     return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
 }
 
+std::shared_ptr<AbstractSyntaxTree> if_statement(Parser& parser) {
+    consume(parser, TOKEN_LEFT_PAREN, "Missing '(' after 'if'.");
+    std::shared_ptr<AbstractSyntaxTree> condition = expression(parser);
+    consume(parser, TOKEN_RIGHT_PAREN, "Missing ')' after 'if' condition.");
+    std::shared_ptr<BlockNode> if_block = block(parser);
+    std::shared_ptr<BlockNode> else_block = nullptr;
+    if (check(parser, TOKEN_ELSE)) {
+        advance(parser);
+        else_block = block(parser);
+    }
+    return std::shared_ptr<IfNode>(new IfNode(condition, if_block, else_block));
+}
+
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
@@ -231,7 +245,31 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_VAR})) {
         return var_statement(parser);
     }
+    if (match(parser, {TOKEN_IF})) {
+        return if_statement(parser);
+    }
     return expression_statement(parser);
+}
+
+std::shared_ptr<BlockNode> block(Parser& parser) {
+    consume(parser, TOKEN_LEFT_BRACE, "Missing '{' before block.");
+    std::shared_ptr<BlockNode> block = std::shared_ptr<BlockNode>(new BlockNode());
+    push_scope(parser, block);
+    const int nest_level = parser.scope_stack.size();
+    while (
+        !eof(parser) && (
+            parser.scope_stack.size() != nest_level ||
+            (parser.scope_stack.size() == nest_level && !check(parser, TOKEN_RIGHT_BRACE))
+        )
+    ) {
+        block->add(statement(parser));
+    }
+    if (eof(parser)) {
+        print_error(parser, "Missing '} after block.");
+    }
+    consume(parser, TOKEN_RIGHT_BRACE, "Missing '}' after block.");
+    pop_scope(parser);
+    return block;
 }
 
 std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {

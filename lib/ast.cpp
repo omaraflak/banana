@@ -160,13 +160,24 @@ IfNode::IfNode(
 void IfNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
     condition->write(instructions);
-    JumpIfFalseInstruction* jump = new JumpIfFalseInstruction(0);
+    JumpIfFalseInstruction* jump = new JumpIfFalseInstruction();
     instructions.push_back(jump);
     if_block->write(instructions);
-    jump->set_address(ast::count_bytes(instructions));
     if (else_block != nullptr) {
+        JumpInstruction* jump_to_end = new JumpInstruction();
+        instructions.push_back(jump_to_end);
+        jump->set_address(ast::count_bytes(instructions));
         else_block->write(instructions);
+        jump_to_end->set_address(ast::count_bytes(instructions));
+    } else {
+        jump->set_address(ast::count_bytes(instructions));
     }
+    // jump_if_false .else
+    // [if block]
+    // jump .end
+    // .else
+    // [else block]
+    // .end
 }
 
 WhileNode::WhileNode(
@@ -181,7 +192,7 @@ void WhileNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
     uint64_t while_address = ast::count_bytes(instructions);
     condition->write(instructions);
-    JumpIfFalseInstruction* jump = new JumpIfFalseInstruction(0);
+    JumpIfFalseInstruction* jump = new JumpIfFalseInstruction();
     instructions.push_back(jump);
     body->write(instructions);
     instructions.push_back(new JumpInstruction(while_address));
@@ -205,7 +216,7 @@ void ForNode::write(std::vector<const Instruction*>& instructions) {
     init->write(instructions);
     uint64_t if_address = ast::count_bytes(instructions);
     condition->write(instructions);
-    JumpIfFalseInstruction* jump = new JumpIfFalseInstruction(0);
+    JumpIfFalseInstruction* jump = new JumpIfFalseInstruction();
     instructions.push_back(jump);
     body->write(instructions);
     increment->write(instructions);
@@ -315,7 +326,7 @@ std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(const std::
     if (root->get_main() == nullptr) {
         root->write(instructions);
     } else {
-        JumpInstruction* jump = new JumpInstruction((uint64_t) 0);
+        JumpInstruction* jump = new JumpInstruction();
         instructions.push_back(jump);
         root->write(instructions);
         jump->set_address(root->get_main()->get_program_address());
