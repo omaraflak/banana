@@ -76,7 +76,7 @@ const char* next_line(const Scanner& scanner) {
 }
 
 void error(const Scanner& scanner) {
-    std::cout << "Unrecognized token on line " << scanner.line + 1 << "." << std::endl;
+    std::cout << "Unrecognized token on line " << scanner.line << "." << std::endl;
     int i = 0;
     while (scanner.current[i] != '\n' && scanner.current[i] != '\0') {
         std::cout << scanner.current[i];
@@ -92,7 +92,7 @@ std::vector<Token> scanner::scan(const char* code) {
     Scanner scanner;
     scanner.start = code;
     scanner.current = code;
-    scanner.line = 0;
+    scanner.line = 1;
 
     while (*scanner.current != '\0') {
         switch (*scanner.current) {
