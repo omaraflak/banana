@@ -89,17 +89,12 @@ void print_error(const Parser& parser, const std::string& message) {
     std::cout << "Line " << peek(parser).line << ": " << message << std::endl;
 }
 
-void register_variable(Parser& parser, const std::string& name, const std::shared_ptr<VariableNode>& variable) {
+std::shared_ptr<AbstractSyntaxTree> current_scope(const Parser& parser) {
     if (parser.scope_stack.size() == 0) {
-        print_error(parser, "Declaring variable without scope!");
+        print_error(parser, "Reading variable without a scope!");
         exit(1);
     }
-    std::map<std::string, std::shared_ptr<VariableNode>> mapping = parser.identifiers[parser.scope_stack.top()];
-    if (mapping.find(name) != mapping.end()) {
-        print_error(parser, "Identifier '" + name + "' already declared in the scope.");
-        exit(1);
-    }
-    mapping[name] = variable;
+    return parser.scope_stack.top();
 }
 
 void push_scope(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& scope) {
@@ -108,18 +103,18 @@ void push_scope(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& scope
 }
 
 void pop_scope(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> scope = parser.scope_stack.top();
+    std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
     parser.scope_stack.pop();
     parser.identifiers.erase(scope);
 }
 
 std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const std::string& name) {
-    std::shared_ptr<AbstractSyntaxTree> scope = parser.scope_stack.top();
+    std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
     if (parser.identifiers.find(scope) == parser.identifiers.end()) {
-        print_error(parser, "");
+        print_error(parser, "Could not find scope while accessing '" + name + "'!");
         exit(1);
     }
-    std::map<std::string, std::shared_ptr<VariableNode>> mapping;
+    const std::map<std::string, std::shared_ptr<VariableNode>>& mapping = parser.identifiers.at(scope);
     if (mapping.find(name) == mapping.end()) {
         print_error(parser, "Could not find '" + name + "' in current scope.");
         exit(1);
@@ -127,9 +122,15 @@ std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const s
     return mapping.at(name);
 }
 
-std::shared_ptr<VariableNode> new_variable(Parser& parser, const Token& identifier) {
-    std::shared_ptr<VariableNode> variable = std::shared_ptr<VariableNode>(new VariableNode(parser.scope_stack.top()));
-    register_variable(parser, token_as_string(identifier), variable);
+std::shared_ptr<VariableNode> new_variable(Parser& parser, const std::string& name) {
+    std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
+    std::shared_ptr<VariableNode> variable = std::shared_ptr<VariableNode>(new VariableNode(scope));
+    std::map<std::string, std::shared_ptr<VariableNode>>& mapping = parser.identifiers[scope];
+    if (mapping.find(name) != mapping.end()) {
+        print_error(parser, "Identifier '" + name + "' already declared in the scope.");
+        exit(1);
+    }
+    mapping[name] = variable;
     return variable;
 }
 
@@ -214,7 +215,7 @@ std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
     Token id = consume(parser, TOKEN_IDENTIFIER, "Expected identifier.");
-    std::shared_ptr<VariableNode> variable = new_variable(parser, id);
+    std::shared_ptr<VariableNode> variable = new_variable(parser, token_as_string(id));
     consume(parser, TOKEN_EQUAL, "Expected '=' sign after identifier.");
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
