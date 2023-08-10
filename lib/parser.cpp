@@ -29,6 +29,18 @@ typedef struct {
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 void print_error(const Parser& parser, const std::string& message);
 
+std::string token_as_string(const Token& token) {
+    std::stringstream ss;
+    for (int i = 0; i < token.length; i++) {
+        ss << token.start[i];
+    }
+    return ss.str();
+}
+
+uint64_t token_as_long(const Token& token) {
+    return stol(token_as_string(token));
+}
+
 bool eof(const Parser& parser) {
     return parser.current == parser.tokens.size();
 }
@@ -79,7 +91,7 @@ void print_error(const Parser& parser, const std::string& message) {
 
 void register_variable(Parser& parser, const std::string& name, const std::shared_ptr<VariableNode>& variable) {
     if (parser.scope_stack.size() == 0) {
-        print_error(parser, "Declaring variable outside of scope!");
+        print_error(parser, "Declaring variable without scope!");
         exit(1);
     }
     std::map<std::string, std::shared_ptr<VariableNode>> mapping = parser.identifiers[parser.scope_stack.top()];
@@ -115,20 +127,10 @@ std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const s
     return mapping.at(name);
 }
 
-std::shared_ptr<VariableNode> new_variable(const Parser& parser) {
-    return std::shared_ptr<VariableNode>(new VariableNode(parser.scope_stack.top()));
-}
-
-std::string token_as_string(const Token& token) {
-    std::stringstream ss;
-    for (int i = 0; i < token.length; i++) {
-        ss << token.start[i];
-    }
-    return ss.str();
-}
-
-uint64_t token_as_long(const Token& token) {
-    return stol(token_as_string(token));
+std::shared_ptr<VariableNode> new_variable(Parser& parser, const Token& identifier) {
+    std::shared_ptr<VariableNode> variable = std::shared_ptr<VariableNode>(new VariableNode(parser.scope_stack.top()));
+    register_variable(parser, token_as_string(identifier), variable);
+    return variable;
 }
 
 std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
@@ -212,8 +214,7 @@ std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
     Token id = consume(parser, TOKEN_IDENTIFIER, "Expected identifier.");
-    std::shared_ptr<VariableNode> variable = new_variable(parser);
-    register_variable(parser, token_as_string(id), variable);
+    std::shared_ptr<VariableNode> variable = new_variable(parser, id);
     consume(parser, TOKEN_EQUAL, "Expected '=' sign after identifier.");
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
