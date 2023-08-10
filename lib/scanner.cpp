@@ -29,8 +29,8 @@ bool match_string(const Scanner& scanner, const std::string& str) {
 }
 
 const char* match_quote(const Scanner& scanner) {
-    const char* c = scanner.current;
-    while (*c != '\0') {
+    const char* c = scanner.current + 1;
+    while (*c != '\0' && *c != '\n') {
         if (*c == '\\') {
             c += 2;
             continue;
@@ -69,6 +69,12 @@ const char* match_identifier(const Scanner& scanner) {
 
 void error(const Scanner& scanner) {
     std::cout << "Unrecognized token on line " << scanner.line + 1 << "." << std::endl;
+    int i = 0;
+    while (scanner.current[i] != '\n' && scanner.current[i] != '\0') {
+        std::cout << scanner.current[i];
+        i++;
+    }
+    std::cout << std::endl;
     exit(1);
 }
 }
