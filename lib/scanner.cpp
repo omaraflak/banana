@@ -67,6 +67,14 @@ const char* match_identifier(const Scanner& scanner) {
     return c;
 }
 
+const char* next_line(const Scanner& scanner) {
+    const char* c = scanner.current;
+    while (*c != '\n' && *c != '\0') {
+        c++;
+    }
+    return *c == '\0' ? c : c + 1;
+}
+
 void error(const Scanner& scanner) {
     std::cout << "Unrecognized token on line " << scanner.line + 1 << "." << std::endl;
     int i = 0;
@@ -137,7 +145,12 @@ std::vector<Token> scanner::scan(const char* code) {
                 break;
             case '/':
                 scanner.current++;
-                tokens.push_back(create_token(TOKEN_SLASH, scanner));
+                if (*scanner.current == '/') {
+                    scanner.current = next_line(scanner);
+                    scanner.line++;
+                } else {
+                    tokens.push_back(create_token(TOKEN_SLASH, scanner));
+                }
                 break;
             case '*':
                 scanner.current++;
