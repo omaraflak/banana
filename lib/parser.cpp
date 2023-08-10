@@ -1,5 +1,6 @@
 #include "parser.h"
 #include <sstream>
+#include <stack>
 #include <map>
 
 namespace parser {
@@ -21,7 +22,12 @@ std::map<TokenType, AstBinaryOperation> OP_CONVERTER = {
 typedef struct {
     std::vector<Token> tokens;
     int current;
+    std::map<std::shared_ptr<AbstractSyntaxTree>, std::map<std::string, std::shared_ptr<VariableNode>>> identifiers;
+    std::stack<std::shared_ptr<AbstractSyntaxTree>> scope_stack;
 } Parser;
+
+std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
+void print_error(const Parser& parser, const std::string& message);
 
 bool eof(const Parser& parser) {
     return parser.current == parser.tokens.size();
@@ -34,11 +40,11 @@ bool check(const Parser& parser, TokenType type) {
     return parser.tokens[parser.current].type == type;
 }
 
-Token peek(Parser& parser) {
+Token peek(const Parser& parser) {
     return parser.tokens[parser.current];
 }
 
-Token previous(Parser& parser) {
+Token previous(const Parser& parser) {
     return parser.tokens[parser.current - 1];
 }
 
@@ -47,6 +53,14 @@ Token advance(Parser& parser) {
         parser.current++;
     }
     return previous(parser);
+}
+
+Token consume(Parser& parser, const TokenType& type, const std::string& message) {
+    if (check(parser, type)) {
+        return advance(parser);
+    }
+    print_error(parser, message);
+    exit(1);
 }
 
 bool match(Parser& parser, const std::vector<TokenType>& types) {
@@ -59,27 +73,73 @@ bool match(Parser& parser, const std::vector<TokenType>& types) {
     return false;
 }
 
-void consume(Parser& parser, const TokenType& type, const std::string& message) {
-    if (!match(parser, {type})) {
-        std::cout << message << std::endl;
-        exit(1);
-    }
+void print_error(const Parser& parser, const std::string& message) {
+    std::cout << "Line " << peek(parser).line << ": " << message << std::endl;
 }
 
-uint64_t token_as_long(const Token& token) {
+void register_variable(Parser& parser, const std::string& name, const std::shared_ptr<VariableNode>& variable) {
+    if (parser.scope_stack.size() == 0) {
+        print_error(parser, "Declaring variable outside of scope!");
+        exit(1);
+    }
+    std::map<std::string, std::shared_ptr<VariableNode>> mapping = parser.identifiers[parser.scope_stack.top()];
+    if (mapping.find(name) != mapping.end()) {
+        print_error(parser, "Identifier '" + name + "' already declared in the scope.");
+        exit(1);
+    }
+    mapping[name] = variable;
+}
+
+void push_scope(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& scope) {
+    parser.scope_stack.push(scope);
+    parser.identifiers[scope] = std::map<std::string, std::shared_ptr<VariableNode>>();
+}
+
+void pop_scope(Parser& parser) {
+    std::shared_ptr<AbstractSyntaxTree> scope = parser.scope_stack.top();
+    parser.scope_stack.pop();
+    parser.identifiers.erase(scope);
+}
+
+std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const std::string& name) {
+    std::shared_ptr<AbstractSyntaxTree> scope = parser.scope_stack.top();
+    if (parser.identifiers.find(scope) == parser.identifiers.end()) {
+        print_error(parser, "");
+        exit(1);
+    }
+    std::map<std::string, std::shared_ptr<VariableNode>> mapping;
+    if (mapping.find(name) == mapping.end()) {
+        print_error(parser, "Could not find '" + name + "' in current scope.");
+        exit(1);
+    }
+    return mapping.at(name);
+}
+
+std::shared_ptr<VariableNode> new_variable(const Parser& parser) {
+    return std::shared_ptr<VariableNode>(new VariableNode(parser.scope_stack.top()));
+}
+
+std::string token_as_string(const Token& token) {
     std::stringstream ss;
     for (int i = 0; i < token.length; i++) {
         ss << token.start[i];
     }
-    return stol(ss.str());
+    return ss.str();
 }
 
-std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
+uint64_t token_as_long(const Token& token) {
+    return stol(token_as_string(token));
+}
 
 std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
         return std::shared_ptr<LiteralNode>(new LiteralNode(token_as_long(token)));
+    }
+    if (match(parser, {TOKEN_IDENTIFIER})) {
+        Token token = previous(parser);
+        std::string name = token_as_string(token);
+        return get_variable_by_name(parser, name);
     }
     if (match(parser, {TOKEN_LEFT_PAREN})) {
         std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
@@ -150,6 +210,16 @@ std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
     return std::shared_ptr<PrintNode>(new PrintNode(exp));
 }
 
+std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
+    Token id = consume(parser, TOKEN_IDENTIFIER, "Expected identifier.");
+    std::shared_ptr<VariableNode> variable = new_variable(parser);
+    register_variable(parser, token_as_string(id), variable);
+    consume(parser, TOKEN_EQUAL, "Expected '=' sign after identifier.");
+    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
+    consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
+    return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
+}
+
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
@@ -160,14 +230,19 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_PRINT})) {
         return print_statement(parser);
     }
+    if (match(parser, {TOKEN_VAR})) {
+        return var_statement(parser);
+    }
     return expression_statement(parser);
 }
 
 std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
     std::shared_ptr<BlockNode> root = std::shared_ptr<BlockNode>(new BlockNode());
+    push_scope(parser, root);
     while (!eof(parser)) {
         root->add(statement(parser));
     }
+    pop_scope(parser);
     return root;
 }
 }
