@@ -1,7 +1,5 @@
-main
-assembler
-compiler
-parser
-test
 *.obj
 bin
+assembler
+compiler
+main

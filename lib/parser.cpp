@@ -143,11 +143,38 @@ std::shared_ptr<AbstractSyntaxTree> equality(Parser& parser) {
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser) {
     return equality(parser);
 }
+
+std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
+    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
+    consume(parser, TOKEN_SEMICOLON, "Expected ';' after print value.");
+    return std::shared_ptr<PrintNode>(new PrintNode(exp));
+}
+
+std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
+    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
+    consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
+    return exp;
+}
+
+std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
+    if (match(parser, {TOKEN_PRINT})) {
+        return print_statement(parser);
+    }
+    return expression_statement(parser);
+}
+
+std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
+    std::shared_ptr<BlockNode> root = std::shared_ptr<BlockNode>(new BlockNode());
+    while (!eof(parser)) {
+        root->add(statement(parser));
+    }
+    return root;
+}
 }
 
 std::shared_ptr<AbstractSyntaxTree> parser::parse(const std::vector<Token>& tokens) {
     Parser parser;
     parser.current = 0;
     parser.tokens = tokens;
-    return expression(parser);
+    return program(parser);
 }
