@@ -1,4 +1,4 @@
-all: main assembler compiler parser asm
+all: main assembler compiler test asm
 
 main: bin/main.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o
 	g++ -o main bin/main.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o -std=c++17
@@ -9,11 +9,11 @@ assember: bin/assembler.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileut
 compiler: bin/compiler.o bin/ast.o bin/vm.o bin/instructions.o bin/byteutils.o
 	g++ -o compiler bin/compiler.o bin/ast.o bin/vm.o bin/instructions.o bin/byteutils.o -std=c++17
 
-parser: bin/parser.o bin/scanner.o bin/fileutils.o
-	g++ -o parser bin/parser.o bin/scanner.o bin/fileutils.o -std=c++17
+test: bin/test.o bin/scanner.o bin/fileutils.o
+	g++ -o test bin/test.o bin/scanner.o bin/fileutils.o -std=c++17
 
-bin/parser.o: src/parser.cpp lib/scanner.h lib/fileutils.h
-	g++ -c src/parser.cpp -o bin/parser.o -std=c++17
+bin/test.o: src/test.cpp lib/scanner.h lib/fileutils.h
+	g++ -c src/test.cpp -o bin/test.o -std=c++17
 
 bin/compiler.o: src/compiler.cpp lib/ast.h lib/vm.h lib/instructions.h lib/byteutils.h
 	g++ -c src/compiler.cpp -o bin/compiler.o -std=c++17
