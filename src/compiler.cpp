@@ -36,10 +36,10 @@ std::shared_ptr<FunctionNode> make_fibonacci() {
 std::shared_ptr<AbstractSyntaxTree> make_program() {
     auto ten = std::shared_ptr<LiteralNode>(new LiteralNode(10));
     auto fib = make_fibonacci();
-
-    auto main = std::shared_ptr<BlockNode>(new BlockNode());
     auto fib_ten = std::shared_ptr<CallNode>(new CallNode(fib, {ten}));
     auto print_fib_ten = std::shared_ptr<PrintNode>(new PrintNode(fib_ten));
+    
+    auto main = std::shared_ptr<BlockNode>(new BlockNode());
     main->add(print_fib_ten);
 
     auto all = std::shared_ptr<BlockNode>(new BlockNode());
