@@ -3,8 +3,7 @@
 
 #include <vector>
 
-namespace scanner {
-    enum TokenType {
+enum TokenType {
         // Single-character tokens.
         TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
         TOKEN_LEFT_BRACE, TOKEN_RIGHT_BRACE,
@@ -23,14 +22,15 @@ namespace scanner {
         TOKEN_AND, TOKEN_OR, TOKEN_PRINT,
     };
 
-    typedef struct {
-        TokenType type;
-        const char* start;
-        int length;
-        int line;
-    } Token;
+typedef struct {
+    TokenType type;
+    const char* start;
+    int length;
+    int line;
+} Token;
 
-    std::vector<Token> scan(const char* code);
-};
+namespace scanner {
+std::vector<Token> scan(const char* code);
+}
 
 #endif // SCANNER
