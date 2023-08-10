@@ -22,10 +22,8 @@ int main(int argc, char** argv) {
     //     std::cout << "-----" << std::endl;
     // }
 
-    AbstractSyntaxTree* root;
-    AbstractSyntaxTree* main;
-    parser::parse(tokens, &root, &main);
-    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(root, main);
+    std::unique_ptr<AbstractSyntaxTree> root = parser::parse(tokens);
+    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(root.get());
 
     for (auto pair : ast::to_asm(instructions)) {
         std::cout << pair.first << "\t" << pair.second << std::endl;

@@ -1,3 +1,5 @@
 #include "parser.h"
 
-void parser::parse(const std::vector<Token>& tokens, AbstractSyntaxTree** root, AbstractSyntaxTree** main) {}
+std::unique_ptr<AbstractSyntaxTree> parser::parse(const std::vector<Token>& tokens) {
+    return nullptr;
+}

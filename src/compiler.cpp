@@ -38,12 +38,14 @@ int main(int argc, char** argv) {
     main.add(&print_fib_ten);
 
     BlockNode all;
+    all.set_main(&main);
     all.add(&fib);
     all.add(&main);
 
+
     // assemble
 
-    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(&all, &main);
+    std::vector<std::unique_ptr<const Instruction>> instructions = ast::to_instructions(&all);
 
     for (auto pair : ast::to_asm(instructions)) {
         std::cout << pair.first << "\t" << pair.second << std::endl;

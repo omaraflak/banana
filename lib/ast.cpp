@@ -2,6 +2,7 @@
 
 AbstractSyntaxTree::AbstractSyntaxTree() {
     written = false;
+    main = nullptr;
 }
 
 void AbstractSyntaxTree::write(std::vector<const Instruction*>& instructions) {
@@ -15,6 +16,14 @@ uint64_t AbstractSyntaxTree::get_program_address() const {
 
 bool AbstractSyntaxTree::is_written() const {
     return written;
+}
+
+void AbstractSyntaxTree::set_main(AbstractSyntaxTree* main) {
+    this->main = main;
+}
+
+AbstractSyntaxTree* AbstractSyntaxTree::get_main() const {
+    return main;
 }
 
 LiteralNode::LiteralNode(const uint64_t& value) : AbstractSyntaxTree() {
@@ -301,15 +310,15 @@ uint64_t ast::count_bytes(const std::vector<const Instruction*>& instructions) {
     return size;
 }
 
-std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(AbstractSyntaxTree* root, AbstractSyntaxTree* main) {
+std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(AbstractSyntaxTree* root) {
     std::vector<const Instruction*> instructions;
-    if (main == nullptr) {
+    if (root->get_main() == nullptr) {
         root->write(instructions);
     } else {
         JumpInstruction* jump = new JumpInstruction((uint64_t) 0);
         instructions.push_back(jump);
         root->write(instructions);
-        jump->set_address(main->get_program_address());
+        jump->set_address(root->get_main()->get_program_address());
     }
     instructions.push_back(new HaltInstruction());
 

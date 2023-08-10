@@ -16,7 +16,11 @@ class AbstractSyntaxTree {
     uint64_t get_program_address() const;
     bool is_written() const;
 
+    void set_main(AbstractSyntaxTree* main);
+    AbstractSyntaxTree* get_main() const;
+
     protected:
+    AbstractSyntaxTree* main;
     uint64_t program_address;
     bool written;
 };
@@ -184,7 +188,7 @@ class HaltNode: public AbstractSyntaxTree {
 
 namespace ast {
     uint64_t count_bytes(const std::vector<const Instruction*>& instructions);
-    std::vector<std::unique_ptr<const Instruction>> to_instructions(AbstractSyntaxTree* root, AbstractSyntaxTree* main = nullptr);
+    std::vector<std::unique_ptr<const Instruction>> to_instructions(AbstractSyntaxTree* root);
     std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
     std::vector<std::pair<uint64_t, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
 };

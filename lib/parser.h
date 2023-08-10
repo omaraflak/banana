@@ -6,7 +6,7 @@
 #include <memory>
 
 namespace parser {
-void parse(const std::vector<Token>& tokens, AbstractSyntaxTree** root, AbstractSyntaxTree** main);
+std::unique_ptr<AbstractSyntaxTree> parse(const std::vector<Token>& tokens);
 }
 
 #endif // PARSER
