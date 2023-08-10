@@ -19,7 +19,7 @@ enum TokenType {
         // Keywords.
         TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
         TOKEN_FOR, TOKEN_WHILE, TOKEN_TRUE, TOKEN_FALSE,
-        TOKEN_AND, TOKEN_OR, TOKEN_PRINT,
+        TOKEN_AND, TOKEN_OR, TOKEN_PRINT, TOKEN_VAR
     };
 
 typedef struct {

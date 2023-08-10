@@ -267,6 +267,15 @@ std::vector<Token> scanner::scan(const char* code) {
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
                 }
                 break;
+            case 'v':
+                if (match_string(scanner, "var")) {
+                    scanner.current += 3;
+                    tokens.push_back(create_token(TOKEN_VAR, scanner));
+                } else {
+                    scanner.current = match_identifier(scanner);
+                    tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
+                }
+                break;
             case '"': {
                 const char* quote = match_quote(scanner);
                 if (quote == nullptr) {
@@ -303,7 +312,6 @@ std::vector<Token> scanner::scan(const char* code) {
             case 'q':
             case 's':
             case 'u':
-            case 'v':
             case 'x':
             case 'y':
             case 'z':
