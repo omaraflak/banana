@@ -18,6 +18,7 @@ enum TokenType {
         TOKEN_STAR, TOKEN_STAR_EQUAL,
         TOKEN_SLASH, TOKEN_SLASH_EQUAL,
         TOKEN_MOD, TOKEN_MOD_EQUAL,
+        TOKEN_XOR, TOKEN_XOR_EQUAL,
         // Literals.
         TOKEN_IDENTIFIER, TOKEN_STRING, TOKEN_NUMBER,
         // Keywords.

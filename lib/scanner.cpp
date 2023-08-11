@@ -190,6 +190,16 @@ std::vector<Token> scanner::scan(const char* code) {
                     tokens.push_back(create_token(TOKEN_MOD, scanner));
                 }
                 break;
+            case '^':
+                scanner.current++;
+                if (match_string(scanner, "^=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_XOR_EQUAL, scanner));
+                } else {
+                    scanner.current++;
+                    tokens.push_back(create_token(TOKEN_XOR, scanner));
+                }
+                break;
             case '!':
                 if (match_string(scanner, "!=")) {
                     scanner.current += 2;
