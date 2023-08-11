@@ -1,0 +1,14 @@
+var a = 1;
+var b = 2;
+var c = 0;
+var n = 30;
+
+print a;
+print b;
+while (n > 0) {
+    c = a + b;
+    print c;
+    a = b;
+    b = c;
+    n -= 1;
+}
