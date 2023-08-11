@@ -136,25 +136,49 @@ std::vector<Token> scanner::scan(const char* code) {
                 tokens.push_back(create_token(TOKEN_SEMICOLON, scanner));
                 break;
             case '+':
-                scanner.current++;
-                tokens.push_back(create_token(TOKEN_PLUS, scanner));
+                if (match_string(scanner, "++")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_PLUS_PLUS, scanner));
+                } else if (match_string(scanner, "+=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_PLUS_EQUAL, scanner));
+                } else {
+                    scanner.current++;
+                    tokens.push_back(create_token(TOKEN_PLUS, scanner));
+                }
                 break;
             case '-':
-                scanner.current++;
-                tokens.push_back(create_token(TOKEN_MINUS, scanner));
+                if (match_string(scanner, "--")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_MINUS_MINUS, scanner));
+                } else if (match_string(scanner, "-=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_MINUS_EQUAL, scanner));
+                } else {
+                    scanner.current++;
+                    tokens.push_back(create_token(TOKEN_MINUS, scanner));
+                }
                 break;
             case '/':
-                scanner.current++;
-                if (*scanner.current == '/') {
+                if (match_string(scanner, "//")) {
                     scanner.current = next_line(scanner);
                     scanner.line++;
+                } else if (match_string(scanner, "/=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_SLASH_EQUAL, scanner));
                 } else {
+                    scanner.current++;
                     tokens.push_back(create_token(TOKEN_SLASH, scanner));
                 }
                 break;
             case '*':
-                scanner.current++;
-                tokens.push_back(create_token(TOKEN_STAR, scanner));
+                if (match_string(scanner, "*=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_STAR_EQUAL, scanner));
+                } else {
+                    scanner.current++;
+                    tokens.push_back(create_token(TOKEN_STAR, scanner));
+                }
                 break;
             case '!':
                 if (match_string(scanner, "!=")) {

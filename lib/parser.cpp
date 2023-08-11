@@ -37,6 +37,10 @@ std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 void print_error(const Parser& parser, const std::string& message);
 std::shared_ptr<BlockNode> block(Parser& parser);
 
+std::shared_ptr<LiteralNode> literal(const uint64_t& value) {
+    return std::shared_ptr<LiteralNode>(new LiteralNode(value));
+}
+
 std::string token_as_string(const Token& token) {
     std::stringstream ss;
     for (int i = 0; i < token.length; i++) {
@@ -64,8 +68,8 @@ Token peek(const Parser& parser) {
     return parser.tokens[parser.current];
 }
 
-Token previous(const Parser& parser) {
-    return parser.tokens[parser.current - 1];
+Token previous(const Parser& parser, const int& offset = 1) {
+    return parser.tokens[parser.current - offset];
 }
 
 Token advance(Parser& parser) {
@@ -91,6 +95,19 @@ bool match(Parser& parser, const std::vector<TokenType>& types) {
         }
     }
     return false;
+}
+
+bool match_sequence(Parser& parser, const std::vector<TokenType>& types) {
+    if (parser.current + types.size() >= parser.tokens.size()) {
+        return false;
+    }
+    for (int i = 0; i < types.size(); i++) {
+        if (parser.tokens[parser.current + i].type != types[i]) {
+            return false;
+        }
+    }
+    parser.current += types.size();
+    return true;
 }
 
 void print_error(const Parser& parser, const std::string& message) {
@@ -270,6 +287,35 @@ std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
     return std::shared_ptr<WhileNode>(new WhileNode(condition, while_block));
 }
 
+std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser) {
+    Token assign = previous(parser);
+    Token id = previous(parser, 2);
+    std::shared_ptr<VariableNode> variable = get_variable_by_name(parser, token_as_string(id));
+    std::shared_ptr<AbstractSyntaxTree> exp;
+    switch (assign.type) {
+        case TOKEN_PLUS_EQUAL:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_ADD));
+            break;
+        case TOKEN_MINUS_EQUAL:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_SUB));
+            break;
+        case TOKEN_STAR_EQUAL:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_MUL));
+            break;
+        case TOKEN_SLASH_EQUAL:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_DIV));
+            break;
+        case TOKEN_PLUS_PLUS:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(1), AST_ADD));
+            break;
+        case TOKEN_MINUS_MINUS:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(1), AST_SUB));
+            break;
+    }
+    consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
+    return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
+}
+
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
@@ -288,6 +334,17 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     }
     if (match(parser, {TOKEN_WHILE})) {
         return while_statement(parser);
+    }
+    if (
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_STAR_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_SLASH_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_PLUS}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_MINUS})
+    ) {
+        return assign_statement(parser);
     }
     return expression_statement(parser);
 }
