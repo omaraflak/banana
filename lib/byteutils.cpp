@@ -9,12 +9,16 @@ uint64_t bytes::and_long(const uint64_t& a, const uint64_t& b) { return a & b; }
 uint64_t bytes::or_long(const uint64_t& a, const uint64_t& b) { return a | b; }
 uint64_t bytes::xor_long(const uint64_t& a, const uint64_t& b) { return a ^ b; }
 uint64_t bytes::not_long(const uint64_t& x) { return ~x; }
+
 uint8_t bytes::lt_long(const uint64_t& a, const uint64_t& b) { return a < b; }
 uint8_t bytes::lte_long(const uint64_t& a, const uint64_t& b) { return a <= b; }
 uint8_t bytes::gt_long(const uint64_t& a, const uint64_t& b) { return a > b; }
 uint8_t bytes::gte_long(const uint64_t& a, const uint64_t& b) { return a >= b; }
 uint8_t bytes::eq_long(const uint64_t& a, const uint64_t& b) { return a == b; }
 uint8_t bytes::not_eq_long(const uint64_t& a, const uint64_t& b) { return a != b; }
+uint8_t bytes::bool_and(const bool& a, const bool& b) { return a && b; }
+uint8_t bytes::bool_or(const bool& a, const bool& b) { return a || b; }
+uint8_t bytes::bool_not(const bool& x) { return !x; }
 
 void bytes::push_byte(std::vector<uint8_t>& stack, const uint8_t& value) {
     stack.push_back(value);

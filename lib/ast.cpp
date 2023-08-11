@@ -114,10 +114,10 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
         case AST_MOD:
             instructions.push_back(new ModInstruction());
             break;
-        case AST_AND:
+        case AST_BIN_AND:
             instructions.push_back(new AndInstruction());
             break;
-        case AST_OR:
+        case AST_BIN_OR:
             instructions.push_back(new OrInstruction());
             break;
         case AST_XOR:
@@ -141,8 +141,38 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
         case AST_NOT_EQ:
             instructions.push_back(new NotEqInstruction());
             break;
+        case AST_BOOL_AND:
+            instructions.push_back(new BoolAndInstruction());
+            break;
+        case AST_BOOL_OR:
+            instructions.push_back(new BoolOrInstruction());
+            break;
         default:
-            std::cout << "Unrecognized operation: " << (int) operation << std::endl;
+            std::cout << "Unrecognized binary operation: " << (int) operation << std::endl;
+            exit(1);
+    }
+}
+
+UnaryOperationNode::UnaryOperationNode(
+    const std::shared_ptr<AbstractSyntaxTree>& expression,
+    const AstUnaryOperation& operation
+) : AbstractSyntaxTree() {
+    this->expression = expression;
+    this->operation = operation;
+}
+
+void UnaryOperationNode::write(std::vector<const Instruction*>& instructions) {
+    AbstractSyntaxTree::write(instructions);
+    expression->write(instructions);
+    switch (operation) {
+        case AST_BIN_NOT:
+            instructions.push_back(new NotInstruction());
+            break;
+        case AST_BOOL_NOT:
+            instructions.push_back(new BoolNotInstruction());
+            break;
+        default:
+            std::cout << "Unrecognized unary operation: " << (int) operation << std::endl;
             exit(1);
     }
 }
@@ -172,12 +202,6 @@ void IfNode::write(std::vector<const Instruction*>& instructions) {
     } else {
         jump->set_address(ast::count_bytes(instructions));
     }
-    // jump_if_false .else
-    // [if block]
-    // jump .end
-    // .else
-    // [else block]
-    // .end
 }
 
 WhileNode::WhileNode(

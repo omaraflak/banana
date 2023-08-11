@@ -135,6 +135,24 @@ std::vector<Token> scanner::scan(const char* code) {
                 scanner.current++;
                 tokens.push_back(create_token(TOKEN_SEMICOLON, scanner));
                 break;
+            case '&':
+                if (match_string(scanner, "&=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_AMPERSAND_EQUAL, scanner));
+                } else {
+                    scanner.current++;
+                    tokens.push_back(create_token(TOKEN_AMPERSAND, scanner));
+                }
+                break;
+            case '|':
+                if (match_string(scanner, "|=")) {
+                    scanner.current += 2;
+                    tokens.push_back(create_token(TOKEN_PIPE_EQUAL, scanner));
+                } else {
+                    scanner.current++;
+                    tokens.push_back(create_token(TOKEN_PIPE, scanner));
+                }
+                break;
             case '+':
                 if (match_string(scanner, "++")) {
                     scanner.current += 2;

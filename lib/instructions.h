@@ -33,6 +33,9 @@ enum {
     OP_GTE,
     OP_EQ,
     OP_NOT_EQ,
+    OP_BOOL_AND,
+    OP_BOOL_OR,
+    OP_BOOL_NOT,
     OP_PRINT,
     OP_PRINT_C,
     OP_STORE,
@@ -221,7 +224,6 @@ class CompareInstruction: public Instruction {
     std::function<uint8_t(const uint64_t&, const uint64_t&)> operation;
 };
 
-
 class LtInstruction: public CompareInstruction {
     public:
     LtInstruction();
@@ -250,6 +252,31 @@ class EqInstruction: public CompareInstruction {
 class NotEqInstruction: public CompareInstruction {
     public:
     NotEqInstruction();
+};
+
+class BoolInstruction: public Instruction {
+    public:
+    BoolInstruction(const uint8_t& opcode, std::function<uint8_t(const bool&, const bool&)> operation);
+    void execute(Vm& vm) const;
+
+    private:
+    std::function<uint8_t(const bool&, const bool&)> operation;
+};
+
+class BoolAndInstruction: public BoolInstruction {
+    public:
+    BoolAndInstruction();
+};
+
+class BoolOrInstruction: public BoolInstruction {
+    public:
+    BoolOrInstruction();
+};
+
+class BoolNotInstruction: public Instruction {
+    public:
+    BoolNotInstruction();
+    void execute(Vm& vm) const;
 };
 
 class PrintInstruction: public Instruction {

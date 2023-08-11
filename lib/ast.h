@@ -49,9 +49,10 @@ class VariableNode: public AbstractSyntaxTree {
 
 enum AstBinaryOperation {
     AST_ADD, AST_SUB, AST_MUL, AST_DIV,
-    AST_MOD, AST_AND, AST_OR, AST_XOR,
-    AST_LT, AST_LTE, AST_GT, AST_GTE,
-    AST_EQ, AST_NOT_EQ
+    AST_MOD, AST_BIN_AND, AST_BIN_OR,
+    AST_XOR, AST_LT, AST_LTE, AST_GT,
+    AST_GTE, AST_EQ, AST_NOT_EQ,
+    AST_BOOL_AND, AST_BOOL_OR
 };
 
 class BinaryOperationNode: public AbstractSyntaxTree {
@@ -67,6 +68,23 @@ class BinaryOperationNode: public AbstractSyntaxTree {
     std::shared_ptr<AbstractSyntaxTree> left;
     std::shared_ptr<AbstractSyntaxTree> right;
     AstBinaryOperation operation;
+};
+
+enum AstUnaryOperation {
+    AST_BIN_NOT, AST_BOOL_NOT
+};
+
+class UnaryOperationNode: public AbstractSyntaxTree {
+    public:
+    UnaryOperationNode(
+        const std::shared_ptr<AbstractSyntaxTree>& expression,
+        const AstUnaryOperation& operation
+    );
+    void write(std::vector<const Instruction*>& instructions);
+
+    private:
+    std::shared_ptr<AbstractSyntaxTree> expression;
+    AstUnaryOperation operation;
 };
 
 class BlockNode: public AbstractSyntaxTree {

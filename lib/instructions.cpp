@@ -47,6 +47,9 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_GTE, "gte"},
     {OP_EQ, "eq"},
     {OP_NOT_EQ, "not_eq"},
+    {OP_BOOL_AND, "b_and"},
+    {OP_BOOL_OR, "b_or"},
+    {OP_BOOL_NOT, "b_not"},
     {OP_PRINT, "print"},
     {OP_PRINT_C, "printc"},
     {OP_STORE, "store"},
@@ -126,6 +129,12 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new EqInstruction();
         case OP_NOT_EQ:
             return new NotEqInstruction();
+        case OP_BOOL_AND:
+            return new BoolAndInstruction();
+        case OP_BOOL_OR:
+            return new BoolOrInstruction();
+        case OP_BOOL_NOT:
+            return new BoolNotInstruction();
         case OP_PRINT:
             return new PrintInstruction();
         case OP_PRINT_C:
@@ -417,6 +426,27 @@ GteInstruction::GteInstruction() : CompareInstruction(OP_GTE, bytes::gte_long) {
 EqInstruction::EqInstruction() : CompareInstruction(OP_EQ, bytes::eq_long) {}
 
 NotEqInstruction::NotEqInstruction() : CompareInstruction(OP_NOT_EQ, bytes::not_eq_long) {}
+
+BoolInstruction::BoolInstruction(const uint8_t& opcode, std::function<uint8_t(const bool&, const bool&)> operation) : Instruction(opcode) {
+    this->operation = operation;
+}
+
+void BoolInstruction::execute(Vm& vm) const {
+    uint8_t right = bytes::pop_byte(*vm.stack);
+    uint8_t left = bytes::pop_byte(*vm.stack);
+    bytes::push_byte(*vm.stack, operation(left, right));   
+}
+
+BoolAndInstruction::BoolAndInstruction() : BoolInstruction(OP_BOOL_AND, bytes::bool_and) {}
+
+BoolOrInstruction::BoolOrInstruction() : BoolInstruction(OP_BOOL_OR, bytes::bool_or) {}
+
+BoolNotInstruction::BoolNotInstruction() : Instruction(OP_BOOL_NOT) {}
+
+void BoolNotInstruction::execute(Vm& vm) const {
+    bool value = bytes::pop_byte(*vm.stack);
+    bytes::push_byte(*vm.stack, !value);
+}
 
 PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}
 
