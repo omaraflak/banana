@@ -38,6 +38,7 @@ std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon);
+std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& parser);
 bool match_assign(Parser& parser);
 
 void print_error(const Parser& parser, const std::string& message);
@@ -293,6 +294,16 @@ std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
     return std::shared_ptr<WhileNode>(new WhileNode(condition, while_block));
 }
 
+std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
+    consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after 'for'.");
+    std::shared_ptr<AbstractSyntaxTree> init = var_statement_or_assign_expression(parser);
+    std::shared_ptr<AbstractSyntaxTree> condition = expression_statement(parser);
+    std::shared_ptr<AbstractSyntaxTree> increment = var_statement_or_assign_expression(parser);
+    consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after 'for' increment.");
+    std::shared_ptr<BlockNode> for_block = block(parser);
+    return std::shared_ptr<ForNode>(new ForNode(init, condition, increment, for_block));
+}
+
 std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& parser) {
     if (match(parser, {TOKEN_VAR})) {
         return var_statement(parser);
@@ -302,16 +313,6 @@ std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& p
     }
     print_error(parser, "Expected assign expression.");
     exit(1);
-}
-
-std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
-    consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after 'for'.");
-    std::shared_ptr<AbstractSyntaxTree> init = var_statement_or_assign_expression(parser);
-    std::shared_ptr<AbstractSyntaxTree> condition = expression_statement(parser);
-    std::shared_ptr<AbstractSyntaxTree> increment = var_statement_or_assign_expression(parser);
-    consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after 'for' increment.");
-    std::shared_ptr<BlockNode> for_block = block(parser);
-    return std::shared_ptr<ForNode>(new ForNode(init, condition, increment, for_block));
 }
 
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon = true) {
