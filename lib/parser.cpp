@@ -19,11 +19,18 @@ std::map<TokenType, AstBinaryOperation> OP_CONVERTER = {
     {TOKEN_OR, AST_OR}
 };
 
+typedef std::map<std::string, std::shared_ptr<VariableNode>> Identifiers;
+
+typedef struct {
+    std::map<std::shared_ptr<AbstractSyntaxTree>, Identifiers> identifiers;
+    std::vector<std::shared_ptr<AbstractSyntaxTree>> scope_stack;
+} Frame;
+
 typedef struct {
     std::vector<Token> tokens;
     int current;
-    std::map<std::shared_ptr<AbstractSyntaxTree>, std::map<std::string, std::shared_ptr<VariableNode>>> identifiers;
-    std::stack<std::shared_ptr<AbstractSyntaxTree>> scope_stack;
+    std::map<std::shared_ptr<AbstractSyntaxTree>, Frame> frames;
+    std::stack<std::shared_ptr<AbstractSyntaxTree>> frame_stack;
 } Parser;
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
@@ -90,39 +97,62 @@ void print_error(const Parser& parser, const std::string& message) {
     std::cout << "Line " << peek(parser).line << ": " << message << std::endl;
 }
 
-std::shared_ptr<AbstractSyntaxTree> current_scope(const Parser& parser) {
-    if (parser.scope_stack.size() == 0) {
-        print_error(parser, "Reading variable without a scope!");
+std::shared_ptr<AbstractSyntaxTree> current_frame(const Parser& parser) {
+    if (parser.frame_stack.empty()) {
+        print_error(parser, "Could not find the current frame!");
         exit(1);
     }
-    return parser.scope_stack.top();
+    return parser.frame_stack.top();
+}
+
+std::shared_ptr<AbstractSyntaxTree> current_scope(const Parser& parser) {
+    const Frame& frame = parser.frames.at(current_frame(parser));
+    if (frame.scope_stack.empty()) {
+        print_error(parser, "Could not find the current scope!");
+        exit(1);
+    }
+    return frame.scope_stack.back();
+}
+
+void push_frame(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& frame) {
+    parser.frame_stack.push(frame);
+    parser.frames[frame] = Frame();
+}
+
+void pop_frame(Parser& parser) {
+    parser.frames.erase(parser.frame_stack.top());
+    parser.frame_stack.pop();
 }
 
 void push_scope(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& scope) {
-    parser.scope_stack.push(scope);
-    parser.identifiers[scope] = std::map<std::string, std::shared_ptr<VariableNode>>();
+    Frame& frame = parser.frames[current_frame(parser)];
+    frame.scope_stack.push_back(scope);
+    frame.identifiers[scope] = Identifiers();
 }
 
 void pop_scope(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
-    parser.scope_stack.pop();
-    parser.identifiers.erase(scope);
+    Frame& frame = parser.frames[current_frame(parser)];
+    frame.identifiers.erase(current_scope(parser));
+    frame.scope_stack.back();
 }
 
 std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const std::string& name) {
-    std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
-    const std::map<std::string, std::shared_ptr<VariableNode>>& mapping = parser.identifiers.at(scope);
-    if (mapping.find(name) == mapping.end()) {
-        print_error(parser, "Could not find '" + name + "' in current scope.");
-        exit(1);
+    const Frame& frame = parser.frames.at(current_frame(parser));
+    for (const auto& scope : frame.scope_stack) {
+        const auto& mapping = frame.identifiers.at(scope);
+        if (mapping.find(name) != mapping.end()) {
+            return mapping.at(name);
+        }
     }
-    return mapping.at(name);
+    print_error(parser, "Could not find '" + name + "' in current scope.");
+    exit(1);
 }
 
 std::shared_ptr<VariableNode> new_variable(Parser& parser, const std::string& name) {
+    std::shared_ptr<AbstractSyntaxTree> frame = current_frame(parser);
     std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
-    std::shared_ptr<VariableNode> variable = std::shared_ptr<VariableNode>(new VariableNode(scope));
-    std::map<std::string, std::shared_ptr<VariableNode>>& mapping = parser.identifiers[scope];
+    std::shared_ptr<VariableNode> variable = std::shared_ptr<VariableNode>(new VariableNode(frame));
+    auto& mapping = parser.frames[frame].identifiers[scope];
     if (mapping.find(name) != mapping.end()) {
         print_error(parser, "Identifier '" + name + "' already declared in the scope.");
         exit(1);
@@ -266,11 +296,12 @@ std::shared_ptr<BlockNode> block(Parser& parser) {
     consume(parser, TOKEN_LEFT_BRACE, "Missing '{' before block.");
     std::shared_ptr<BlockNode> block = std::shared_ptr<BlockNode>(new BlockNode());
     push_scope(parser, block);
-    const int nest_level = parser.scope_stack.size();
+    const Frame& frame = parser.frames.at(current_frame(parser));
+    const int nest_level = frame.scope_stack.size();
     while (
         !eof(parser) && (
-            parser.scope_stack.size() != nest_level ||
-            (parser.scope_stack.size() == nest_level && !check(parser, TOKEN_RIGHT_BRACE))
+            frame.scope_stack.size() != nest_level ||
+            (frame.scope_stack.size() == nest_level && !check(parser, TOKEN_RIGHT_BRACE))
         )
     ) {
         block->add(statement(parser));
@@ -285,11 +316,13 @@ std::shared_ptr<BlockNode> block(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
     std::shared_ptr<BlockNode> root = std::shared_ptr<BlockNode>(new BlockNode());
+    push_frame(parser, root);
     push_scope(parser, root);
     while (!eof(parser)) {
         root->add(statement(parser));
     }
     pop_scope(parser);
+    pop_frame(parser);
     return root;
 }
 }
