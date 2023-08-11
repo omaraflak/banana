@@ -212,7 +212,7 @@ std::shared_ptr<AbstractSyntaxTree> unary(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> factor(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> left = unary(parser);
-    while (match(parser, {TOKEN_STAR, TOKEN_SLASH})) {
+    while (match(parser, {TOKEN_STAR, TOKEN_SLASH, TOKEN_MOD})) {
         AstBinaryOperation op = OP_CONVERTER[previous(parser).type];
         std::shared_ptr<AbstractSyntaxTree> right = unary(parser);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
@@ -222,7 +222,7 @@ std::shared_ptr<AbstractSyntaxTree> factor(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> term(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> left = factor(parser);
-    while (match(parser, {TOKEN_PLUS, TOKEN_MINUS, TOKEN_MOD})) {
+    while (match(parser, {TOKEN_PLUS, TOKEN_MINUS})) {
         AstBinaryOperation op = OP_CONVERTER[previous(parser).type];
         std::shared_ptr<AbstractSyntaxTree> right = factor(parser);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
