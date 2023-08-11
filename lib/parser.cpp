@@ -16,7 +16,8 @@ std::map<TokenType, AstBinaryOperation> OP_CONVERTER = {
     {TOKEN_STAR, AST_MUL},
     {TOKEN_SLASH, AST_DIV},
     {TOKEN_AND, AST_AND},
-    {TOKEN_OR, AST_OR}
+    {TOKEN_OR, AST_OR},
+    {TOKEN_MOD, AST_MOD},
 };
 
 typedef std::map<std::string, std::shared_ptr<VariableNode>> Identifiers;
@@ -221,7 +222,7 @@ std::shared_ptr<AbstractSyntaxTree> factor(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> term(Parser& parser) {
     std::shared_ptr<AbstractSyntaxTree> left = factor(parser);
-    while (match(parser, {TOKEN_PLUS, TOKEN_MINUS})) {
+    while (match(parser, {TOKEN_PLUS, TOKEN_MINUS, TOKEN_MOD})) {
         AstBinaryOperation op = OP_CONVERTER[previous(parser).type];
         std::shared_ptr<AbstractSyntaxTree> right = factor(parser);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
@@ -320,6 +321,9 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser) {
         case TOKEN_SLASH_EQUAL:
             exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_DIV));
             break;
+        case TOKEN_MOD_EQUAL:
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_MOD));
+            break;
         case TOKEN_PLUS_PLUS:
             exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(1), AST_ADD));
             break;
@@ -362,6 +366,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
         match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_EQUAL}) ||
         match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_STAR_EQUAL}) ||
         match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_SLASH_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MOD_EQUAL}) ||
         match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_PLUS}) ||
         match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_MINUS})
     ) {
