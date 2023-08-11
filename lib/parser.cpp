@@ -34,6 +34,8 @@ typedef struct {
 } Parser;
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
+std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
+std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
 void print_error(const Parser& parser, const std::string& message);
 std::shared_ptr<BlockNode> block(Parser& parser);
 
@@ -287,6 +289,16 @@ std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
     return std::shared_ptr<WhileNode>(new WhileNode(condition, while_block));
 }
 
+std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
+    consume(parser, TOKEN_LEFT_PAREN, "Missing '(' after 'for'.");
+    std::shared_ptr<AbstractSyntaxTree> init = statement(parser);
+    std::shared_ptr<AbstractSyntaxTree> condition = expression_statement(parser);
+    std::shared_ptr<AbstractSyntaxTree> increment = statement(parser);
+    consume(parser, TOKEN_RIGHT_PAREN, "Missing ')' after 'for' increment.");
+    std::shared_ptr<BlockNode> for_block = block(parser);
+    return std::shared_ptr<ForNode>(new ForNode(init, condition, increment, for_block));
+}
+
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser) {
     Token assign = previous(parser);
     Token id = previous(parser, 2);
@@ -318,7 +330,7 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser) {
             print_error(parser, "Could not recognize assignment type!");
             exit(1);
     }
-    consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
+    consume(parser, TOKEN_SEMICOLON, "Expected ';' after statement.");
     return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
 }
 
@@ -340,6 +352,9 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     }
     if (match(parser, {TOKEN_WHILE})) {
         return while_statement(parser);
+    }
+    if (match(parser, {TOKEN_FOR})) {
+        return for_statement(parser);
     }
     if (
         match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_EQUAL}) ||
