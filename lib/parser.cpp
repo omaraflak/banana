@@ -38,6 +38,7 @@ std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon);
+bool match_assign(Parser& parser);
 
 void print_error(const Parser& parser, const std::string& message);
 std::shared_ptr<BlockNode> block(Parser& parser);
@@ -296,16 +297,7 @@ std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& p
     if (match(parser, {TOKEN_VAR})) {
         return var_statement(parser);
     }
-    if (
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_STAR_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_SLASH_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MOD_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_PLUS}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_MINUS})
-    ) {
+    if (match_assign(parser)) {
         return assign_statement(parser, false);
     }
     print_error(parser, "Expected assign expression.");
@@ -368,6 +360,17 @@ std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
     return exp;
 }
 
+bool match_assign(Parser& parser) {
+    return match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_STAR_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_SLASH_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MOD_EQUAL}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_PLUS}) ||
+        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_MINUS});
+}
+
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_PRINT})) {
         return print_statement(parser);
@@ -384,16 +387,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_FOR})) {
         return for_statement(parser);
     }
-    if (
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_STAR_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_SLASH_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MOD_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_PLUS}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_MINUS})
-    ) {
+    if (match_assign(parser)) {
         return assign_statement(parser);
     }
     return expression_statement(parser);
