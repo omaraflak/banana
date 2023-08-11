@@ -133,7 +133,7 @@ void push_scope(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& scope
 void pop_scope(Parser& parser) {
     Frame& frame = parser.frames[current_frame(parser)];
     frame.identifiers.erase(current_scope(parser));
-    frame.scope_stack.back();
+    frame.scope_stack.pop_back();
 }
 
 std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const std::string& name) {
