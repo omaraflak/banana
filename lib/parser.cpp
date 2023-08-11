@@ -293,6 +293,9 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser) {
     std::shared_ptr<VariableNode> variable = get_variable_by_name(parser, token_as_string(id));
     std::shared_ptr<AbstractSyntaxTree> exp;
     switch (assign.type) {
+        case TOKEN_EQUAL:
+            exp = expression(parser);
+            break;
         case TOKEN_PLUS_EQUAL:
             exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_ADD));
             break;
@@ -311,6 +314,9 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser) {
         case TOKEN_MINUS_MINUS:
             exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(1), AST_SUB));
             break;
+        default:
+            print_error(parser, "Could not recognize assignment type!");
+            exit(1);
     }
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
     return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
