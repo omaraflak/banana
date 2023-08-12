@@ -13,7 +13,9 @@ fun fib(n) {
 }
 
 fun main() {
-    print fib(10);
+    for (var i = 1; i < 10; i++) {
+        print fib(i);
+    }
 }
 ```
 
