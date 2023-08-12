@@ -19,10 +19,11 @@ fun main() {
 }
 ```
 
-Compile banana:
+Compile 🍌:
 
 ```
-cmake . && make
+cmake .
+make
 ```
 
 Run program:
