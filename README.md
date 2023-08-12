@@ -1,4 +1,4 @@
-# VM-based programming language
+# Banana
 
 This is a toy programming language based on a virtual machine.
 
@@ -23,7 +23,7 @@ Execute:
 
 ```
 make
-./compiler -i file.txt
+./banana -i file.txt
 ```
 
 # Features

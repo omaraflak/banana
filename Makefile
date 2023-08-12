@@ -1,13 +1,13 @@
-all: assembler compiler
+all: assembler banana
 
 assembler: bin/assembler.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o
 	g++ -o assembler bin/assembler.o  bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o -std=c++17
 
-compiler: bin/compiler.o bin/scanner.o bin/parser.o bin/ast.o bin/instructions.o bin/vm.o bin/byteutils.o bin/fileutils.o
-	g++ -o compiler bin/compiler.o bin/scanner.o bin/parser.o bin/ast.o bin/instructions.o bin/vm.o bin/byteutils.o bin/fileutils.o -std=c++17
+banana: bin/banana.o bin/scanner.o bin/parser.o bin/ast.o bin/instructions.o bin/vm.o bin/byteutils.o bin/fileutils.o
+	g++ -o banana bin/banana.o bin/scanner.o bin/parser.o bin/ast.o bin/instructions.o bin/vm.o bin/byteutils.o bin/fileutils.o -std=c++17
 
-bin/compiler.o: src/compiler.cpp lib/scanner.h lib/parser.h lib/ast.h lib/fileutils.h
-	g++ -c src/compiler.cpp -o bin/compiler.o -std=c++17
+bin/banana.o: src/banana.cpp lib/scanner.h lib/parser.h lib/ast.h lib/fileutils.h
+	g++ -c src/banana.cpp -o bin/banana.o -std=c++17
 
 bin/assembler.o: src/assembler.cpp lib/vm.h lib/instructions.h lib/byteutils.h lib/fileutils.h
 	g++ -c src/assembler.cpp -o bin/assembler.o -std=c++17
@@ -31,4 +31,4 @@ bin/scanner.o: lib/scanner.cpp lib/scanner.h
 	g++ -c lib/scanner.cpp -o bin/scanner.o -std=c++17
 
 bin/parser.o: lib/parser.cpp lib/parser.h
-	g++ -c lib/parser.cpp -o bin/parser.o -std=c++17
+	g++ -c lib/parser.cpp -o bin/parser.o -std=c++17t 
