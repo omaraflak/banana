@@ -20,16 +20,16 @@ void Vm::execute() {
 }
 
 void Vm::push_frame() {
-    stacks.push_front(std::vector<uint8_t>());
-    stack = &stacks.front();
-    heaps.push_front(new uint8_t[HEAP_MEMORY]);
-    heap = heaps.front();
+    stacks.push(std::vector<uint8_t>());
+    stack = &stacks.top();
+    heaps.push(new uint8_t[HEAP_MEMORY]);
+    heap = heaps.top();
 }
 
 void Vm::pop_frame() {
-    stacks.pop_front();
-    stack = &stacks.front();
-    delete heaps.front();
-    heaps.pop_front();
-    heap = heaps.front();
+    stacks.pop();
+    stack = &stacks.top();
+    delete heaps.top();
+    heaps.pop();
+    heap = heaps.top();
 }

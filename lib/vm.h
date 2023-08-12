@@ -4,7 +4,6 @@
 
 #include <stack>
 #include <vector>
-#include <forward_list>
 #include <stdint.h>
 
 class Vm {
@@ -19,8 +18,8 @@ class Vm {
     std::vector<uint8_t>* stack;
     std::vector<uint8_t> program;
     std::stack<uint64_t> call_stack;
-    std::forward_list<std::vector<uint8_t>> stacks;
-    std::forward_list<uint8_t*> heaps;
+    std::stack<std::vector<uint8_t>> stacks;
+    std::stack<uint8_t*> heaps;
     uint64_t ip;
     bool running;
 };
