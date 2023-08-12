@@ -18,14 +18,25 @@ Token create_token(const TokenType& type, const Scanner& scanner) {
     return token;
 }
 
-bool match_string(const Scanner& scanner, const std::string& str) {
+bool is_digit(const char& c) {
+    return '0' <= c && c <= '9';
+}
+
+bool is_character(const char& c) {
+    return ('a' <= c && c <= 'z') or ('A' <= c && c <= 'Z');
+}
+
+bool match_string(const Scanner& scanner, const std::string& str, const bool& keyword = false) {
     for (int i = 0; i < str.size(); i++) {
         const char* p = scanner.current + i;
         if (*p == '\0' || *p != str[i]) {
             return false;
         }
     }
-    return true;
+    if (!keyword) {
+        return true;
+    }
+    return !is_character(scanner.current[str.size()]);
 }
 
 const char* match_quote(const Scanner& scanner) {
@@ -49,14 +60,6 @@ const char* match_number(const Scanner& scanner) {
          c++;
     }
     return c;
-}
-
-bool is_digit(const char& c) {
-    return '0' <= c && c <= '9';
-}
-
-bool is_character(const char& c) {
-    return ('a' <= c && c <= 'z') or ('A' <= c && c <= 'Z');
 }
 
 const char* match_identifier(const Scanner& scanner) {
@@ -255,10 +258,10 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'f':
-                if (match_string(scanner, "for")) {
+                if (match_string(scanner, "for", true)) {
                     scanner.current += 3;
                     tokens.push_back(create_token(TOKEN_FOR, scanner));
-                } else if (match_string(scanner, "fun")) {
+                } else if (match_string(scanner, "fun", true)) {
                     scanner.current += 3;
                     tokens.push_back(create_token(TOKEN_FUN, scanner));
                 } else {
@@ -268,7 +271,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 scanner.start = scanner.current;
                 break;
             case 'r':
-                if (match_string(scanner, "return")) {
+                if (match_string(scanner, "return", true)) {
                     scanner.current += 6;
                     tokens.push_back(create_token(TOKEN_RETURN, scanner));
                 } else {
@@ -277,7 +280,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'i':
-                if (match_string(scanner, "if")) {
+                if (match_string(scanner, "if", true)) {
                     scanner.current += 2;
                     tokens.push_back(create_token(TOKEN_IF, scanner));
                 } else {
@@ -286,7 +289,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'e':
-                if (match_string(scanner, "else")) {
+                if (match_string(scanner, "else", true)) {
                     scanner.current += 4;
                     tokens.push_back(create_token(TOKEN_ELSE, scanner));
                 } else {
@@ -295,7 +298,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'w':
-                if (match_string(scanner, "while")) {
+                if (match_string(scanner, "while", true)) {
                     scanner.current += 5;
                     tokens.push_back(create_token(TOKEN_WHILE, scanner));
                 } else {
@@ -304,7 +307,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'a':
-                if (match_string(scanner, "and")) {
+                if (match_string(scanner, "and", true)) {
                     scanner.current += 3;
                     tokens.push_back(create_token(TOKEN_AND, scanner));
                 } else {
@@ -313,7 +316,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'o':
-                if (match_string(scanner, "or")) {
+                if (match_string(scanner, "or", true)) {
                     scanner.current += 2;
                     tokens.push_back(create_token(TOKEN_OR, scanner));
                 } else {
@@ -322,7 +325,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'p':
-                if (match_string(scanner, "print")) {
+                if (match_string(scanner, "print", true)) {
                     scanner.current += 5;
                     tokens.push_back(create_token(TOKEN_PRINT, scanner));
                 } else {
@@ -331,7 +334,7 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case 'v':
-                if (match_string(scanner, "var")) {
+                if (match_string(scanner, "var", true)) {
                     scanner.current += 3;
                     tokens.push_back(create_token(TOKEN_VAR, scanner));
                 } else {

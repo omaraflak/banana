@@ -2,6 +2,7 @@
 #include <sstream>
 #include <stack>
 #include <map>
+#include <set>
 
 namespace parser {
 std::map<TokenType, AstBinaryOperation> BIN_OP = {
@@ -21,6 +22,12 @@ std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_PIPE, AST_BIN_OR},
     {TOKEN_AND, AST_BOOL_AND},
     {TOKEN_OR, AST_BOOL_OR},
+};
+
+std::set<TokenType> KEYWORDS = {
+    TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
+    TOKEN_FOR, TOKEN_WHILE, TOKEN_AND, TOKEN_OR,
+    TOKEN_PRINT, TOKEN_VAR
 };
 
 typedef std::map<std::string, std::shared_ptr<VariableNode>> Identifiers;
@@ -278,6 +285,11 @@ std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
 }
 
 std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
+    Token p = peek(parser);
+    if (KEYWORDS.find(p.type) != KEYWORDS.end()) {
+        print_error(parser, "'" + token_as_string(p) + "' is a reserved identifier.");
+        exit(1);
+    }
     Token id = consume(parser, TOKEN_IDENTIFIER, "Expected identifier.");
     std::shared_ptr<VariableNode> variable = new_variable(parser, token_as_string(id));
     consume(parser, TOKEN_EQUAL, "Expected '=' sign after identifier.");
