@@ -1,9 +1,5 @@
 #include "byteutils.h"
 
-void bytes::push_byte(std::vector<uint8_t>& stack, const uint8_t& value) {
-    stack.push_back(value);
-}
-
 void bytes::push_short(std::vector<uint8_t>& stack, const uint16_t& value) {
     stack.push_back(BYTE_0(value));
     stack.push_back(BYTE_1(value));
@@ -45,12 +41,8 @@ uint64_t bytes::pop_long(std::vector<uint8_t>& stack) {
     return ((uint64_t) pop_int(stack) << 32) | pop_int(stack);
 }
 
-uint8_t bytes::read_byte(const uint8_t* stack, const uint64_t& index) {
-    return stack[index];
-}
-
 uint16_t bytes::read_short(const uint8_t* stack, const uint64_t& index) {
-    return ((uint16_t) read_byte(stack, index + 1) << 8) | read_byte(stack, index);
+    return ((uint16_t) stack[index + 1] << 8) | stack[index];
 }
 
 uint32_t bytes::read_int(const uint8_t* stack, const uint64_t& index) {
@@ -59,10 +51,6 @@ uint32_t bytes::read_int(const uint8_t* stack, const uint64_t& index) {
 
 uint64_t bytes::read_long(const uint8_t* stack, const uint64_t& index) {
     return ((uint64_t) read_int(stack, index + 4) << 32) | read_int(stack, index);
-}
-
-uint8_t bytes::read_byte(const std::vector<uint8_t>& stack, const uint64_t& index) {
-    return bytes::read_byte(stack.data(), index);
 }
 
 uint16_t bytes::read_short(const std::vector<uint8_t>& stack, const uint64_t& index) {
@@ -75,10 +63,6 @@ uint32_t bytes::read_int(const std::vector<uint8_t>& stack, const uint64_t& inde
 
 uint64_t bytes::read_long(const std::vector<uint8_t>& stack, const uint64_t& index) {
     return bytes::read_long(stack.data(), index);
-}
-
-void bytes::write_byte(uint8_t* stack, const uint64_t& index, const uint8_t& value) {
-    stack[index] = value;
 }
 
 void bytes::write_short(uint8_t* stack, const uint64_t& index, const uint16_t& value) {
@@ -102,10 +86,6 @@ void bytes::write_long(uint8_t* stack, const uint64_t& index, const uint64_t& va
     stack[index + 5] = BYTE_5(value);
     stack[index + 6] = BYTE_6(value);
     stack[index + 7] = BYTE_7(value);
-}
-
-void bytes::write_byte(std::vector<uint8_t>& stack, const uint64_t& index, const uint8_t& value) {
-    bytes::write_byte(stack.data(), index, value);
 }
 
 void bytes::write_short(std::vector<uint8_t>& stack, const uint64_t& index, const uint16_t& value) {

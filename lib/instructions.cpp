@@ -345,7 +345,7 @@ CallInstruction::CallInstruction(const Address& address, const uint8_t& param_co
 void CallInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
-    param_count = bytes::read_byte(buffer, *index);
+    param_count = buffer[*index];
     *index += SIZE_OF_BYTE;
 }
 
@@ -387,7 +387,7 @@ RetInstruction::RetInstruction(const uint8_t& values_count) : Instruction(OP_RET
 }
 
 void RetInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
-    values_count = bytes::read_byte(buffer, *index);
+    values_count = buffer[*index];
     *index += SIZE_OF_BYTE;
 }
 
