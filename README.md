@@ -19,11 +19,16 @@ fun main() {
 }
 ```
 
-Execute:
+Compile banana:
 
 ```
-make
-./banana -i file.txt
+cmake . && make
+```
+
+Run program:
+
+```
+./banana -i ./examples/fibonacci.txt
 ```
 
 # Features

@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25.1)
+project (banana)
+include_directories(lib)
+file(GLOB SOURCES "lib/*.cpp")
+add_executable(banana src/banana.cpp ${SOURCES})
+add_executable(assembler src/assembler.cpp ${SOURCES})
