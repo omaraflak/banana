@@ -290,9 +290,7 @@ std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser) {
 }
 
 std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
-    consume(parser, TOKEN_SEMICOLON, "Expected ';' after print value.");
-    return std::shared_ptr<PrintNode>(new PrintNode(exp));
+    return std::shared_ptr<PrintNode>(new PrintNode(expression_statement(parser)));
 }
 
 std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
@@ -389,6 +387,16 @@ std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
     pop_scope(parser);
     pop_frame(parser);
     return fun_node;
+}
+
+std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
+    if (check(parser, TOKEN_SEMICOLON)) {
+        return std::shared_ptr<ReturnNode>(new ReturnNode());
+    }
+    std::shared_ptr<BlockNode> block(new BlockNode());
+    block->add(expression_statement(parser));
+    block->add(std::shared_ptr<ReturnNode>(new ReturnNode()));
+    return block;
 }
 
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser) {
@@ -488,6 +496,9 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     }
     if (match(parser, {TOKEN_FUN})) {
         return fun_statement(parser);
+    }
+    if (match(parser, {TOKEN_RETURN})) {
+        return return_statement(parser);
     }
     return expression_statement(parser);
 }
