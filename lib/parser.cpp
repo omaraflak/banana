@@ -47,8 +47,8 @@ typedef struct {
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
-std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon);
-std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& parser);
+std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon = true);
+std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser);
 bool match_assign(Parser& parser);
 
 void print_error(const Parser& parser, const std::string& message);
@@ -321,18 +321,15 @@ std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
     consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after 'for'.");
-    std::shared_ptr<AbstractSyntaxTree> init = var_statement_or_assign_expression(parser);
+    std::shared_ptr<AbstractSyntaxTree> init = statement(parser);
     std::shared_ptr<AbstractSyntaxTree> condition = expression_statement(parser);
-    std::shared_ptr<AbstractSyntaxTree> increment = var_statement_or_assign_expression(parser);
+    std::shared_ptr<AbstractSyntaxTree> increment = assign_expression(parser);
     consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after 'for' increment.");
     std::shared_ptr<BlockNode> for_block = block(parser);
     return std::shared_ptr<ForNode>(new ForNode(init, condition, increment, for_block));
 }
 
-std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& parser) {
-    if (match(parser, {TOKEN_VAR})) {
-        return var_statement(parser);
-    }
+std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser) {
     if (match_assign(parser)) {
         return assign_statement(parser, /* expect_semicolon */ false);
     }
@@ -340,7 +337,7 @@ std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& p
     exit(1);
 }
 
-std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon = true) {
+std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon) {
     Token assign = previous(parser);
     Token id = previous(parser, 2);
     std::shared_ptr<VariableNode> variable = get_variable_by_name(parser, token_as_string(id));
