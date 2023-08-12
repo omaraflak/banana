@@ -28,8 +28,6 @@ enum {
     OP_JUMP_IF_FALSE,
     OP_CALL,
     OP_RET,
-    OP_DUP,
-    OP_SWAP,
     OP_LT,
     OP_LTE,
     OP_GT,
@@ -196,18 +194,6 @@ class RetInstruction: public Instruction {
 
     private:
     uint8_t values_count;
-};
-
-class DupInstruction: public Instruction {
-    public:
-    DupInstruction();
-    void execute(Vm& vm) const;
-};
-
-class SwapInstruction: public Instruction {
-    public:
-    SwapInstruction();
-    void execute(Vm& vm) const;
 };
 
 class LtInstruction: public Instruction {

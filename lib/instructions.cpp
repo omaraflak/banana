@@ -39,8 +39,6 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_JUMP_IF_FALSE, "jump_if_false"},
     {OP_CALL, "call"},
     {OP_RET, "ret"},
-    {OP_DUP, "dup"},
-    {OP_SWAP, "swap"},
     {OP_LT, "lt"},
     {OP_LTE, "lte"},
     {OP_GT, "gt"},
@@ -115,10 +113,6 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new CallInstruction();
         case OP_RET:
             return new RetInstruction();
-        case OP_DUP:
-            return new DupInstruction();
-        case OP_SWAP:
-            return new SwapInstruction();
         case OP_LT:
             return new LtInstruction();
         case OP_LTE:
@@ -423,22 +417,6 @@ std::string RetInstruction::to_string() const {
 
 uint8_t RetInstruction::size() const {
     return Instruction::size() + SIZE_OF_BYTE;
-}
-
-DupInstruction::DupInstruction() : Instruction(OP_DUP) {}
-
-void DupInstruction::execute(Vm& vm) const {
-    Value value = bytes::read_long(*vm.stack, vm.stack->size() - SIZE_OF_LONG);
-    bytes::push_long(*vm.stack, value);
-}
-
-SwapInstruction::SwapInstruction() : Instruction(OP_SWAP) {}
-
-void SwapInstruction::execute(Vm& vm) const {
-    Value a = bytes::pop_long(*vm.stack);
-    Value b = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, a);
-    bytes::push_long(*vm.stack, b);
 }
 
 LtInstruction::LtInstruction() : Instruction(OP_LT) {}
