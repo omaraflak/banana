@@ -34,6 +34,6 @@ Currently, the language is very limited and supports the following features.
 
 **Constructs**: `fun`, `if`, `else`, `for`, `while`, `return`.
 
-**Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `and`, `or` (also `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`, `++`, `--`).
+**Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `and`, `or` (also `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`, `++`, `--`).
 
 **Std library**: `print`.
