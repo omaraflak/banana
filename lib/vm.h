@@ -22,7 +22,6 @@ class Vm {
     std::forward_list<std::vector<uint8_t>> heaps;
     uint64_t ip;
     bool running;
-    bool debug;
 };
 
 #endif // VM
