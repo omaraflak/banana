@@ -167,41 +167,75 @@ Instruction* Instruction::from_string(const std::string& str) {
     return instruction;
 }
 
-BinaryOperationInstruction::BinaryOperationInstruction(const uint8_t& opcode, std::function<Value(const Value&, const Value&)> operation) : Instruction(opcode) {
-    this->operation = operation;
-}
+AddInstruction::AddInstruction() : Instruction(OP_ADD) {}
 
-void BinaryOperationInstruction::execute(Vm& vm) const {
+void AddInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, operation(left, right));
+    bytes::push_long(*vm.stack, left + right);
 }
 
-AddInstruction::AddInstruction() : BinaryOperationInstruction(OP_ADD, bytes::add_long) {}
+SubInstruction::SubInstruction() : Instruction(OP_SUB) {}
 
-SubInstruction::SubInstruction() : BinaryOperationInstruction(OP_SUB, bytes::sub_long) {}
-
-MulInstruction::MulInstruction() : BinaryOperationInstruction(OP_MUL, bytes::mul_long) {}
-
-DivInstruction::DivInstruction() : BinaryOperationInstruction(OP_DIV, bytes::div_long) {}
-
-ModInstruction::ModInstruction() : BinaryOperationInstruction(OP_MOD, bytes::mod_long) {}
-
-AndInstruction::AndInstruction() : BinaryOperationInstruction(OP_AND, bytes::and_long) {}
-
-OrInstruction::OrInstruction() : BinaryOperationInstruction(OP_OR, bytes::or_long) {}
-
-XorInstruction::XorInstruction() : BinaryOperationInstruction(OP_XOR, bytes::xor_long) {}
-
-UnaryOperationInstruction::UnaryOperationInstruction(const uint8_t& opcode, std::function<Value(const Value&)> operation) : Instruction(opcode) {
-    this->operation = operation;
+void SubInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left - right);
 }
 
-void UnaryOperationInstruction::execute(Vm& vm) const {
-    bytes::push_long(*vm.stack, operation(bytes::pop_long(*vm.stack)));
+MulInstruction::MulInstruction() : Instruction(OP_MUL) {}
+
+void MulInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left * right);
 }
 
-NotInstruction::NotInstruction() : UnaryOperationInstruction(OP_NOT, bytes::not_long) {}
+DivInstruction::DivInstruction() : Instruction(OP_DIV) {}
+
+void DivInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left / right);
+}
+
+ModInstruction::ModInstruction() : Instruction(OP_MOD) {}
+
+void ModInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left % right);
+}
+
+AndInstruction::AndInstruction() : Instruction(OP_AND) {}
+
+void AndInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left & right);
+}
+
+OrInstruction::OrInstruction() : Instruction(OP_OR) {}
+
+void OrInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left | right);
+}
+
+XorInstruction::XorInstruction() : Instruction(OP_XOR) {}
+
+void XorInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left ^ right);
+}
+
+NotInstruction::NotInstruction() : Instruction(OP_NOT) {}
+
+void NotInstruction::execute(Vm& vm) const {
+    bytes::push_long(*vm.stack, ~bytes::pop_long(*vm.stack));
+}
 
 PushInstruction::PushInstruction() : Instruction(OP_PUSH) {}
 
@@ -405,47 +439,74 @@ void SwapInstruction::execute(Vm& vm) const {
     bytes::push_long(*vm.stack, b);
 }
 
-CompareInstruction::CompareInstruction(const uint8_t& opcode, std::function<uint8_t(const Value&, const Value&)> operation) : Instruction(opcode) {
-    this->operation = operation;
-}
+LtInstruction::LtInstruction() : Instruction(OP_LT) {}
 
-void CompareInstruction::execute(Vm& vm) const {
+void LtInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, operation(left, right));
+    bytes::push_byte(*vm.stack, left < right);
 }
 
-LtInstruction::LtInstruction() : CompareInstruction(OP_LT, bytes::lt_long) {}
+LteInstruction::LteInstruction() : Instruction(OP_LTE) {}
 
-LteInstruction::LteInstruction() : CompareInstruction(OP_LTE, bytes::lte_long) {}
-
-GtInstruction::GtInstruction() : CompareInstruction(OP_GT, bytes::gt_long) {}
-
-GteInstruction::GteInstruction() : CompareInstruction(OP_GTE, bytes::gte_long) {}
-
-EqInstruction::EqInstruction() : CompareInstruction(OP_EQ, bytes::eq_long) {}
-
-NotEqInstruction::NotEqInstruction() : CompareInstruction(OP_NOT_EQ, bytes::not_eq_long) {}
-
-BoolInstruction::BoolInstruction(const uint8_t& opcode, std::function<uint8_t(const bool&, const bool&)> operation) : Instruction(opcode) {
-    this->operation = operation;
+void LteInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_byte(*vm.stack, left <= right);
 }
 
-void BoolInstruction::execute(Vm& vm) const {
+GtInstruction::GtInstruction() : Instruction(OP_GT) {}
+
+void GtInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_byte(*vm.stack, left > right);
+}
+
+GteInstruction::GteInstruction() : Instruction(OP_GTE) {}
+
+void GteInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_byte(*vm.stack, left >= right);
+}
+
+EqInstruction::EqInstruction() : Instruction(OP_EQ) {}
+
+void EqInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_byte(*vm.stack, left == right);
+}
+
+NotEqInstruction::NotEqInstruction() : Instruction(OP_NOT_EQ) {}
+
+void NotEqInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_byte(*vm.stack, left != right);
+}
+
+BoolAndInstruction::BoolAndInstruction() : Instruction(OP_BOOL_AND) {}
+
+void BoolAndInstruction::execute(Vm& vm) const {
     uint8_t right = bytes::pop_byte(*vm.stack);
     uint8_t left = bytes::pop_byte(*vm.stack);
-    bytes::push_byte(*vm.stack, operation(left, right));   
+    bytes::push_byte(*vm.stack, left && right);
 }
 
-BoolAndInstruction::BoolAndInstruction() : BoolInstruction(OP_BOOL_AND, bytes::bool_and) {}
+BoolOrInstruction::BoolOrInstruction() : Instruction(OP_BOOL_OR) {}
 
-BoolOrInstruction::BoolOrInstruction() : BoolInstruction(OP_BOOL_OR, bytes::bool_or) {}
+void BoolOrInstruction::execute(Vm& vm) const {
+    uint8_t right = bytes::pop_byte(*vm.stack);
+    uint8_t left = bytes::pop_byte(*vm.stack);
+    bytes::push_byte(*vm.stack, left || right);
+}
 
 BoolNotInstruction::BoolNotInstruction() : Instruction(OP_BOOL_NOT) {}
 
 void BoolNotInstruction::execute(Vm& vm) const {
-    bool value = bytes::pop_byte(*vm.stack);
-    bytes::push_byte(*vm.stack, !value);
+    bytes::push_byte(*vm.stack, !bytes::pop_byte(*vm.stack));
 }
 
 PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}

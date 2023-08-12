@@ -20,26 +20,6 @@
 #define SIZE_OF_LONG 8
 
 namespace bytes {
-int64_t add_long(const int64_t& a, const int64_t& b);
-int64_t sub_long(const int64_t& a, const int64_t& b);
-int64_t mul_long(const int64_t& a, const int64_t& b);
-int64_t div_long(const int64_t& a, const int64_t& b);
-int64_t mod_long(const int64_t& a, const int64_t& b);
-int64_t and_long(const int64_t& a, const int64_t& b);
-int64_t or_long(const int64_t& a, const int64_t& b);
-int64_t xor_long(const int64_t& a, const int64_t& b);
-int64_t not_long(const int64_t& x);
-
-uint8_t lt_long(const int64_t& a, const int64_t& b);
-uint8_t lte_long(const int64_t& a, const int64_t& b);
-uint8_t gt_long(const int64_t& a, const int64_t& b);
-uint8_t gte_long(const int64_t& a, const int64_t& b);
-uint8_t eq_long(const int64_t& a, const int64_t& b);
-uint8_t not_eq_long(const int64_t& a, const int64_t& b);
-uint8_t bool_and(const bool& a, const bool& b);
-uint8_t bool_or(const bool& a, const bool& b);
-uint8_t bool_not(const bool& x);
-
 uint8_t pop_byte(std::vector<uint8_t>& stack);
 uint16_t pop_short(std::vector<uint8_t>& stack);
 uint32_t pop_int(std::vector<uint8_t>& stack);

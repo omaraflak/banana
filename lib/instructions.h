@@ -64,67 +64,58 @@ class Instruction {
     uint8_t opcode;
 };
 
-class BinaryOperationInstruction: public Instruction {
-    public:
-    BinaryOperationInstruction(const uint8_t& opcode, std::function<Value(const Value&, const Value&)> operation);
-    void execute(Vm& vm) const;
-
-    private:
-    std::function<Value(const Value&, const Value&)> operation;
-};
-
-class AddInstruction: public BinaryOperationInstruction {
+class AddInstruction: public Instruction {
     public:
     AddInstruction();
+    void execute(Vm& vm) const;
 };
 
-class SubInstruction: public BinaryOperationInstruction {
+class SubInstruction: public Instruction {
     public:
     SubInstruction();
+    void execute(Vm& vm) const;
 };
 
-class MulInstruction: public BinaryOperationInstruction {
+class MulInstruction: public Instruction {
     public:
     MulInstruction();
+    void execute(Vm& vm) const;
 };
 
-class DivInstruction: public BinaryOperationInstruction {
+class DivInstruction: public Instruction {
     public:
     DivInstruction();
+    void execute(Vm& vm) const;
 };
 
-class ModInstruction: public BinaryOperationInstruction {
+class ModInstruction: public Instruction {
     public:
     ModInstruction();
+    void execute(Vm& vm) const;
 };
 
-class AndInstruction: public BinaryOperationInstruction {
+class AndInstruction: public Instruction {
     public:
     AndInstruction();
+    void execute(Vm& vm) const;
 };
 
-class OrInstruction: public BinaryOperationInstruction {
+class OrInstruction: public Instruction {
     public:
     OrInstruction();
+    void execute(Vm& vm) const;
 };
 
-class XorInstruction: public BinaryOperationInstruction {
+class XorInstruction: public Instruction {
     public:
     XorInstruction();
-};
-
-class UnaryOperationInstruction: public Instruction {
-    public:
-    UnaryOperationInstruction(const uint8_t& opcode, std::function<Value(const Value&)> operation);
     void execute(Vm& vm) const;
-
-    private:
-    std::function<Value(const Value&)> operation;
 };
 
-class NotInstruction: public UnaryOperationInstruction {
+class NotInstruction: public Instruction {
     public:
     NotInstruction();
+    void execute(Vm& vm) const;
 };
 
 class PushInstruction: public Instruction {
@@ -218,62 +209,52 @@ class SwapInstruction: public Instruction {
     void execute(Vm& vm) const;
 };
 
-class CompareInstruction: public Instruction {
-    public:
-    CompareInstruction(const uint8_t& opcode, std::function<uint8_t(const Value&, const Value&)> operation);
-    void execute(Vm& vm) const;
-
-    private:
-    std::function<uint8_t(const Value&, const Value&)> operation;
-};
-
-class LtInstruction: public CompareInstruction {
+class LtInstruction: public Instruction {
     public:
     LtInstruction();
+    void execute(Vm& vm) const;
 };
 
-class LteInstruction: public CompareInstruction {
+class LteInstruction: public Instruction {
     public:
     LteInstruction();
+    void execute(Vm& vm) const;
 };
 
-class GtInstruction: public CompareInstruction {
+class GtInstruction: public Instruction {
     public:
     GtInstruction();
+    void execute(Vm& vm) const;
 };
 
-class GteInstruction: public CompareInstruction {
+class GteInstruction: public Instruction {
     public:
     GteInstruction();
+    void execute(Vm& vm) const;
 };
 
-class EqInstruction: public CompareInstruction {
+class EqInstruction: public Instruction {
     public:
     EqInstruction();
+    void execute(Vm& vm) const;
 };
 
-class NotEqInstruction: public CompareInstruction {
+class NotEqInstruction: public Instruction {
     public:
     NotEqInstruction();
-};
-
-class BoolInstruction: public Instruction {
-    public:
-    BoolInstruction(const uint8_t& opcode, std::function<uint8_t(const bool&, const bool&)> operation);
     void execute(Vm& vm) const;
-
-    private:
-    std::function<uint8_t(const bool&, const bool&)> operation;
 };
 
-class BoolAndInstruction: public BoolInstruction {
+class BoolAndInstruction: public Instruction {
     public:
     BoolAndInstruction();
+    void execute(Vm& vm) const;
 };
 
-class BoolOrInstruction: public BoolInstruction {
+class BoolOrInstruction: public Instruction {
     public:
     BoolOrInstruction();
+    void execute(Vm& vm) const;
 };
 
 class BoolNotInstruction: public Instruction {
