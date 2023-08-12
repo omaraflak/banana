@@ -1,4 +1,4 @@
-all: assembler banana
+all: bin assembler banana
 
 assembler: bin/assembler.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o
 	g++ -o assembler bin/assembler.o  bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o -std=c++17
@@ -31,4 +31,7 @@ bin/scanner.o: lib/scanner.cpp lib/scanner.h
 	g++ -c lib/scanner.cpp -o bin/scanner.o -std=c++17
 
 bin/parser.o: lib/parser.cpp lib/parser.h
-	g++ -c lib/parser.cpp -o bin/parser.o -std=c++17t 
+	g++ -c lib/parser.cpp -o bin/parser.o -std=c++17
+
+bin:
+	mkdir bin
