@@ -8,7 +8,7 @@
 
 class Vm {
     public:
-    Vm(std::vector<uint8_t> program);
+    Vm(const std::vector<uint8_t>& program);
 
     void execute();
     void push_frame();

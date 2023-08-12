@@ -2,7 +2,7 @@
 #include "instructions.h"
 #include <string>
 
-Vm::Vm(std::vector<uint8_t> program) {
+Vm::Vm(const std::vector<uint8_t>& program) {
     this->program = program;
     ip = 0;
     running = true;
