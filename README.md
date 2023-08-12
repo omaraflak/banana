@@ -36,6 +36,6 @@ Currently, the language is very limited and supports the following features.
 
 **Binary Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `and`, `or` (also `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`).
 
-**Unary Operators**: `=`, `++`, `--`.
+**Unary Operators**: `=`, `-`, `!`, `~`, `++`, `--`.
 
 **Std library**: `print`.
