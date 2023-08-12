@@ -359,7 +359,7 @@ void CallInstruction::execute(Vm& vm) const {
     vm.call_stack.push_back(vm.ip);
     vm.ip = address;
     std::vector<uint8_t>& old_stack = *vm.stack;
-    vm.new_frame();
+    vm.push_frame();
     for (int i = 0; i < param_count; i++) {
         bytes::push_long(*vm.stack, bytes::pop_long(old_stack));
     }
@@ -399,13 +399,13 @@ void RetInstruction::write(std::vector<uint8_t>& buffer) const {
 void RetInstruction::execute(Vm& vm) const {
     vm.ip = vm.call_stack.back();
     vm.call_stack.pop_back();
-    std::vector<Value> values;
+    Value values[values_count];
     for (int i = 0; i < values_count; i++) {
-        values.push_back(bytes::pop_long(*vm.stack));
+        values[i] = bytes::pop_long(*vm.stack);
     }
     vm.pop_frame();
-    for (auto value : values) {
-        bytes::push_long(*vm.stack, value);
+    for (int i = 0; i < values_count; i++) {
+        bytes::push_long(*vm.stack, values[i]);
     }
 }
 

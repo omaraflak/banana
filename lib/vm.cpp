@@ -33,7 +33,7 @@ Vm::Vm(std::vector<uint8_t> program) {
     this->program = program;
     ip = 0;
     running = true;
-    new_frame();
+    push_frame();
 }
 
 void Vm::execute() {
@@ -54,7 +54,7 @@ void Vm::execute() {
     }
 }
 
-void Vm::new_frame() {
+void Vm::push_frame() {
     stacks.push_front(std::vector<uint8_t>());
     stack = &stacks.front();
     heaps.push_front(std::vector<uint8_t>(MAX_MEMORY));

@@ -11,7 +11,7 @@ class Vm {
     Vm(std::vector<uint8_t> program);
 
     void execute();
-    void new_frame();
+    void push_frame();
     void pop_frame();
 
     std::vector<uint8_t>* stack;
