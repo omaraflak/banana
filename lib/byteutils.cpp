@@ -1,21 +1,21 @@
 #include "byteutils.h"
 
-uint64_t bytes::add_long(const uint64_t& a, const uint64_t& b) { return a + b; }
-uint64_t bytes::sub_long(const uint64_t& a, const uint64_t& b) { return a - b; }
-uint64_t bytes::mul_long(const uint64_t& a, const uint64_t& b) { return a * b; }
-uint64_t bytes::div_long(const uint64_t& a, const uint64_t& b) { return a / b; }
-uint64_t bytes::mod_long(const uint64_t& a, const uint64_t& b) { return a % b; }
-uint64_t bytes::and_long(const uint64_t& a, const uint64_t& b) { return a & b; }
-uint64_t bytes::or_long(const uint64_t& a, const uint64_t& b) { return a | b; }
-uint64_t bytes::xor_long(const uint64_t& a, const uint64_t& b) { return a ^ b; }
-uint64_t bytes::not_long(const uint64_t& x) { return ~x; }
+int64_t bytes::add_long(const int64_t& a, const int64_t& b) { return a + b; }
+int64_t bytes::sub_long(const int64_t& a, const int64_t& b) { return a - b; }
+int64_t bytes::mul_long(const int64_t& a, const int64_t& b) { return a * b; }
+int64_t bytes::div_long(const int64_t& a, const int64_t& b) { return a / b; }
+int64_t bytes::mod_long(const int64_t& a, const int64_t& b) { return a % b; }
+int64_t bytes::and_long(const int64_t& a, const int64_t& b) { return a & b; }
+int64_t bytes::or_long(const int64_t& a, const int64_t& b) { return a | b; }
+int64_t bytes::xor_long(const int64_t& a, const int64_t& b) { return a ^ b; }
+int64_t bytes::not_long(const int64_t& x) { return ~x; }
 
-uint8_t bytes::lt_long(const uint64_t& a, const uint64_t& b) { return a < b; }
-uint8_t bytes::lte_long(const uint64_t& a, const uint64_t& b) { return a <= b; }
-uint8_t bytes::gt_long(const uint64_t& a, const uint64_t& b) { return a > b; }
-uint8_t bytes::gte_long(const uint64_t& a, const uint64_t& b) { return a >= b; }
-uint8_t bytes::eq_long(const uint64_t& a, const uint64_t& b) { return a == b; }
-uint8_t bytes::not_eq_long(const uint64_t& a, const uint64_t& b) { return a != b; }
+uint8_t bytes::lt_long(const int64_t& a, const int64_t& b) { return a < b; }
+uint8_t bytes::lte_long(const int64_t& a, const int64_t& b) { return a <= b; }
+uint8_t bytes::gt_long(const int64_t& a, const int64_t& b) { return a > b; }
+uint8_t bytes::gte_long(const int64_t& a, const int64_t& b) { return a >= b; }
+uint8_t bytes::eq_long(const int64_t& a, const int64_t& b) { return a == b; }
+uint8_t bytes::not_eq_long(const int64_t& a, const int64_t& b) { return a != b; }
 uint8_t bytes::bool_and(const bool& a, const bool& b) { return a && b; }
 uint8_t bytes::bool_or(const bool& a, const bool& b) { return a || b; }
 uint8_t bytes::bool_not(const bool& x) { return !x; }

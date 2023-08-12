@@ -10,7 +10,7 @@ void AbstractSyntaxTree::write(std::vector<const Instruction*>& instructions) {
     written = true;
 }
 
-uint64_t AbstractSyntaxTree::get_program_address() const {
+Address AbstractSyntaxTree::get_program_address() const {
     return program_address;
 }
 
@@ -26,7 +26,7 @@ AbstractSyntaxTree* AbstractSyntaxTree::get_main() const {
     return main;
 }
 
-LiteralNode::LiteralNode(const uint64_t& value) : AbstractSyntaxTree() {
+LiteralNode::LiteralNode(const Value& value) : AbstractSyntaxTree() {
     this->value = value;
 }
 
@@ -53,7 +53,7 @@ void VariableNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new LoadInstruction(address));
 }
 
-uint64_t VariableNode::get_address() const {
+Address VariableNode::get_address() const {
     return address;
 }
 
@@ -220,7 +220,7 @@ WhileNode::WhileNode(
 
 void WhileNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
-    uint64_t while_address = ast::count_bytes(instructions);
+    Address while_address = ast::count_bytes(instructions);
     condition->write(instructions);
     JumpIfFalseInstruction* jump = new JumpIfFalseInstruction();
     instructions.push_back(jump);
@@ -244,7 +244,7 @@ ForNode::ForNode(
 void ForNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
     init->write(instructions);
-    uint64_t if_address = ast::count_bytes(instructions);
+    Address if_address = ast::count_bytes(instructions);
     condition->write(instructions);
     JumpIfFalseInstruction* jump = new JumpIfFalseInstruction();
     instructions.push_back(jump);
@@ -354,8 +354,8 @@ void HaltNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new HaltInstruction());
 }
 
-uint64_t ast::count_bytes(const std::vector<const Instruction*>& instructions) {
-    uint64_t size = 0;
+Address ast::count_bytes(const std::vector<const Instruction*>& instructions) {
+    Address size = 0;
     for (const Instruction* instruction : instructions) {
         size += instruction->size();
     }
@@ -389,9 +389,9 @@ std::vector<uint8_t> ast::to_bytes(const std::vector<std::unique_ptr<const Instr
     return bytes;
 }
 
-std::vector<std::pair<uint64_t, std::string>> ast::to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
-    std::vector<std::pair<uint64_t, std::string>> strings;
-    uint64_t index = 0;
+std::vector<std::pair<Address, std::string>> ast::to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
+    std::vector<std::pair<Address, std::string>> strings;
+    Address index = 0;
     for (const auto& instruction : instructions) {
         strings.push_back(std::make_pair(index, instruction->to_string()));
         index += instruction->size();

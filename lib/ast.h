@@ -13,7 +13,7 @@ class AbstractSyntaxTree {
     AbstractSyntaxTree();
     virtual void write(std::vector<const Instruction*>& instructions);
 
-    uint64_t get_program_address() const;
+    Address get_program_address() const;
     bool is_written() const;
 
     void set_main(AbstractSyntaxTree* main);
@@ -21,30 +21,30 @@ class AbstractSyntaxTree {
 
     protected:
     AbstractSyntaxTree* main;
-    uint64_t program_address;
+    Address program_address;
     bool written;
 };
 
 class LiteralNode: public AbstractSyntaxTree {
     public:
-    LiteralNode(const uint64_t& value);
+    LiteralNode(const Value& value);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    uint64_t value;
+    Value value;
 };
 
 class VariableNode: public AbstractSyntaxTree {
     public:
     VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame);
     void write(std::vector<const Instruction*>& instructions);
-    uint64_t get_address() const;
+    Address get_address() const;
     
     private:
     std::shared_ptr<const AbstractSyntaxTree> frame;
-    uint64_t address;
+    Address address;
 
-    static inline std::map<std::shared_ptr<const AbstractSyntaxTree>, uint64_t> latest_address;
+    static inline std::map<std::shared_ptr<const AbstractSyntaxTree>, Address> latest_address;
 };
 
 enum AstBinaryOperation {
@@ -209,10 +209,10 @@ class HaltNode: public AbstractSyntaxTree {
 };
 
 namespace ast {
-    uint64_t count_bytes(const std::vector<const Instruction*>& instructions);
+    Address count_bytes(const std::vector<const Instruction*>& instructions);
     std::vector<std::unique_ptr<const Instruction>> to_instructions(const std::shared_ptr<AbstractSyntaxTree>& root);
     std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
-    std::vector<std::pair<uint64_t, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
+    std::vector<std::pair<Address, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
 };
 
 #endif // AST

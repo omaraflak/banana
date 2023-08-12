@@ -63,7 +63,7 @@ Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
 }
 
-void Instruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {}
+void Instruction::read(const std::vector<uint8_t>& buffer, Value* index) {}
 
 void Instruction::write(std::vector<uint8_t>& buffer) const {
     buffer.push_back(opcode);
@@ -167,13 +167,13 @@ Instruction* Instruction::from_string(const std::string& str) {
     return instruction;
 }
 
-BinaryOperationInstruction::BinaryOperationInstruction(const uint8_t& opcode, std::function<uint64_t(const uint64_t&, const uint64_t&)> operation) : Instruction(opcode) {
+BinaryOperationInstruction::BinaryOperationInstruction(const uint8_t& opcode, std::function<Value(const Value&, const Value&)> operation) : Instruction(opcode) {
     this->operation = operation;
 }
 
 void BinaryOperationInstruction::execute(Vm& vm) const {
-    uint64_t right = bytes::pop_long(*vm.stack);
-    uint64_t left = bytes::pop_long(*vm.stack);
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
     bytes::push_long(*vm.stack, operation(left, right));
 }
 
@@ -193,7 +193,7 @@ OrInstruction::OrInstruction() : BinaryOperationInstruction(OP_OR, bytes::or_lon
 
 XorInstruction::XorInstruction() : BinaryOperationInstruction(OP_XOR, bytes::xor_long) {}
 
-UnaryOperationInstruction::UnaryOperationInstruction(const uint8_t& opcode, std::function<uint64_t(const uint64_t&)> operation) : Instruction(opcode) {
+UnaryOperationInstruction::UnaryOperationInstruction(const uint8_t& opcode, std::function<Value(const Value&)> operation) : Instruction(opcode) {
     this->operation = operation;
 }
 
@@ -205,11 +205,11 @@ NotInstruction::NotInstruction() : UnaryOperationInstruction(OP_NOT, bytes::not_
 
 PushInstruction::PushInstruction() : Instruction(OP_PUSH) {}
 
-PushInstruction::PushInstruction(const uint64_t& value) : Instruction(OP_PUSH) {
+PushInstruction::PushInstruction(const Value& value) : Instruction(OP_PUSH) {
     this->value = value;
 }
 
-void PushInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+void PushInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     value = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -239,17 +239,17 @@ uint8_t PushInstruction::size() const {
 
 JumpInstruction::JumpInstruction() : Instruction(OP_JUMP) {}
 
-JumpInstruction::JumpInstruction(const uint64_t& address) : Instruction(OP_JUMP) {
+JumpInstruction::JumpInstruction(const Address& address) : Instruction(OP_JUMP) {
     this->address = address;
 }
 
 JumpInstruction::JumpInstruction(const uint8_t& opcode) : Instruction(opcode) {}
 
-JumpInstruction::JumpInstruction(const uint8_t& opcode, const uint64_t& address) : Instruction(opcode) {
+JumpInstruction::JumpInstruction(const uint8_t& opcode, const Address& address) : Instruction(opcode) {
     this->address = address;
 }
 
-void JumpInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+void JumpInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -277,13 +277,13 @@ uint8_t JumpInstruction::size() const {
     return Instruction::size() + SIZE_OF_LONG;
 }
 
-void JumpInstruction::set_address(const uint64_t& address) {
+void JumpInstruction::set_address(const Address& address) {
     this->address = address;
 }
 
 JumpIfInstruction::JumpIfInstruction() : JumpInstruction((uint8_t) OP_JUMP_IF) {}
 
-JumpIfInstruction::JumpIfInstruction(const uint64_t& address) : JumpInstruction(OP_JUMP_IF, address) {}
+JumpIfInstruction::JumpIfInstruction(const Address& address) : JumpInstruction(OP_JUMP_IF, address) {}
 
 void JumpIfInstruction::execute(Vm& vm) const {
     if (bytes::pop_byte(*vm.stack) == 1) {
@@ -293,7 +293,7 @@ void JumpIfInstruction::execute(Vm& vm) const {
 
 JumpIfFalseInstruction::JumpIfFalseInstruction() : JumpInstruction((uint8_t) OP_JUMP_IF_FALSE) {}
 
-JumpIfFalseInstruction::JumpIfFalseInstruction(const uint64_t& address) : JumpInstruction(OP_JUMP_IF_FALSE, address) {}
+JumpIfFalseInstruction::JumpIfFalseInstruction(const Address& address) : JumpInstruction(OP_JUMP_IF_FALSE, address) {}
 
 void JumpIfFalseInstruction::execute(Vm& vm) const {
     if (bytes::pop_byte(*vm.stack) == 0) {
@@ -303,12 +303,12 @@ void JumpIfFalseInstruction::execute(Vm& vm) const {
 
 CallInstruction::CallInstruction() : Instruction(OP_CALL) {}
 
-CallInstruction::CallInstruction(const uint64_t& address, const uint8_t& param_count) : Instruction(OP_CALL) {
+CallInstruction::CallInstruction(const Address& address, const uint8_t& param_count) : Instruction(OP_CALL) {
     this->address = address;
     this->param_count = param_count;
 }
 
-void CallInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+void CallInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
     param_count = bytes::read_byte(buffer, *index);
@@ -352,7 +352,7 @@ RetInstruction::RetInstruction(const uint8_t& values_count) : Instruction(OP_RET
     this->values_count = values_count;
 }
 
-void RetInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+void RetInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     values_count = bytes::read_byte(buffer, *index);
     *index += SIZE_OF_BYTE;
 }
@@ -365,7 +365,7 @@ void RetInstruction::write(std::vector<uint8_t>& buffer) const {
 void RetInstruction::execute(Vm& vm) const {
     vm.ip = vm.call_stack.back();
     vm.call_stack.pop_back();
-    std::vector<uint64_t> values;
+    std::vector<Value> values;
     for (int i = 0; i < values_count; i++) {
         values.push_back(bytes::pop_long(*vm.stack));
     }
@@ -392,26 +392,26 @@ uint8_t RetInstruction::size() const {
 DupInstruction::DupInstruction() : Instruction(OP_DUP) {}
 
 void DupInstruction::execute(Vm& vm) const {
-    uint64_t value = bytes::read_long(*vm.stack, vm.stack->size() - SIZE_OF_LONG);
+    Value value = bytes::read_long(*vm.stack, vm.stack->size() - SIZE_OF_LONG);
     bytes::push_long(*vm.stack, value);
 }
 
 SwapInstruction::SwapInstruction() : Instruction(OP_SWAP) {}
 
 void SwapInstruction::execute(Vm& vm) const {
-    uint64_t a = bytes::pop_long(*vm.stack);
-    uint64_t b = bytes::pop_long(*vm.stack);
+    Value a = bytes::pop_long(*vm.stack);
+    Value b = bytes::pop_long(*vm.stack);
     bytes::push_long(*vm.stack, a);
     bytes::push_long(*vm.stack, b);
 }
 
-CompareInstruction::CompareInstruction(const uint8_t& opcode, std::function<uint8_t(const uint64_t&, const uint64_t&)> operation) : Instruction(opcode) {
+CompareInstruction::CompareInstruction(const uint8_t& opcode, std::function<uint8_t(const Value&, const Value&)> operation) : Instruction(opcode) {
     this->operation = operation;
 }
 
 void CompareInstruction::execute(Vm& vm) const {
-    uint64_t right = bytes::pop_long(*vm.stack);
-    uint64_t left = bytes::pop_long(*vm.stack);
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
     bytes::push_byte(*vm.stack, operation(left, right));
 }
 
@@ -462,11 +462,11 @@ void PrintCharInstruction::execute(Vm& vm) const {
 
 StoreInstruction::StoreInstruction() : Instruction(OP_STORE) {}
 
-StoreInstruction::StoreInstruction(const uint64_t& address) : Instruction(OP_STORE) {
+StoreInstruction::StoreInstruction(const Address& address) : Instruction(OP_STORE) {
     this->address = address;
 }
 
-void StoreInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+void StoreInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -496,11 +496,11 @@ uint8_t StoreInstruction::size() const {
 
 LoadInstruction::LoadInstruction() : Instruction(OP_LOAD) {}
 
-LoadInstruction::LoadInstruction(const uint64_t& address) : Instruction(OP_LOAD) {
+LoadInstruction::LoadInstruction(const Address& address) : Instruction(OP_LOAD) {
     this->address = address;
 }
 
-void LoadInstruction::read(const std::vector<uint8_t>& buffer, uint64_t* index) {
+void LoadInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
