@@ -32,8 +32,8 @@ Currently, the language is very limited and supports the following features.
 
 **Types**: variables are typed using the `var` keyword, but currently it only supports numbers.
 
-**Keywords**: `if`, `else`, `for`, `while`, `fun`, `return`, `and`, `or` 
+**Constructs**: `fun`, `if`, `else`, `for`, `while`, `return`.
 
-**Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|` (also `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`, and `++`, `--`)
+**Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `and`, `or` (also `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`, `++`, `--`).
 
-**Std library**:`print`
+**Std library**: `print`.
