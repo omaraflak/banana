@@ -1,7 +1,4 @@
-all: main assembler compiler asm
-
-main: bin/main.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o
-	g++ -o main bin/main.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o -std=c++17
+all: assembler compiler
 
 assembler: bin/assembler.o bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o
 	g++ -o assembler bin/assembler.o  bin/vm.o bin/instructions.o bin/byteutils.o bin/fileutils.o -std=c++17
@@ -14,9 +11,6 @@ bin/compiler.o: src/compiler.cpp lib/scanner.h lib/parser.h lib/ast.h lib/fileut
 
 bin/assembler.o: src/assembler.cpp lib/vm.h lib/instructions.h lib/byteutils.h lib/fileutils.h
 	g++ -c src/assembler.cpp -o bin/assembler.o -std=c++17
-
-bin/main.o: src/main.cpp lib/vm.h lib/instructions.h lib/byteutils.h lib/fileutils.h
-	g++ -c src/main.cpp -o bin/main.o -std=c++17
 
 bin/instructions.o: lib/instructions.cpp lib/instructions.h
 	g++ -c lib/instructions.cpp -o bin/instructions.o -std=c++17
@@ -38,6 +32,3 @@ bin/scanner.o: lib/scanner.cpp lib/scanner.h
 
 bin/parser.o: lib/parser.cpp lib/parser.h
 	g++ -c lib/parser.cpp -o bin/parser.o -std=c++17
-
-asm: assembler
-	for i in examples/*.asm; do ./assembler $$i $$i.obj; done
