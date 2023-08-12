@@ -334,7 +334,7 @@ std::shared_ptr<AbstractSyntaxTree> var_statement_or_assign_expression(Parser& p
         return var_statement(parser);
     }
     if (match_assign(parser)) {
-        return assign_statement(parser, false);
+        return assign_statement(parser, /* expect_semicolon */ false);
     }
     print_error(parser, "Expected assign expression.");
     exit(1);
