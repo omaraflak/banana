@@ -138,6 +138,10 @@ std::vector<Token> scanner::scan(const char* code) {
                 scanner.current++;
                 tokens.push_back(create_token(TOKEN_SEMICOLON, scanner));
                 break;
+            case '~':
+                scanner.current++;
+                tokens.push_back(create_token(TOKEN_TILDE, scanner));
+                break;
             case '&':
                 if (match_string(scanner, "&=")) {
                     scanner.current += 2;

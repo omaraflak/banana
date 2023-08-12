@@ -71,7 +71,7 @@ class BinaryOperationNode: public AbstractSyntaxTree {
 };
 
 enum AstUnaryOperation {
-    AST_BIN_NOT, AST_BOOL_NOT
+    AST_BIN_NOT, AST_BOOL_NOT, AST_UNARY_MINUS
 };
 
 class UnaryOperationNode: public AbstractSyntaxTree {

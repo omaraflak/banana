@@ -451,7 +451,7 @@ void BoolNotInstruction::execute(Vm& vm) const {
 PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}
 
 void PrintInstruction::execute(Vm& vm) const {
-    std::cout << bytes::pop_long(*vm.stack);
+    std::cout << (int64_t) bytes::pop_long(*vm.stack);
 }
 
 PrintCharInstruction::PrintCharInstruction() : Instruction(OP_PRINT_C) {}

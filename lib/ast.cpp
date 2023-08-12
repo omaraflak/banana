@@ -163,13 +163,19 @@ UnaryOperationNode::UnaryOperationNode(
 
 void UnaryOperationNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
-    expression->write(instructions);
     switch (operation) {
         case AST_BIN_NOT:
+            expression->write(instructions);
             instructions.push_back(new NotInstruction());
             break;
         case AST_BOOL_NOT:
+            expression->write(instructions);
             instructions.push_back(new BoolNotInstruction());
+            break;
+        case AST_UNARY_MINUS:
+            instructions.push_back(new PushInstruction(0));
+            expression->write(instructions);
+            instructions.push_back(new SubInstruction());
             break;
         default:
             std::cout << "Unrecognized unary operation: " << (int) operation << std::endl;

@@ -26,6 +26,12 @@ std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_OR, AST_BOOL_OR},
 };
 
+std::map<TokenType, AstUnaryOperation> UNA_OP = {
+    {TOKEN_BANG, AST_BOOL_NOT},
+    {TOKEN_TILDE, AST_BIN_NOT},
+    {TOKEN_MINUS, AST_UNARY_MINUS},
+};
+
 std::set<TokenType> KEYWORDS = {
     TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
     TOKEN_FOR, TOKEN_WHILE, TOKEN_AND, TOKEN_OR,
@@ -239,11 +245,10 @@ std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
 }
 
 std::shared_ptr<AbstractSyntaxTree> unary(Parser& parser) {
-    if (match(parser, {TOKEN_MINUS, TOKEN_BANG})) {
-        AstBinaryOperation op = BIN_OP[previous(parser).type];
+    if (match(parser, {TOKEN_MINUS, TOKEN_BANG, TOKEN_TILDE})) {
+        AstUnaryOperation op = UNA_OP[previous(parser).type];
         std::shared_ptr<AbstractSyntaxTree> exp = unary(parser);
-        std::shared_ptr<LiteralNode> zero = std::shared_ptr<LiteralNode>(new LiteralNode(0));
-        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(zero, exp, op));
+        return std::shared_ptr<UnaryOperationNode>(new UnaryOperationNode(exp, op));
     }
     return primary(parser);
 }
