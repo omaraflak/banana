@@ -4,15 +4,14 @@
 #include <vector>
 #include <stdint.h>
 
-#define MASK (int64_t) 0xff
-#define BYTE_0(x) (x & MASK)
-#define BYTE_1(x) ((x & (MASK << 8)) >> 8)
-#define BYTE_2(x) ((x & (MASK << 16)) >> 16)
-#define BYTE_3(x) ((x & (MASK << 24)) >> 24)
-#define BYTE_4(x) ((x & (MASK << 32)) >> 32)
-#define BYTE_5(x) ((x & (MASK << 40)) >> 40)
-#define BYTE_6(x) ((x & (MASK << 48)) >> 48)
-#define BYTE_7(x) ((x & (MASK << 56)) >> 56)
+#define BYTE_0(x) (x & 0xff)
+#define BYTE_1(x) ((x & 0xff00) >> 8)
+#define BYTE_2(x) ((x & 0xff0000) >> 16)
+#define BYTE_3(x) ((x & 0xff000000) >> 24)
+#define BYTE_4(x) ((x & 0xff00000000) >> 32)
+#define BYTE_5(x) ((x & 0xff0000000000) >> 40)
+#define BYTE_6(x) ((x & 0xff000000000000) >> 48)
+#define BYTE_7(x) ((x & 0xff00000000000000) >> 56)
 
 #define SIZE_OF_BYTE 1
 #define SIZE_OF_SHORT 2

@@ -352,7 +352,7 @@ void CallInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
 void CallInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
     bytes::push_long(buffer, address);
-    bytes::push_byte(buffer, param_count);
+    buffer.push_back(param_count);
 }
 
 void CallInstruction::execute(Vm& vm) const {
@@ -393,7 +393,7 @@ void RetInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
 
 void RetInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_byte(buffer, values_count);
+    buffer.push_back(values_count);
 }
 
 void RetInstruction::execute(Vm& vm) const {
@@ -444,7 +444,7 @@ LtInstruction::LtInstruction() : Instruction(OP_LT) {}
 void LtInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, left < right);
+    vm.stack->push_back(left < right);
 }
 
 LteInstruction::LteInstruction() : Instruction(OP_LTE) {}
@@ -452,7 +452,7 @@ LteInstruction::LteInstruction() : Instruction(OP_LTE) {}
 void LteInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, left <= right);
+    vm.stack->push_back(left <= right);
 }
 
 GtInstruction::GtInstruction() : Instruction(OP_GT) {}
@@ -460,7 +460,7 @@ GtInstruction::GtInstruction() : Instruction(OP_GT) {}
 void GtInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, left > right);
+    vm.stack->push_back(left > right);
 }
 
 GteInstruction::GteInstruction() : Instruction(OP_GTE) {}
@@ -468,7 +468,7 @@ GteInstruction::GteInstruction() : Instruction(OP_GTE) {}
 void GteInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, left >= right);
+    vm.stack->push_back(left >= right);
 }
 
 EqInstruction::EqInstruction() : Instruction(OP_EQ) {}
@@ -476,7 +476,7 @@ EqInstruction::EqInstruction() : Instruction(OP_EQ) {}
 void EqInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, left == right);
+    vm.stack->push_back(left == right);
 }
 
 NotEqInstruction::NotEqInstruction() : Instruction(OP_NOT_EQ) {}
@@ -484,7 +484,7 @@ NotEqInstruction::NotEqInstruction() : Instruction(OP_NOT_EQ) {}
 void NotEqInstruction::execute(Vm& vm) const {
     Value right = bytes::pop_long(*vm.stack);
     Value left = bytes::pop_long(*vm.stack);
-    bytes::push_byte(*vm.stack, left != right);
+    vm.stack->push_back(left != right);
 }
 
 BoolAndInstruction::BoolAndInstruction() : Instruction(OP_BOOL_AND) {}
@@ -492,7 +492,7 @@ BoolAndInstruction::BoolAndInstruction() : Instruction(OP_BOOL_AND) {}
 void BoolAndInstruction::execute(Vm& vm) const {
     uint8_t right = bytes::pop_byte(*vm.stack);
     uint8_t left = bytes::pop_byte(*vm.stack);
-    bytes::push_byte(*vm.stack, left && right);
+    vm.stack->push_back(left && right);
 }
 
 BoolOrInstruction::BoolOrInstruction() : Instruction(OP_BOOL_OR) {}
@@ -500,13 +500,13 @@ BoolOrInstruction::BoolOrInstruction() : Instruction(OP_BOOL_OR) {}
 void BoolOrInstruction::execute(Vm& vm) const {
     uint8_t right = bytes::pop_byte(*vm.stack);
     uint8_t left = bytes::pop_byte(*vm.stack);
-    bytes::push_byte(*vm.stack, left || right);
+    vm.stack->push_back(left || right);
 }
 
 BoolNotInstruction::BoolNotInstruction() : Instruction(OP_BOOL_NOT) {}
 
 void BoolNotInstruction::execute(Vm& vm) const {
-    bytes::push_byte(*vm.stack, !bytes::pop_byte(*vm.stack));
+    vm.stack->push_back(!bytes::pop_byte(*vm.stack));
 }
 
 PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}
