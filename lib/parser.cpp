@@ -44,7 +44,7 @@ typedef struct {
     int current;
     std::map<std::shared_ptr<AbstractSyntaxTree>, Frame> frames;
     std::stack<std::shared_ptr<AbstractSyntaxTree>> frame_stack;
-    std::map<std::string, std::shared_ptr<AbstractSyntaxTree>> functions;
+    std::map<std::string, std::shared_ptr<FunctionNode>> functions;
 } Parser;
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
@@ -52,6 +52,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon = true);
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser);
+std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& expect_semicolon = true);
 bool match_assign(Parser& parser);
 
 void print_error(const Parser& parser, const std::string& message);
@@ -206,12 +207,23 @@ void register_function(Parser& parser, const std::shared_ptr<FunctionNode>& fun,
     parser.functions[name] = fun;
 }
 
+std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::string& name) {
+    if (parser.functions.find(name) == parser.functions.end()) {
+        print_error(parser, "Function '" + name + "' not found.");
+        exit(1);
+    }
+    return parser.functions.at(name);
+}
+
 std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
         return std::shared_ptr<LiteralNode>(new LiteralNode(token_as_long(token)));
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
+        if (match(parser, {TOKEN_LEFT_PAREN})) {
+            return call_statement(parser, /* expect_semicolon */ false);
+        }
         Token token = previous(parser);
         std::string name = token_as_string(token);
         return get_variable_by_name(parser, name);
@@ -377,13 +389,13 @@ std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
     consume(parser, TOKEN_IDENTIFIER, "Expected identifier after 'fun'.");
     Token fun_id = previous(parser);
     std::shared_ptr<FunctionNode> fun_node = std::shared_ptr<FunctionNode>(new FunctionNode());
+    register_function(parser, fun_node, token_as_string(fun_id));
     push_frame(parser, fun_node);
     push_scope(parser, fun_node);
     std::vector<std::shared_ptr<VariableNode>> parameters = fun_parameters(parser);
     std::shared_ptr<AbstractSyntaxTree> fun_block = block(parser);
     fun_node->set_body(fun_block);
     fun_node->set_parameters(parameters);
-    register_function(parser, fun_node, token_as_string(fun_id));
     pop_scope(parser);
     pop_frame(parser);
     return fun_node;
@@ -393,10 +405,27 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     if (check(parser, TOKEN_SEMICOLON)) {
         return std::shared_ptr<ReturnNode>(new ReturnNode());
     }
-    std::shared_ptr<BlockNode> block(new BlockNode());
-    block->add(expression_statement(parser));
-    block->add(std::shared_ptr<ReturnNode>(new ReturnNode()));
-    return block;
+    return std::shared_ptr<ReturnNode>(new ReturnNode({expression_statement(parser)}));
+}
+
+std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& expect_semicolon) {
+    Token fun_id = previous(parser, 2);
+    std::shared_ptr<FunctionNode> fun_node = get_function(parser, token_as_string(fun_id));
+    std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
+    for (;;) {
+        if (check(parser, TOKEN_RIGHT_PAREN)) {
+            advance(parser);
+            break;
+        }
+        values.push_back(expression(parser));
+        if (!check(parser, TOKEN_RIGHT_PAREN)) {
+            consume(parser, TOKEN_COMMA, "Expected comma after function parameter.");
+        }
+    }
+    if (expect_semicolon) {
+        consume(parser, TOKEN_SEMICOLON, "Expected ';' after function call");
+    }
+    return std::shared_ptr<CallNode>(new CallNode(fun_node, values));
 }
 
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser) {
@@ -499,6 +528,9 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     }
     if (match(parser, {TOKEN_RETURN})) {
         return return_statement(parser);
+    }
+    if (match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_LEFT_PAREN})) {
+        return call_statement(parser);
     }
     return expression_statement(parser);
 }

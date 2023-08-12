@@ -338,7 +338,7 @@ void CallInstruction::read_string(const std::vector<std::string>& strings) {
 
 std::string CallInstruction::to_string() const {
     std::stringstream ss;
-    ss << Instruction::to_string() << " " << address << " " << param_count;
+    ss << Instruction::to_string() << " " << address << " " << (int) param_count;
     return ss.str();
 }
 
@@ -381,7 +381,7 @@ void RetInstruction::read_string(const std::vector<std::string>& strings) {
 
 std::string RetInstruction::to_string() const {
     std::stringstream ss;
-    ss << Instruction::to_string() << " " << values_count;
+    ss << Instruction::to_string() << " " << (int) values_count;
     return ss.str();
 }
 
