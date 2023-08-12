@@ -358,7 +358,7 @@ void CallInstruction::write(std::vector<uint8_t>& buffer) const {
 }
 
 void CallInstruction::execute(Vm& vm) const {
-    vm.call_stack.push_back(vm.ip);
+    vm.call_stack.push(vm.ip);
     vm.ip = address;
     std::vector<uint8_t>& old_stack = *vm.stack;
     vm.push_frame();
@@ -399,8 +399,8 @@ void RetInstruction::write(std::vector<uint8_t>& buffer) const {
 }
 
 void RetInstruction::execute(Vm& vm) const {
-    vm.ip = vm.call_stack.back();
-    vm.call_stack.pop_back();
+    vm.ip = vm.call_stack.top();
+    vm.call_stack.pop();
     Value values[values_count];
     for (int i = 0; i < values_count; i++) {
         values[i] = bytes::pop_long(*vm.stack);
@@ -540,7 +540,7 @@ void StoreInstruction::write(std::vector<uint8_t>& buffer) const {
 }
 
 void StoreInstruction::execute(Vm& vm) const {
-    bytes::write_long(*vm.heap, address, bytes::pop_long(*vm.stack));
+    bytes::write_long(vm.heap, address, bytes::pop_long(*vm.stack));
 }
 
 void StoreInstruction::read_string(const std::vector<std::string>& strings) {
@@ -574,7 +574,7 @@ void LoadInstruction::write(std::vector<uint8_t>& buffer) const {
 }
 
 void LoadInstruction::execute(Vm& vm) const {
-    bytes::push_long(*vm.stack, bytes::read_long(*vm.heap, address));
+    bytes::push_long(*vm.stack, bytes::read_long(vm.heap, address));
 }
 
 void LoadInstruction::read_string(const std::vector<std::string>& strings) {
