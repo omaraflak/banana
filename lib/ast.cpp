@@ -274,12 +274,14 @@ void PrintStringNode::write(std::vector<const Instruction*>& instructions) {
     }
 }
 
+FunctionNode::FunctionNode() : AbstractSyntaxTree() {}
+
 FunctionNode::FunctionNode(
     const std::shared_ptr<AbstractSyntaxTree>& body,
     const std::vector<std::shared_ptr<VariableNode>>& parameters
 ) : AbstractSyntaxTree() {
-    this->body = body;
-    this->parameters.insert(this->parameters.end(), parameters.begin(), parameters.end());
+    set_body(body);
+    set_parameters(parameters);
 }
 
 void FunctionNode::write(std::vector<const Instruction*>& instructions) {
@@ -292,6 +294,15 @@ void FunctionNode::write(std::vector<const Instruction*>& instructions) {
 
 uint8_t FunctionNode::get_parameters_count() const {
     return parameters.size();
+}
+
+void FunctionNode::set_body(const std::shared_ptr<AbstractSyntaxTree>& body) {
+    this->body = body;
+}
+
+void FunctionNode::set_parameters(const std::vector<std::shared_ptr<VariableNode>>& parameters) {
+    this->parameters.clear();
+    this->parameters.insert(this->parameters.end(), parameters.begin(), parameters.end());
 }
 
 CallNode::CallNode(

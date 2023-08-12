@@ -5,6 +5,8 @@
 #include <set>
 
 namespace parser {
+const std::string MAIN = "main";
+
 std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_EQUAL_EQUAL, AST_EQ},
     {TOKEN_BANG_EQUAL, AST_NOT_EQ},
@@ -42,6 +44,7 @@ typedef struct {
     int current;
     std::map<std::shared_ptr<AbstractSyntaxTree>, Frame> frames;
     std::stack<std::shared_ptr<AbstractSyntaxTree>> frame_stack;
+    std::map<std::string, std::shared_ptr<AbstractSyntaxTree>> functions;
 } Parser;
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
@@ -195,6 +198,14 @@ std::shared_ptr<VariableNode> new_variable(Parser& parser, const std::string& na
     return variable;
 }
 
+void register_function(Parser& parser, const std::shared_ptr<FunctionNode>& fun, const std::string& name) {
+    if (parser.functions.find(name) != parser.functions.end()) {
+        print_error(parser, "Function named '" + name + "' was already declared.");
+        exit(1);
+    }
+    parser.functions[name] = fun;
+}
+
 std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
@@ -329,6 +340,57 @@ std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
     return std::shared_ptr<ForNode>(new ForNode(init, condition, increment, for_block));
 }
 
+std::vector<std::shared_ptr<VariableNode>> fun_parameters(Parser& parser) {
+    consume(parser, TOKEN_LEFT_PAREN, "Expected '(' before 'fun' parameters.");
+    std::vector<std::shared_ptr<VariableNode>> parameters;
+    TokenType previous_token = TOKEN_LEFT_PAREN;
+    for (;;) {
+        Token p = peek(parser);
+        if (p.type == TOKEN_IDENTIFIER) {
+            if (previous_token != TOKEN_LEFT_PAREN && previous_token != TOKEN_COMMA) {
+                print_error(parser, "Unexpected token '" + token_as_string(p) + "'.");
+                exit(1);
+            }
+            parameters.push_back(new_variable(parser, token_as_string(p)));
+            advance(parser);
+        } else if (p.type == TOKEN_COMMA) {
+            if (previous_token != TOKEN_IDENTIFIER) {
+                print_error(parser, "Unexpected token '" + token_as_string(p) + "'.");
+                exit(1);
+            }
+            advance(parser);
+        } else if (p.type == TOKEN_RIGHT_PAREN) {
+            if (previous_token != TOKEN_LEFT_PAREN && previous_token != TOKEN_IDENTIFIER) {
+                print_error(parser, "Unexpected token '" + token_as_string(p) + "'.");
+                exit(1);
+            }
+            advance(parser);
+            break;
+        } else {
+            print_error(parser, "Unexpected token '" + token_as_string(p) + "'.");
+            exit(1);
+        }
+        previous_token = p.type;
+    }
+    return parameters;
+}
+
+std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
+    consume(parser, TOKEN_IDENTIFIER, "Expected identifier after 'fun'.");
+    Token fun_id = previous(parser);
+    std::shared_ptr<FunctionNode> fun_node = std::shared_ptr<FunctionNode>(new FunctionNode());
+    push_frame(parser, fun_node);
+    push_scope(parser, fun_node);
+    std::vector<std::shared_ptr<VariableNode>> parameters = fun_parameters(parser);
+    std::shared_ptr<AbstractSyntaxTree> fun_block = block(parser);
+    fun_node->set_body(fun_block);
+    fun_node->set_parameters(parameters);
+    register_function(parser, fun_node, token_as_string(fun_id));
+    pop_scope(parser);
+    pop_frame(parser);
+    return fun_node;
+}
+
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser) {
     if (match_assign(parser)) {
         return assign_statement(parser, /* expect_semicolon */ false);
@@ -424,6 +486,9 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match_assign(parser)) {
         return assign_statement(parser);
     }
+    if (match(parser, {TOKEN_FUN})) {
+        return fun_statement(parser);
+    }
     return expression_statement(parser);
 }
 
@@ -449,6 +514,14 @@ std::shared_ptr<BlockNode> block(Parser& parser) {
     return block;
 }
 
+void jump_to_main(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& root) {
+    if (parser.functions.find(MAIN) == parser.functions.end()) {
+        // find beginning of script;
+        return;
+    }
+    root->set_main(parser.functions.at(MAIN).get());
+}
+
 std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
     std::shared_ptr<BlockNode> root = std::shared_ptr<BlockNode>(new BlockNode());
     push_frame(parser, root);
@@ -458,6 +531,7 @@ std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
     }
     pop_scope(parser);
     pop_frame(parser);
+    jump_to_main(parser, root);
     return root;
 }
 }
