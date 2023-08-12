@@ -234,6 +234,7 @@ std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
         return exp;
     }
     std::cout << "Reached end of primary expression without any matches." << std::endl;
+    std::cout << "Token: '" << token_as_string(peek(parser)) << "'" << std::endl;
     exit(1);
 }
 
@@ -403,9 +404,11 @@ std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     if (check(parser, TOKEN_SEMICOLON)) {
+        advance(parser);
         return std::shared_ptr<ReturnNode>(new ReturnNode());
     }
-    return std::shared_ptr<ReturnNode>(new ReturnNode({expression_statement(parser)}));
+    std::shared_ptr<AbstractSyntaxTree> exp = expression_statement(parser);
+    return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
 
 std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& expect_semicolon) {
