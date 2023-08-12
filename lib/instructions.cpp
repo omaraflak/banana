@@ -63,7 +63,7 @@ Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
 }
 
-void Instruction::read(const std::vector<uint8_t>& buffer, Value* index) {}
+void Instruction::read(const std::vector<uint8_t>& buffer, Address* index) {}
 
 void Instruction::write(std::vector<uint8_t>& buffer) const {
     buffer.push_back(opcode);
@@ -243,7 +243,7 @@ PushInstruction::PushInstruction(const Value& value) : Instruction(OP_PUSH) {
     this->value = value;
 }
 
-void PushInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
+void PushInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
     value = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -283,7 +283,7 @@ JumpInstruction::JumpInstruction(const uint8_t& opcode, const Address& address) 
     this->address = address;
 }
 
-void JumpInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
+void JumpInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -342,7 +342,7 @@ CallInstruction::CallInstruction(const Address& address, const uint8_t& param_co
     this->param_count = param_count;
 }
 
-void CallInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
+void CallInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
     param_count = buffer[*index];
@@ -386,7 +386,7 @@ RetInstruction::RetInstruction(const uint8_t& values_count) : Instruction(OP_RET
     this->values_count = values_count;
 }
 
-void RetInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
+void RetInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
     values_count = buffer[*index];
     *index += SIZE_OF_BYTE;
 }
@@ -527,7 +527,7 @@ StoreInstruction::StoreInstruction(const Address& address) : Instruction(OP_STOR
     this->address = address;
 }
 
-void StoreInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
+void StoreInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
@@ -561,7 +561,7 @@ LoadInstruction::LoadInstruction(const Address& address) : Instruction(OP_LOAD) 
     this->address = address;
 }
 
-void LoadInstruction::read(const std::vector<uint8_t>& buffer, Value* index) {
+void LoadInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
     address = bytes::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
