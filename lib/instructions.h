@@ -49,6 +49,7 @@ enum {
 class Instruction {
     public:
     Instruction(const uint8_t& opcode);
+    virtual ~Instruction();
     virtual void read(const std::vector<uint8_t>& buffer, Address* index);
     virtual void write(std::vector<uint8_t>& buffer) const;
     virtual void execute(Vm& vm) const;

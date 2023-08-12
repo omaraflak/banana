@@ -63,6 +63,8 @@ Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
 }
 
+Instruction::~Instruction() {}
+
 void Instruction::read(const std::vector<uint8_t>& buffer, Address* index) {}
 
 void Instruction::write(std::vector<uint8_t>& buffer) const {
