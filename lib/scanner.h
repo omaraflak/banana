@@ -31,11 +31,11 @@ enum TokenType {
     TOKEN_PRINT, TOKEN_VAR
 };
 
-typedef struct {
+struct Token{
     TokenType type;
     std::string value;
     int line;
-} Token;
+};
 
 namespace scanner {
 std::vector<Token> scan(const std::string& code);

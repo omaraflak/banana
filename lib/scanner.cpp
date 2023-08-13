@@ -2,12 +2,12 @@
 #include <iostream>
 
 namespace scanner {
-typedef struct {
+struct Scanner {
     std::string code;
     int start;
     int current;
     int line;
-} Scanner;
+};
 
 Token create_token(const TokenType& type, const Scanner& scanner) {
     Token token;
