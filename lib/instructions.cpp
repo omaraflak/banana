@@ -56,7 +56,6 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_BOOLEAN_OR, "bool_or"},
     {OP_BOOLEAN_NOT, "bool_not"},
     {OP_PRINT, "print"},
-    {OP_PRINT_C, "printc"},
     {OP_STORE, "store"},
     {OP_LOAD, "load"},
     {OP_HALT, "halt"},
@@ -140,8 +139,6 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new BooleanNotInstruction();
         case OP_PRINT:
             return new PrintInstruction();
-        case OP_PRINT_C:
-            return new PrintCharInstruction();
         case OP_STORE:
             return new StoreInstruction();
         case OP_LOAD:
@@ -242,36 +239,35 @@ void BinaryNotInstruction::execute(Vm& vm) const {
 
 PushInstruction::PushInstruction() : Instruction(OP_PUSH) {}
 
-PushInstruction::PushInstruction(const Value& value) : Instruction(OP_PUSH) {
+PushInstruction::PushInstruction(const Var& value) : Instruction(OP_PUSH) {
     this->value = value;
 }
 
 void PushInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    value = byteutils::read_long(buffer, *index);
-    *index += SIZE_OF_LONG;
+    value = var::read(buffer, index);
 }
 
 void PushInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, value);
+    var::push(value, buffer);
 }
     
 void PushInstruction::execute(Vm& vm) const {
-    vm.stack->push_back(var::create_long(value));
+    vm.stack->push_back(value);
 }
 
 void PushInstruction::read_string(const std::vector<std::string>& strings) {
-    value = stol(strings[0]);
+    value = var::from_string(strings);
 }
 
 std::string PushInstruction::to_string() const {
     std::stringstream ss;
-    ss << Instruction::to_string() << " " << value;
+    ss << Instruction::to_string() << " " << var::to_string(value);
     return ss.str();
 }
 
 uint8_t PushInstruction::size() const {
-    return Instruction::size() + SIZE_OF_LONG;
+    return Instruction::size() + var::size(value);
 }
 
 JumpInstruction::JumpInstruction() : Instruction(OP_JUMP) {}
@@ -500,12 +496,6 @@ PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}
 
 void PrintInstruction::execute(Vm& vm) const {
     var::print(instructions::pop_var(vm.stack));
-}
-
-PrintCharInstruction::PrintCharInstruction() : Instruction(OP_PRINT_C) {}
-
-void PrintCharInstruction::execute(Vm& vm) const {
-    var::print_char(instructions::pop_var(vm.stack));
 }
 
 StoreInstruction::StoreInstruction() : Instruction(OP_STORE) {}

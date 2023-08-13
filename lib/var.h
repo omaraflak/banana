@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 union Data {
-    char _byte;
+    char _char;
     short _short;
     int _int;
     long _long;
@@ -14,8 +14,7 @@ union Data {
 };
 
 enum DataType {
-    BYTE, SHORT, INT, LONG,
-    BOOL
+    CHAR, SHORT, INT, LONG, BOOL
 };
 
 struct Var {
@@ -25,9 +24,14 @@ struct Var {
 
 namespace var {
     void push(const Var &var, std::vector<uint8_t>& bytes);
-    Var pop(std::vector<uint8_t>& bytes);
+    Var read(const std::vector<uint8_t>& bytes, uint64_t* index);
 
-    Var create_byte(const char& value);
+    std::string to_string(const Var& var);
+    Var from_string(const std::vector<std::string>& strings);
+
+    uint8_t size(const Var& var);
+
+    Var create_char(const char& value);
     Var create_short(const short& value);
     Var create_int(const int& value);
     Var create_long(const long& value);
@@ -55,7 +59,6 @@ namespace var {
     Var boolean_not(const Var& var);
 
     void print(const Var& var);
-    void print_char(const Var& var);
 }
 
 #endif // VAR

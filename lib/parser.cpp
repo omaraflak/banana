@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "var.h"
 #include <sstream>
 #include <stack>
 #include <map>
@@ -58,7 +59,7 @@ bool match_assign(Parser& parser);
 void print_error(const Parser& parser, const std::string& message);
 std::shared_ptr<BlockNode> block(Parser& parser);
 
-std::shared_ptr<LiteralNode> literal(const uint64_t& value) {
+std::shared_ptr<LiteralNode> literal(const Var& value) {
     return std::shared_ptr<LiteralNode>(new LiteralNode(value));
 }
 
@@ -210,7 +211,7 @@ std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::stri
 std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
-        return std::shared_ptr<LiteralNode>(new LiteralNode(token_as_long(token)));
+        return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_long(token_as_long(token))));
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
         if (match(parser, {TOKEN_LEFT_PAREN})) {
@@ -233,7 +234,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
 std::shared_ptr<AbstractSyntaxTree> unary_expression(Parser& parser) {
     if (check(parser, TOKEN_MINUS)) {
         advance(parser);
-        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal(0), unary_expression(parser), AST_SUB));
+        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal(var::create_long(0)), unary_expression(parser), AST_SUB));
     }
     if (check(parser, TOKEN_BANG)) {
         advance(parser);
@@ -448,10 +449,10 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool&
             exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_BIN_OR));
             break;
         case TOKEN_PLUS_PLUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(1), AST_ADD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(var::create_long(1)), AST_ADD));
             break;
         case TOKEN_MINUS_MINUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(1), AST_SUB));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal(var::create_long(1)), AST_SUB));
             break;
         default:
             print_error(parser, "Could not recognize assignment type!");

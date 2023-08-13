@@ -27,11 +27,11 @@ class AbstractSyntaxTree {
 
 class LiteralNode: public AbstractSyntaxTree {
     public:
-    LiteralNode(const Value& value);
+    LiteralNode(const Var& value);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    Value value;
+    Var value;
 };
 
 class VariableNode: public AbstractSyntaxTree {

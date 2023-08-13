@@ -27,7 +27,7 @@ AbstractSyntaxTree* AbstractSyntaxTree::get_main() const {
     return main;
 }
 
-LiteralNode::LiteralNode(const Value& value) : AbstractSyntaxTree() {
+LiteralNode::LiteralNode(const Var& value) : AbstractSyntaxTree() {
     this->value = value;
 }
 
@@ -264,10 +264,8 @@ PrintStringNode::PrintStringNode(const std::string& str) : AbstractSyntaxTree() 
 void PrintStringNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
     for (auto it = str.rbegin(); it < str.rend(); it++) {
-        instructions.push_back(new PushInstruction(*it));
-    }
-    for (int i = 0; i < str.size(); i++) {
-        instructions.push_back(new PrintCharInstruction());
+        instructions.push_back(new PushInstruction(var::create_char(*it)));
+        instructions.push_back(new PrintInstruction());
     }
 }
 

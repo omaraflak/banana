@@ -9,7 +9,6 @@
 #include "vm.h"
 
 typedef uint64_t Address;
-typedef int64_t Value;
 
 enum {
     OP_ADD,
@@ -37,7 +36,6 @@ enum {
     OP_BOOLEAN_OR,
     OP_BOOLEAN_NOT,
     OP_PRINT,
-    OP_PRINT_C,
     OP_STORE,
     OP_LOAD,
     OP_HALT
@@ -119,7 +117,7 @@ class BinaryNotInstruction: public Instruction {
 class PushInstruction: public Instruction {
     public:
     PushInstruction();
-    PushInstruction(const Value& value);
+    PushInstruction(const Var& value);
     void read(const std::vector<uint8_t>& buffer, Address* index);
     void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
@@ -129,7 +127,7 @@ class PushInstruction: public Instruction {
 
 
     private:
-    Value value;
+    Var value;
 };
 
 class JumpInstruction: public Instruction {
@@ -252,12 +250,6 @@ class BooleanNotInstruction: public Instruction {
 class PrintInstruction: public Instruction {
     public:
     PrintInstruction();
-    void execute(Vm& vm) const;
-};
-
-class PrintCharInstruction: public Instruction {
-    public:
-    PrintCharInstruction();
     void execute(Vm& vm) const;
 };
 
