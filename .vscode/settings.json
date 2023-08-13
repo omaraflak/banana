@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "array": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "map": "cpp"
     },
     "cmake.configureOnOpen": true
 }

@@ -1,13 +1,9 @@
 #if !defined(FILEUTILS)
 #define FILEUTILS
 
-#include <iostream>
 #include <vector>
-#include <fstream>
-#include <sstream>
 #include <string>
 #include <stdint.h>
-#include <iterator>
 
 namespace fileutils {
 std::vector<uint8_t> read_bytes(const std::string& filename);

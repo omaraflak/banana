@@ -1,4 +1,8 @@
 #include "fileutils.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iterator>
 
 std::vector<uint8_t> fileutils::read_bytes(const std::string& filename) {
     std::ifstream is(filename.c_str(), std::ios::binary);
