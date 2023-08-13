@@ -1,20 +1,19 @@
 #include "scanner.h"
 #include <iostream>
-#include <string>
 
 namespace scanner {
 typedef struct {
-    const char* start;
-    const char* current;
+    std::string code;
+    int start;
+    int current;
     int line;
 } Scanner;
 
 Token create_token(const TokenType& type, const Scanner& scanner) {
     Token token;
-    token.start = scanner.start;
-    token.length = scanner.current - scanner.start;
-    token.line = scanner.line;
     token.type = type;
+    token.line = scanner.line;
+    token.value = scanner.code.substr(scanner.start, scanner.current - scanner.start);
     return token;
 }
 
@@ -23,66 +22,66 @@ bool is_digit(const char& c) {
 }
 
 bool is_character(const char& c) {
-    return ('a' <= c && c <= 'z') or ('A' <= c && c <= 'Z');
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
 }
 
 bool match_string(const Scanner& scanner, const std::string& str, const bool& keyword = false) {
     for (int i = 0; i < str.size(); i++) {
-        const char* p = scanner.current + i;
-        if (*p == '\0' || *p != str[i]) {
+        const char p = scanner.code[scanner.current + i];
+        if (p == '\0' || p != str[i]) {
             return false;
         }
     }
     if (!keyword) {
         return true;
     }
-    return !is_character(scanner.current[str.size()]);
+    return !is_character(scanner.code[scanner.current + str.size()]);
 }
 
-const char* match_quote(const Scanner& scanner) {
-    const char* c = scanner.current + 1;
-    while (*c != '\0' && *c != '\n') {
-        if (*c == '\\') {
-            c += 2;
+int match_quote(const Scanner& scanner) {
+    int p = scanner.current + 1;
+    while (p < scanner.code.size() && scanner.code[p] != '\n') {
+        if (scanner.code[p] == '\\') {
+            p += 2;
             continue;
         }
-        if (*c == '"') {
-            return c + 1;
+        if (scanner.code[p] == '"') {
+            return p + 1;
         }
-        c++;
+        p++;
     }
-    return nullptr;
+    return -1;
 }
 
-const char* match_number(const Scanner& scanner) {
-    const char* c = scanner.current;
-    while ('0' <= *c && *c <= '9') {
-         c++;
+int match_number(const Scanner& scanner) {
+    int p = scanner.current;
+    while ('0' <= scanner.code[p] && scanner.code[p] <= '9') {
+         p++;
     }
-    return c;
+    return p;
 }
 
-const char* match_identifier(const Scanner& scanner) {
-    const char* c = scanner.current;
-    while (is_character(*c) || is_digit(*c)) {
-        c++;
+int match_identifier(const Scanner& scanner) {
+    int p = scanner.current;
+    while (is_character(scanner.code[p]) || is_digit(scanner.code[p])) {
+        p++;
     }
-    return c;
+    return p;
 }
 
-const char* next_line(const Scanner& scanner) {
-    const char* c = scanner.current;
-    while (*c != '\n' && *c != '\0') {
-        c++;
+int next_line(const Scanner& scanner) {
+    int p = scanner.current;
+    while (p < scanner.code.size() && scanner.code[p] != '\n') {
+        p++;
     }
-    return *c == '\0' ? c : c + 1;
+    return p < scanner.code.size() ? p + 1 : p;
 }
 
 void error(const Scanner& scanner) {
     std::cout << "Unrecognized token on line " << scanner.line << "." << std::endl;
     int i = 0;
-    while (scanner.current[i] != '\n' && scanner.current[i] != '\0') {
-        std::cout << scanner.current[i];
+    while (scanner.current + i < scanner.code.size() && scanner.code[scanner.current + i] != '\n') {
+        std::cout << scanner.code[scanner.current + i];
         i++;
     }
     std::cout << std::endl;
@@ -90,15 +89,16 @@ void error(const Scanner& scanner) {
 }
 }
 
-std::vector<Token> scanner::scan(const char* code) {
+std::vector<Token> scanner::scan(const std::string& code) {
     std::vector<Token> tokens;
     Scanner scanner;
-    scanner.start = code;
-    scanner.current = code;
+    scanner.code = code;
+    scanner.start = 0;
+    scanner.current = 0;
     scanner.line = 1;
 
-    while (*scanner.current != '\0') {
-        switch (*scanner.current) {
+    while (scanner.code[scanner.current] != '\0') {
+        switch (scanner.code[scanner.current]) {
             case ' ':
             case '\r':
             case '\t':
@@ -347,8 +347,8 @@ std::vector<Token> scanner::scan(const char* code) {
                 }
                 break;
             case '"': {
-                const char* quote = match_quote(scanner);
-                if (quote == nullptr) {
+                int quote = match_quote(scanner);
+                if (quote == -1) {
                     std::cout << "Closing string quote is missing on line " << scanner.line << std::endl;
                 }
                 scanner.current = quote;

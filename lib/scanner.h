@@ -2,6 +2,7 @@
 #define SCANNER
 
 #include <vector>
+#include <string>
 
 enum TokenType {
     // Single-character tokens.
@@ -32,13 +33,12 @@ enum TokenType {
 
 typedef struct {
     TokenType type;
-    const char* start;
-    int length;
+    std::string value;
     int line;
 } Token;
 
 namespace scanner {
-std::vector<Token> scan(const char* code);
+std::vector<Token> scan(const std::string& code);
 }
 
 #endif // SCANNER
