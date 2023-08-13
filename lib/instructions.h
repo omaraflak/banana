@@ -125,7 +125,6 @@ class PushInstruction: public Instruction {
     std::string to_string() const;
     uint8_t size() const;
 
-
     private:
     Var value;
 };
