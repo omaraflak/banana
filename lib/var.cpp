@@ -71,7 +71,7 @@ std::string var::to_string(const Var& var) {
     ss << var.type << " ";
     switch (var.type) {
         case CHAR:
-            ss << var.data._char;
+            ss << (int) var.data._char;
             break;
         case SHORT:
             ss << var.data._short;
