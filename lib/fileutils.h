@@ -1,5 +1,5 @@
-#if !defined(FILEUTILS)
-#define FILEUTILS
+#if !defined(FILE_UTILS)
+#define FILE_UTILS
 
 #include <vector>
 #include <string>
@@ -13,4 +13,4 @@ void write_bytes(const std::vector<uint8_t>& bytes, const std::string& filename)
 void write_lines(const std::vector<std::string>& lines, const std::string& filename);
 }
 
-#endif // FILEUTILS
+#endif // FILE_UTILS

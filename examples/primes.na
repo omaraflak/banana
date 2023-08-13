@@ -8,13 +8,13 @@ fun isprime(n) {
 }
 
 fun main() {
-    var n = 1000;
+    var n = 30;
     var i = 3;
     while (n > 1) {
         if (isprime(i) == 1) {
+            print i;
             n--;
         }
         i += 2;
     }
-    print i - 2;
 }

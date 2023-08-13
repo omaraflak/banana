@@ -166,71 +166,71 @@ Instruction* Instruction::from_string(const std::string& str) {
 AddInstruction::AddInstruction() : Instruction(OP_ADD) {}
 
 void AddInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left + right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left + right);
 }
 
 SubInstruction::SubInstruction() : Instruction(OP_SUB) {}
 
 void SubInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left - right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left - right);
 }
 
 MulInstruction::MulInstruction() : Instruction(OP_MUL) {}
 
 void MulInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left * right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left * right);
 }
 
 DivInstruction::DivInstruction() : Instruction(OP_DIV) {}
 
 void DivInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left / right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left / right);
 }
 
 ModInstruction::ModInstruction() : Instruction(OP_MOD) {}
 
 void ModInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left % right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left % right);
 }
 
 XorInstruction::XorInstruction() : Instruction(OP_XOR) {}
 
 void XorInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left ^ right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left ^ right);
 }
 
 BinaryAndInstruction::BinaryAndInstruction() : Instruction(OP_BINARY_AND) {}
 
 void BinaryAndInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left & right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left & right);
 }
 
 BinaryOrInstruction::BinaryOrInstruction() : Instruction(OP_BINARY_OR) {}
 
 void BinaryOrInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left | right);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
+    byteutils::push_long(*vm.stack, left | right);
 }
 
 BinaryNotInstruction::BinaryNotInstruction() : Instruction(OP_BINARY_NOT) {}
 
 void BinaryNotInstruction::execute(Vm& vm) const {
-    bytes::push_long(*vm.stack, ~bytes::pop_long(*vm.stack));
+    byteutils::push_long(*vm.stack, ~byteutils::pop_long(*vm.stack));
 }
 
 PushInstruction::PushInstruction() : Instruction(OP_PUSH) {}
@@ -240,17 +240,17 @@ PushInstruction::PushInstruction(const Value& value) : Instruction(OP_PUSH) {
 }
 
 void PushInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    value = bytes::read_long(buffer, *index);
+    value = byteutils::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void PushInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_long(buffer, value);
+    byteutils::push_long(buffer, value);
 }
     
 void PushInstruction::execute(Vm& vm) const {
-    bytes::push_long(*vm.stack, value);
+    byteutils::push_long(*vm.stack, value);
 }
 
 void PushInstruction::read_string(const std::vector<std::string>& strings) {
@@ -280,13 +280,13 @@ JumpInstruction::JumpInstruction(const uint8_t& opcode, const Address& address) 
 }
 
 void JumpInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = bytes::read_long(buffer, *index);
+    address = byteutils::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void JumpInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_long(buffer, address);
+    byteutils::push_long(buffer, address);
 }
 
 void JumpInstruction::execute(Vm& vm) const {
@@ -316,7 +316,7 @@ JumpIfInstruction::JumpIfInstruction() : JumpInstruction((uint8_t) OP_JUMP_IF) {
 JumpIfInstruction::JumpIfInstruction(const Address& address) : JumpInstruction(OP_JUMP_IF, address) {}
 
 void JumpIfInstruction::execute(Vm& vm) const {
-    if (bytes::pop_byte(*vm.stack) == 1) {
+    if (byteutils::pop_byte(*vm.stack) == 1) {
         vm.ip = address;
     }
 }
@@ -326,7 +326,7 @@ JumpIfFalseInstruction::JumpIfFalseInstruction() : JumpInstruction((uint8_t) OP_
 JumpIfFalseInstruction::JumpIfFalseInstruction(const Address& address) : JumpInstruction(OP_JUMP_IF_FALSE, address) {}
 
 void JumpIfFalseInstruction::execute(Vm& vm) const {
-    if (bytes::pop_byte(*vm.stack) == 0) {
+    if (byteutils::pop_byte(*vm.stack) == 0) {
         vm.ip = address;
     }
 }
@@ -339,7 +339,7 @@ CallInstruction::CallInstruction(const Address& address, const uint8_t& param_co
 }
 
 void CallInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = bytes::read_long(buffer, *index);
+    address = byteutils::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
     param_count = buffer[*index];
     *index += SIZE_OF_BYTE;
@@ -347,7 +347,7 @@ void CallInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
 
 void CallInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_long(buffer, address);
+    byteutils::push_long(buffer, address);
     buffer.push_back(param_count);
 }
 
@@ -357,7 +357,7 @@ void CallInstruction::execute(Vm& vm) const {
     std::vector<uint8_t>& old_stack = *vm.stack;
     vm.push_frame();
     for (int i = 0; i < param_count; i++) {
-        bytes::push_long(*vm.stack, bytes::pop_long(old_stack));
+        byteutils::push_long(*vm.stack, byteutils::pop_long(old_stack));
     }
 }
 
@@ -397,11 +397,11 @@ void RetInstruction::execute(Vm& vm) const {
     vm.call_stack.pop();
     Value values[values_count];
     for (int i = 0; i < values_count; i++) {
-        values[i] = bytes::pop_long(*vm.stack);
+        values[i] = byteutils::pop_long(*vm.stack);
     }
     vm.pop_frame();
     for (int i = 0; i < values_count; i++) {
-        bytes::push_long(*vm.stack, values[i]);
+        byteutils::push_long(*vm.stack, values[i]);
     }
 }
 
@@ -422,83 +422,83 @@ uint8_t RetInstruction::size() const {
 LtInstruction::LtInstruction() : Instruction(OP_LT) {}
 
 void LtInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
     vm.stack->push_back(left < right);
 }
 
 LteInstruction::LteInstruction() : Instruction(OP_LTE) {}
 
 void LteInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
     vm.stack->push_back(left <= right);
 }
 
 GtInstruction::GtInstruction() : Instruction(OP_GT) {}
 
 void GtInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
     vm.stack->push_back(left > right);
 }
 
 GteInstruction::GteInstruction() : Instruction(OP_GTE) {}
 
 void GteInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
     vm.stack->push_back(left >= right);
 }
 
 EqInstruction::EqInstruction() : Instruction(OP_EQ) {}
 
 void EqInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
     vm.stack->push_back(left == right);
 }
 
 NotEqInstruction::NotEqInstruction() : Instruction(OP_NOT_EQ) {}
 
 void NotEqInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
+    Value right = byteutils::pop_long(*vm.stack);
+    Value left = byteutils::pop_long(*vm.stack);
     vm.stack->push_back(left != right);
 }
 
 BooleanAndInstruction::BooleanAndInstruction() : Instruction(OP_BOOLEAN_AND) {}
 
 void BooleanAndInstruction::execute(Vm& vm) const {
-    uint8_t right = bytes::pop_byte(*vm.stack);
-    uint8_t left = bytes::pop_byte(*vm.stack);
+    uint8_t right = byteutils::pop_byte(*vm.stack);
+    uint8_t left = byteutils::pop_byte(*vm.stack);
     vm.stack->push_back(left && right);
 }
 
 BooleanOrInstruction::BooleanOrInstruction() : Instruction(OP_BOOLEAN_OR) {}
 
 void BooleanOrInstruction::execute(Vm& vm) const {
-    uint8_t right = bytes::pop_byte(*vm.stack);
-    uint8_t left = bytes::pop_byte(*vm.stack);
+    uint8_t right = byteutils::pop_byte(*vm.stack);
+    uint8_t left = byteutils::pop_byte(*vm.stack);
     vm.stack->push_back(left || right);
 }
 
 BooleanNotInstruction::BooleanNotInstruction() : Instruction(OP_BOOLEAN_NOT) {}
 
 void BooleanNotInstruction::execute(Vm& vm) const {
-    vm.stack->push_back(!bytes::pop_byte(*vm.stack));
+    vm.stack->push_back(!byteutils::pop_byte(*vm.stack));
 }
 
 PrintInstruction::PrintInstruction() : Instruction(OP_PRINT) {}
 
 void PrintInstruction::execute(Vm& vm) const {
-    std::cout << (int64_t) bytes::pop_long(*vm.stack);
+    std::cout << (int64_t) byteutils::pop_long(*vm.stack);
 }
 
 PrintCharInstruction::PrintCharInstruction() : Instruction(OP_PRINT_C) {}
 
 void PrintCharInstruction::execute(Vm& vm) const {
-    std::cout << (char) bytes::pop_long(*vm.stack);
+    std::cout << (char) byteutils::pop_long(*vm.stack);
 }
 
 StoreInstruction::StoreInstruction() : Instruction(OP_STORE) {}
@@ -508,17 +508,17 @@ StoreInstruction::StoreInstruction(const Address& address) : Instruction(OP_STOR
 }
 
 void StoreInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = bytes::read_long(buffer, *index);
+    address = byteutils::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void StoreInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_long(buffer, address);
+    byteutils::push_long(buffer, address);
 }
 
 void StoreInstruction::execute(Vm& vm) const {
-    bytes::write_long(vm.heap, address, bytes::pop_long(*vm.stack));
+    byteutils::write_long(vm.heap, address, byteutils::pop_long(*vm.stack));
 }
 
 void StoreInstruction::read_string(const std::vector<std::string>& strings) {
@@ -542,17 +542,17 @@ LoadInstruction::LoadInstruction(const Address& address) : Instruction(OP_LOAD) 
 }
 
 void LoadInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = bytes::read_long(buffer, *index);
+    address = byteutils::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void LoadInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    bytes::push_long(buffer, address);
+    byteutils::push_long(buffer, address);
 }
 
 void LoadInstruction::execute(Vm& vm) const {
-    bytes::push_long(*vm.stack, bytes::read_long(vm.heap, address));
+    byteutils::push_long(*vm.stack, byteutils::read_long(vm.heap, address));
 }
 
 void LoadInstruction::read_string(const std::vector<std::string>& strings) {

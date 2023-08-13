@@ -18,7 +18,7 @@
 #define SIZE_OF_INT 4
 #define SIZE_OF_LONG 8
 
-namespace bytes {
+namespace byteutils {
 uint8_t pop_byte(std::vector<uint8_t>& stack);
 uint16_t pop_short(std::vector<uint8_t>& stack);
 uint32_t pop_int(std::vector<uint8_t>& stack);
