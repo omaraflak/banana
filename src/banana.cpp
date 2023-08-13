@@ -57,6 +57,13 @@ std::string replace_extension(const std::string& filename, const std::string& ex
     return file_name(filename) + "." + extension;
 }
 
+void help(const std::string& exe) {
+    std::cout << "Syntax is: " << exe << " [-c] [-a] [-i]" << " [bytecode|source]" << std::endl;
+    std::cout << "  -c\t Compiles banana code to vm bytecode." << std::endl;
+    std::cout << "  -a\t Translates banana code to vm instructions." << std::endl;
+    std::cout << "  -i\t Execute banana code from source file." << std::endl;
+}
+
 int main(int argc, char** argv) {
     std::string filename = argv[argc - 1];
     std::set<std::string> flags = parse_flags(argc, argv);
@@ -73,11 +80,10 @@ int main(int argc, char** argv) {
         compile_and_execute(filename);
         return 0;
     }
-    if (has_flag(flags, "-h")) {
-        std::cout << "Syntax is: " << argv[0] << " [-c] [-a] [-i] [-h]" << " [source]" << std::endl;
-        return 0;
-    }
     if (argc == 2) {
         execute(filename);
+        return 0;
     }
+    help(argv[0]);
+    return 0;
 }
