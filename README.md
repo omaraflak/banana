@@ -48,23 +48,26 @@ Currently, the language is very limited and supports the following features.
 
 # CLI
 
+#### Run code from compiled file
+
+```
+$ ./banana source.obj
+```
+
 #### Run code from source file
 
 ```
 $ ./banana -i source.na
 ```
 
-#### Compile code from source file
-
-This will compile the source file to vm bytecode.
+#### Compile source file
 
 ```
 $ ./banana -c source.na
 ```
 
-#### Print vm instructions from source file
+#### Print VM instructions from source file
 
-`source.na` :
 ```
 fun add(a, b) {
     return a + b;
