@@ -18,10 +18,10 @@ enum {
     OP_MUL,
     OP_DIV,
     OP_MOD,
-    OP_AND,
-    OP_OR,
     OP_XOR,
-    OP_NOT,
+    OP_BINARY_AND,
+    OP_BINARY_OR,
+    OP_BINARY_NOT,
     OP_PUSH,
     OP_JUMP,
     OP_JUMP_IF,
@@ -34,9 +34,9 @@ enum {
     OP_GTE,
     OP_EQ,
     OP_NOT_EQ,
-    OP_BOOL_AND,
-    OP_BOOL_OR,
-    OP_BOOL_NOT,
+    OP_BOOLEAN_AND,
+    OP_BOOLEAN_OR,
+    OP_BOOLEAN_NOT,
     OP_PRINT,
     OP_PRINT_C,
     OP_STORE,
@@ -93,27 +93,27 @@ class ModInstruction: public Instruction {
     void execute(Vm& vm) const;
 };
 
-class AndInstruction: public Instruction {
-    public:
-    AndInstruction();
-    void execute(Vm& vm) const;
-};
-
-class OrInstruction: public Instruction {
-    public:
-    OrInstruction();
-    void execute(Vm& vm) const;
-};
-
 class XorInstruction: public Instruction {
     public:
     XorInstruction();
     void execute(Vm& vm) const;
 };
 
-class NotInstruction: public Instruction {
+class BinaryAndInstruction: public Instruction {
     public:
-    NotInstruction();
+    BinaryAndInstruction();
+    void execute(Vm& vm) const;
+};
+
+class BinaryOrInstruction: public Instruction {
+    public:
+    BinaryOrInstruction();
+    void execute(Vm& vm) const;
+};
+
+class BinaryNotInstruction: public Instruction {
+    public:
+    BinaryNotInstruction();
     void execute(Vm& vm) const;
 };
 
@@ -232,21 +232,21 @@ class NotEqInstruction: public Instruction {
     void execute(Vm& vm) const;
 };
 
-class BoolAndInstruction: public Instruction {
+class BooleanAndInstruction: public Instruction {
     public:
-    BoolAndInstruction();
+    BooleanAndInstruction();
     void execute(Vm& vm) const;
 };
 
-class BoolOrInstruction: public Instruction {
+class BooleanOrInstruction: public Instruction {
     public:
-    BoolOrInstruction();
+    BooleanOrInstruction();
     void execute(Vm& vm) const;
 };
 
-class BoolNotInstruction: public Instruction {
+class BooleanNotInstruction: public Instruction {
     public:
-    BoolNotInstruction();
+    BooleanNotInstruction();
     void execute(Vm& vm) const;
 };
 

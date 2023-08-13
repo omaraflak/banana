@@ -70,21 +70,22 @@ class BinaryOperationNode: public AbstractSyntaxTree {
     AstBinaryOperation operation;
 };
 
-enum AstUnaryOperation {
-    AST_BIN_NOT, AST_BOOL_NOT, AST_UNARY_MINUS
-};
-
-class UnaryOperationNode: public AbstractSyntaxTree {
+class BooleanNotNode: public AbstractSyntaxTree {
     public:
-    UnaryOperationNode(
-        const std::shared_ptr<AbstractSyntaxTree>& expression,
-        const AstUnaryOperation& operation
-    );
+    BooleanNotNode(const std::shared_ptr<AbstractSyntaxTree>& expression);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
     std::shared_ptr<AbstractSyntaxTree> expression;
-    AstUnaryOperation operation;
+};
+
+class BinaryNotNode: public AbstractSyntaxTree {
+    public:
+    BinaryNotNode(const std::shared_ptr<AbstractSyntaxTree>& expression);
+    void write(std::vector<const Instruction*>& instructions);
+
+    private:
+    std::shared_ptr<AbstractSyntaxTree> expression;
 };
 
 class BlockNode: public AbstractSyntaxTree {

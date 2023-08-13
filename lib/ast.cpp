@@ -114,14 +114,14 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
         case AST_MOD:
             instructions.push_back(new ModInstruction());
             break;
-        case AST_BIN_AND:
-            instructions.push_back(new AndInstruction());
-            break;
-        case AST_BIN_OR:
-            instructions.push_back(new OrInstruction());
-            break;
         case AST_XOR:
             instructions.push_back(new XorInstruction());
+            break;
+        case AST_BIN_AND:
+            instructions.push_back(new BinaryAndInstruction());
+            break;
+        case AST_BIN_OR:
+            instructions.push_back(new BinaryOrInstruction());
             break;
         case AST_LT:
             instructions.push_back(new LtInstruction());
@@ -142,10 +142,10 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
             instructions.push_back(new NotEqInstruction());
             break;
         case AST_BOOL_AND:
-            instructions.push_back(new BoolAndInstruction());
+            instructions.push_back(new BooleanAndInstruction());
             break;
         case AST_BOOL_OR:
-            instructions.push_back(new BoolOrInstruction());
+            instructions.push_back(new BooleanOrInstruction());
             break;
         default:
             std::cout << "Unrecognized binary operation: " << (int) operation << std::endl;
@@ -153,34 +153,24 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
     }
 }
 
-UnaryOperationNode::UnaryOperationNode(
-    const std::shared_ptr<AbstractSyntaxTree>& expression,
-    const AstUnaryOperation& operation
-) : AbstractSyntaxTree() {
+BooleanNotNode::BooleanNotNode(const std::shared_ptr<AbstractSyntaxTree>& expression) : AbstractSyntaxTree() {
     this->expression = expression;
-    this->operation = operation;
 }
 
-void UnaryOperationNode::write(std::vector<const Instruction*>& instructions) {
+void BooleanNotNode::write(std::vector<const Instruction*>& instructions) {
     AbstractSyntaxTree::write(instructions);
-    switch (operation) {
-        case AST_BIN_NOT:
-            expression->write(instructions);
-            instructions.push_back(new NotInstruction());
-            break;
-        case AST_BOOL_NOT:
-            expression->write(instructions);
-            instructions.push_back(new BoolNotInstruction());
-            break;
-        case AST_UNARY_MINUS:
-            instructions.push_back(new PushInstruction(0));
-            expression->write(instructions);
-            instructions.push_back(new SubInstruction());
-            break;
-        default:
-            std::cout << "Unrecognized unary operation: " << (int) operation << std::endl;
-            exit(1);
-    }
+    expression->write(instructions);
+    instructions.push_back(new BooleanNotInstruction());
+}
+
+BinaryNotNode::BinaryNotNode(const std::shared_ptr<AbstractSyntaxTree>& expression) : AbstractSyntaxTree() {
+    this->expression = expression;
+}
+
+void BinaryNotNode::write(std::vector<const Instruction*>& instructions) {
+    AbstractSyntaxTree::write(instructions);
+    expression->write(instructions);
+    instructions.push_back(new BinaryNotInstruction());
 }
 
 IfNode::IfNode(

@@ -26,12 +26,6 @@ std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_OR, AST_BOOL_OR},
 };
 
-std::map<TokenType, AstUnaryOperation> UNA_OP = {
-    {TOKEN_BANG, AST_BOOL_NOT},
-    {TOKEN_TILDE, AST_BIN_NOT},
-    {TOKEN_MINUS, AST_UNARY_MINUS},
-};
-
 std::set<TokenType> KEYWORDS = {
     TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
     TOKEN_FOR, TOKEN_WHILE, TOKEN_AND, TOKEN_OR,
@@ -221,7 +215,7 @@ std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::stri
     return parser.functions.at(name);
 }
 
-std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
+std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
         return std::shared_ptr<LiteralNode>(new LiteralNode(token_as_long(token)));
@@ -244,67 +238,51 @@ std::shared_ptr<AbstractSyntaxTree> primary(Parser& parser) {
     exit(1);
 }
 
-std::shared_ptr<AbstractSyntaxTree> unary(Parser& parser) {
-    if (match(parser, {TOKEN_MINUS, TOKEN_BANG, TOKEN_TILDE})) {
-        AstUnaryOperation op = UNA_OP[previous(parser).type];
-        std::shared_ptr<AbstractSyntaxTree> exp = unary(parser);
-        return std::shared_ptr<UnaryOperationNode>(new UnaryOperationNode(exp, op));
+std::shared_ptr<AbstractSyntaxTree> unary_expression(Parser& parser) {
+    if (check(parser, TOKEN_MINUS)) {
+        advance(parser);
+        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal(0), unary_expression(parser), AST_SUB));
     }
-    return primary(parser);
+    if (check(parser, TOKEN_BANG)) {
+        advance(parser);
+        return std::shared_ptr<BooleanNotNode>(new BooleanNotNode(unary_expression(parser)));
+    }
+    if (check(parser, TOKEN_TILDE)) {
+        advance(parser);
+        return std::shared_ptr<BinaryNotNode>(new BinaryNotNode(unary_expression(parser)));
+    }
+    return primary_expression(parser);
 }
 
-std::shared_ptr<AbstractSyntaxTree> factor(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> left = unary(parser);
-    while (match(parser, {TOKEN_STAR, TOKEN_SLASH, TOKEN_MOD, TOKEN_XOR, TOKEN_AMPERSAND, TOKEN_PIPE})) {
-        AstBinaryOperation op = BIN_OP[previous(parser).type];
-        std::shared_ptr<AbstractSyntaxTree> right = unary(parser);
-        left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
+std::shared_ptr<AbstractSyntaxTree> binary_expression(
+    Parser& parser,
+    const std::vector<std::vector<TokenType>>& types,
+    const int& index = 0
+) {
+    if (index == types.size()) {
+        return unary_expression(parser);
     }
-    return left;
-}
-
-std::shared_ptr<AbstractSyntaxTree> term(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> left = factor(parser);
-    while (match(parser, {TOKEN_PLUS, TOKEN_MINUS})) {
+    std::shared_ptr<AbstractSyntaxTree> left = binary_expression(parser, types, index + 1);
+    while (match(parser, types.at(index))) {
         AstBinaryOperation op = BIN_OP[previous(parser).type];
-        std::shared_ptr<AbstractSyntaxTree> right = factor(parser);
-        left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
-    }
-    return left;
-}
-
-std::shared_ptr<AbstractSyntaxTree> comparison(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> left = term(parser);
-    while (match(parser, {TOKEN_LESS, TOKEN_LESS_EQUAL, TOKEN_GREATER, TOKEN_GREATER_EQUAL})) {
-        AstBinaryOperation op = BIN_OP[previous(parser).type];
-        std::shared_ptr<AbstractSyntaxTree> right = term(parser);
-        left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
-    }
-    return left;
-}
-
-std::shared_ptr<AbstractSyntaxTree> equality(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> left = comparison(parser);
-    while (match(parser, {TOKEN_BANG_EQUAL, TOKEN_EQUAL_EQUAL})) {
-        AstBinaryOperation op = BIN_OP[previous(parser).type];
-        std::shared_ptr<AbstractSyntaxTree> right = comparison(parser);
-        left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
-    }
-    return left;
-}
-
-std::shared_ptr<AbstractSyntaxTree> bool_logic(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> left = equality(parser);
-    while (match(parser, {TOKEN_AND, TOKEN_OR})) {
-        AstBinaryOperation op = BIN_OP[previous(parser).type];
-        std::shared_ptr<AbstractSyntaxTree> right = equality(parser);
+        std::shared_ptr<AbstractSyntaxTree> right = binary_expression(parser, types, index + 1);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
     }
     return left;
 }
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser) {
-    return bool_logic(parser);
+    return binary_expression(
+        parser,
+        {
+            // binary operators to be parsed in order of priority
+            {TOKEN_AND, TOKEN_OR},
+            {TOKEN_BANG_EQUAL, TOKEN_EQUAL_EQUAL},
+            {TOKEN_LESS, TOKEN_LESS_EQUAL, TOKEN_GREATER, TOKEN_GREATER_EQUAL},
+            {TOKEN_PLUS, TOKEN_MINUS},
+            {TOKEN_STAR, TOKEN_SLASH, TOKEN_MOD, TOKEN_XOR, TOKEN_AMPERSAND, TOKEN_PIPE}
+        }
+    );
 }
 
 std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {

@@ -29,10 +29,10 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_MUL, "mul"},
     {OP_DIV, "div"},
     {OP_MOD, "mod"},
-    {OP_AND, "and"},
-    {OP_OR, "or"},
     {OP_XOR, "xor"},
-    {OP_NOT, "not"},
+    {OP_BINARY_AND, "bin_and"},
+    {OP_BINARY_OR, "bin_or"},
+    {OP_BINARY_NOT, "bin_not"},
     {OP_PUSH, "push"},
     {OP_JUMP, "jump"},
     {OP_JUMP_IF, "jump_if"},
@@ -45,9 +45,9 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_GTE, "gte"},
     {OP_EQ, "eq"},
     {OP_NOT_EQ, "not_eq"},
-    {OP_BOOL_AND, "b_and"},
-    {OP_BOOL_OR, "b_or"},
-    {OP_BOOL_NOT, "b_not"},
+    {OP_BOOLEAN_AND, "bool_and"},
+    {OP_BOOLEAN_OR, "bool_or"},
+    {OP_BOOLEAN_NOT, "bool_not"},
     {OP_PRINT, "print"},
     {OP_PRINT_C, "printc"},
     {OP_STORE, "store"},
@@ -93,14 +93,14 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new DivInstruction();
         case OP_MOD:
             return new ModInstruction();
-        case OP_AND:
-            return new AndInstruction();
-        case OP_OR:
-            return new OrInstruction();
         case OP_XOR:
             return new XorInstruction();
-        case OP_NOT:
-            return new NotInstruction();
+        case OP_BINARY_AND:
+            return new BinaryAndInstruction();
+        case OP_BINARY_OR:
+            return new BinaryOrInstruction();
+        case OP_BINARY_NOT:
+            return new BinaryNotInstruction();
         case OP_PUSH:
             return new PushInstruction();
         case OP_JUMP:
@@ -125,12 +125,12 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new EqInstruction();
         case OP_NOT_EQ:
             return new NotEqInstruction();
-        case OP_BOOL_AND:
-            return new BoolAndInstruction();
-        case OP_BOOL_OR:
-            return new BoolOrInstruction();
-        case OP_BOOL_NOT:
-            return new BoolNotInstruction();
+        case OP_BOOLEAN_AND:
+            return new BooleanAndInstruction();
+        case OP_BOOLEAN_OR:
+            return new BooleanOrInstruction();
+        case OP_BOOLEAN_NOT:
+            return new BooleanNotInstruction();
         case OP_PRINT:
             return new PrintInstruction();
         case OP_PRINT_C:
@@ -203,22 +203,6 @@ void ModInstruction::execute(Vm& vm) const {
     bytes::push_long(*vm.stack, left % right);
 }
 
-AndInstruction::AndInstruction() : Instruction(OP_AND) {}
-
-void AndInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left & right);
-}
-
-OrInstruction::OrInstruction() : Instruction(OP_OR) {}
-
-void OrInstruction::execute(Vm& vm) const {
-    Value right = bytes::pop_long(*vm.stack);
-    Value left = bytes::pop_long(*vm.stack);
-    bytes::push_long(*vm.stack, left | right);
-}
-
 XorInstruction::XorInstruction() : Instruction(OP_XOR) {}
 
 void XorInstruction::execute(Vm& vm) const {
@@ -227,9 +211,25 @@ void XorInstruction::execute(Vm& vm) const {
     bytes::push_long(*vm.stack, left ^ right);
 }
 
-NotInstruction::NotInstruction() : Instruction(OP_NOT) {}
+BinaryAndInstruction::BinaryAndInstruction() : Instruction(OP_BINARY_AND) {}
 
-void NotInstruction::execute(Vm& vm) const {
+void BinaryAndInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left & right);
+}
+
+BinaryOrInstruction::BinaryOrInstruction() : Instruction(OP_BINARY_OR) {}
+
+void BinaryOrInstruction::execute(Vm& vm) const {
+    Value right = bytes::pop_long(*vm.stack);
+    Value left = bytes::pop_long(*vm.stack);
+    bytes::push_long(*vm.stack, left | right);
+}
+
+BinaryNotInstruction::BinaryNotInstruction() : Instruction(OP_BINARY_NOT) {}
+
+void BinaryNotInstruction::execute(Vm& vm) const {
     bytes::push_long(*vm.stack, ~bytes::pop_long(*vm.stack));
 }
 
@@ -467,25 +467,25 @@ void NotEqInstruction::execute(Vm& vm) const {
     vm.stack->push_back(left != right);
 }
 
-BoolAndInstruction::BoolAndInstruction() : Instruction(OP_BOOL_AND) {}
+BooleanAndInstruction::BooleanAndInstruction() : Instruction(OP_BOOLEAN_AND) {}
 
-void BoolAndInstruction::execute(Vm& vm) const {
+void BooleanAndInstruction::execute(Vm& vm) const {
     uint8_t right = bytes::pop_byte(*vm.stack);
     uint8_t left = bytes::pop_byte(*vm.stack);
     vm.stack->push_back(left && right);
 }
 
-BoolOrInstruction::BoolOrInstruction() : Instruction(OP_BOOL_OR) {}
+BooleanOrInstruction::BooleanOrInstruction() : Instruction(OP_BOOLEAN_OR) {}
 
-void BoolOrInstruction::execute(Vm& vm) const {
+void BooleanOrInstruction::execute(Vm& vm) const {
     uint8_t right = bytes::pop_byte(*vm.stack);
     uint8_t left = bytes::pop_byte(*vm.stack);
     vm.stack->push_back(left || right);
 }
 
-BoolNotInstruction::BoolNotInstruction() : Instruction(OP_BOOL_NOT) {}
+BooleanNotInstruction::BooleanNotInstruction() : Instruction(OP_BOOLEAN_NOT) {}
 
-void BoolNotInstruction::execute(Vm& vm) const {
+void BooleanNotInstruction::execute(Vm& vm) const {
     vm.stack->push_back(!bytes::pop_byte(*vm.stack));
 }
 
