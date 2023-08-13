@@ -40,7 +40,7 @@ Currently, the language is very limited and supports the following features.
 
 **Constructs**: `fun`, `if`, `else`, `for`, `while`, `return`.
 
-**Binary Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `and`, `or` (also `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`).
+**Binary Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `and`, `or`, `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`.
 
 **Unary Operators**: `=`, `-`, `!`, `~`, `++`, `--`.
 
