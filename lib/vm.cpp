@@ -20,9 +20,9 @@ void Vm::execute() {
 }
 
 void Vm::push_frame() {
-    stacks.push(std::vector<uint8_t>());
+    stacks.push(std::vector<Var>());
     stack = &stacks.top();
-    heaps.push(new uint8_t[HEAP_MEMORY]);
+    heaps.push(new Var[HEAP_MEMORY]);
     heap = heaps.top();
 }
 

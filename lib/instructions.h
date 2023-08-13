@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
-#include "byteutils.h"
+#include "var.h"
 #include "vm.h"
 
 typedef uint64_t Address;
