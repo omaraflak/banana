@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "byteutils.h"
 
 AbstractSyntaxTree::AbstractSyntaxTree() {
     written = false;
