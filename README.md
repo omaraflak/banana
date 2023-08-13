@@ -1,6 +1,6 @@
 # Banana programming language
 
-This is a toy programming language based on a virtual machine.
+Banana 🍌, a toy VM-based programming language.
 
 # Sample code
 
