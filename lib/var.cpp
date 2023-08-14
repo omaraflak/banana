@@ -334,13 +334,13 @@ Var var::boolean_and(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char && right.data._char);
+            return create_bool(left.data._char && right.data._char);
         case SHORT:
-            return create_short(left.data._short && right.data._short);
+            return create_bool(left.data._short && right.data._short);
         case INT:
-            return create_int(left.data._int && right.data._int);
+            return create_bool(left.data._int && right.data._int);
         case LONG:
-            return create_long(left.data._long && right.data._long);
+            return create_bool(left.data._long && right.data._long);
         case BOOL:
             return create_bool(left.data._bool && right.data._bool);
         default:
@@ -353,13 +353,13 @@ Var var::boolean_or(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char || right.data._char);
+            return create_bool(left.data._char || right.data._char);
         case SHORT:
-            return create_short(left.data._short || right.data._short);
+            return create_bool(left.data._short || right.data._short);
         case INT:
-            return create_int(left.data._int || right.data._int);
+            return create_bool(left.data._int || right.data._int);
         case LONG:
-            return create_long(left.data._long || right.data._long);
+            return create_bool(left.data._long || right.data._long);
         case BOOL:
             return create_bool(left.data._bool || right.data._bool);
         default:
@@ -373,13 +373,13 @@ Var var::lt(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char < right.data._char);
+            return create_bool(left.data._char < right.data._char);
         case SHORT:
-            return create_short(left.data._short < right.data._short);
+            return create_bool(left.data._short < right.data._short);
         case INT:
-            return create_int(left.data._int < right.data._int);
+            return create_bool(left.data._int < right.data._int);
         case LONG:
-            return create_long(left.data._long < right.data._long);
+            return create_bool(left.data._long < right.data._long);
         case BOOL:
             return create_bool(left.data._bool < right.data._bool);
         default:
@@ -392,13 +392,13 @@ Var var::lte(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char <= right.data._char);
+            return create_bool(left.data._char <= right.data._char);
         case SHORT:
-            return create_short(left.data._short <= right.data._short);
+            return create_bool(left.data._short <= right.data._short);
         case INT:
-            return create_int(left.data._int <= right.data._int);
+            return create_bool(left.data._int <= right.data._int);
         case LONG:
-            return create_long(left.data._long <= right.data._long);
+            return create_bool(left.data._long <= right.data._long);
         case BOOL:
             return create_bool(left.data._bool <= right.data._bool);
         default:
@@ -411,13 +411,13 @@ Var var::gt(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char > right.data._char);
+            return create_bool(left.data._char > right.data._char);
         case SHORT:
-            return create_short(left.data._short > right.data._short);
+            return create_bool(left.data._short > right.data._short);
         case INT:
-            return create_int(left.data._int > right.data._int);
+            return create_bool(left.data._int > right.data._int);
         case LONG:
-            return create_long(left.data._long > right.data._long);
+            return create_bool(left.data._long > right.data._long);
         case BOOL:
             return create_bool(left.data._bool > right.data._bool);
         default:
@@ -430,13 +430,13 @@ Var var::gte(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char >= right.data._char);
+            return create_bool(left.data._char >= right.data._char);
         case SHORT:
-            return create_short(left.data._short >= right.data._short);
+            return create_bool(left.data._short >= right.data._short);
         case INT:
-            return create_int(left.data._int >= right.data._int);
+            return create_bool(left.data._int >= right.data._int);
         case LONG:
-            return create_long(left.data._long >= right.data._long);
+            return create_bool(left.data._long >= right.data._long);
         case BOOL:
             return create_bool(left.data._bool >= right.data._bool);
         default:
@@ -449,13 +449,13 @@ Var var::eq(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char == right.data._char);
+            return create_bool(left.data._char == right.data._char);
         case SHORT:
-            return create_short(left.data._short == right.data._short);
+            return create_bool(left.data._short == right.data._short);
         case INT:
-            return create_int(left.data._int == right.data._int);
+            return create_bool(left.data._int == right.data._int);
         case LONG:
-            return create_long(left.data._long == right.data._long);
+            return create_bool(left.data._long == right.data._long);
         case BOOL:
             return create_bool(left.data._bool == right.data._bool);
         default:
@@ -468,13 +468,13 @@ Var var::neq(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
         case CHAR:
-            return create_char(left.data._char != right.data._char);
+            return create_bool(left.data._char != right.data._char);
         case SHORT:
-            return create_short(left.data._short != right.data._short);
+            return create_bool(left.data._short != right.data._short);
         case INT:
-            return create_int(left.data._int != right.data._int);
+            return create_bool(left.data._int != right.data._int);
         case LONG:
-            return create_long(left.data._long != right.data._long);
+            return create_bool(left.data._long != right.data._long);
         case BOOL:
             return create_bool(left.data._bool != right.data._bool);
         default:
