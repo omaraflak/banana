@@ -1,5 +1,5 @@
 fun isprime(n) {
-    for (var i = 2; i < n; i++) {
+    for (long i = 2; i < n; i++) {
         if (n % i == 0) {
             return 0;
         }
@@ -8,8 +8,8 @@ fun isprime(n) {
 }
 
 fun main() {
-    var n = 30;
-    var i = 3;
+    long n = 30;
+    long i = 3;
     while (n > 1) {
         if (isprime(i) == 1) {
             print i;

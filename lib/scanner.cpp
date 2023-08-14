@@ -287,6 +287,9 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 if (match_string(scanner, "if", /* keyword */ true)) {
                     scanner.current += 2;
                     tokens.push_back(create_token(TOKEN_IF, scanner));
+                } else if (match_string(scanner, "int", /* keyword */ true)) {
+                    scanner.current += 3;
+                    tokens.push_back(create_token(TOKEN_INT, scanner));
                 } else {
                     scanner.current = match_identifier(scanner);
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
@@ -337,10 +340,37 @@ std::vector<Token> scanner::scan(const std::string& code) {
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
                 }
                 break;
-            case 'v':
-                if (match_string(scanner, "var", /* keyword */ true)) {
-                    scanner.current += 3;
-                    tokens.push_back(create_token(TOKEN_VAR, scanner));
+            case 'c':
+                if (match_string(scanner, "char", /* keyword */ true)) {
+                    scanner.current += 4;
+                    tokens.push_back(create_token(TOKEN_CHAR, scanner));
+                } else {
+                    scanner.current = match_identifier(scanner);
+                    tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
+                }
+                break;
+            case 's':
+                if (match_string(scanner, "short", /* keyword */ true)) {
+                    scanner.current += 5;
+                    tokens.push_back(create_token(TOKEN_SHORT, scanner));
+                } else {
+                    scanner.current = match_identifier(scanner);
+                    tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
+                }
+                break;
+            case 'l':
+                if (match_string(scanner, "long", /* keyword */ true)) {
+                    scanner.current += 4;
+                    tokens.push_back(create_token(TOKEN_LONG, scanner));
+                } else {
+                    scanner.current = match_identifier(scanner);
+                    tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
+                }
+                break;
+            case 'b':
+                if (match_string(scanner, "bool", /* keyword */ true)) {
+                    scanner.current += 4;
+                    tokens.push_back(create_token(TOKEN_BOOL, scanner));
                 } else {
                     scanner.current = match_identifier(scanner);
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
@@ -369,19 +399,15 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 tokens.push_back(create_token(TOKEN_NUMBER, scanner));
                 break;
             case '_':
-            case 'b':
-            case 'c':
             case 'd':
             case 'g':
             case 'h':
             case 'j':
             case 'k':
-            case 'l':
             case 'm':
             case 'n':
             case 't':
             case 'q':
-            case 's':
             case 'u':
             case 'x':
             case 'y':

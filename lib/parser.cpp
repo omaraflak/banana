@@ -30,7 +30,8 @@ std::map<TokenType, AstBinaryOperation> BIN_OP = {
 std::set<TokenType> KEYWORDS = {
     TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
     TOKEN_FOR, TOKEN_WHILE, TOKEN_AND, TOKEN_OR,
-    TOKEN_PRINT, TOKEN_VAR
+    TOKEN_PRINT, TOKEN_CHAR, TOKEN_SHORT, TOKEN_INT,
+    TOKEN_LONG, TOKEN_BOOL
 };
 
 typedef std::map<std::string, std::shared_ptr<VariableNode>> Identifiers;
@@ -519,7 +520,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_PRINT})) {
         return print_statement(parser);
     }
-    if (match(parser, {TOKEN_VAR})) {
+    if (match(parser, {TOKEN_LONG})) {
         return var_statement(parser);
     }
     if (match(parser, {TOKEN_IF})) {

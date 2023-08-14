@@ -1,7 +1,7 @@
-var a = 1;
-var b = 2;
-var c = 0;
-var n = 30;
+long a = 1;
+long b = 2;
+long c = 0;
+long n = 30;
 
 print a;
 print b;
