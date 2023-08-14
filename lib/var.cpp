@@ -330,45 +330,6 @@ Var var::binary_or(const Var& left, const Var& right) {
     }
 }
 
-Var var::boolean_and(const Var& left, const Var& right) {
-    assert(left.type == right.type);
-    switch (left.type) {
-        case CHAR:
-            return create_bool(left.data._char && right.data._char);
-        case SHORT:
-            return create_bool(left.data._short && right.data._short);
-        case INT:
-            return create_bool(left.data._int && right.data._int);
-        case LONG:
-            return create_bool(left.data._long && right.data._long);
-        case BOOL:
-            return create_bool(left.data._bool && right.data._bool);
-        default:
-            var::type_not_found(left);
-            exit(1);
-    }
-}
-
-Var var::boolean_or(const Var& left, const Var& right) {
-    assert(left.type == right.type);
-    switch (left.type) {
-        case CHAR:
-            return create_bool(left.data._char || right.data._char);
-        case SHORT:
-            return create_bool(left.data._short || right.data._short);
-        case INT:
-            return create_bool(left.data._int || right.data._int);
-        case LONG:
-            return create_bool(left.data._long || right.data._long);
-        case BOOL:
-            return create_bool(left.data._bool || right.data._bool);
-        default:
-            var::type_not_found(left);
-            exit(1);
-    }
-}
-
-
 Var var::lt(const Var& left, const Var& right) {
     assert(left.type == right.type);
     switch (left.type) {
@@ -477,6 +438,44 @@ Var var::neq(const Var& left, const Var& right) {
             return create_bool(left.data._long != right.data._long);
         case BOOL:
             return create_bool(left.data._bool != right.data._bool);
+        default:
+            var::type_not_found(left);
+            exit(1);
+    }
+}
+
+Var var::boolean_and(const Var& left, const Var& right) {
+    assert(left.type == right.type);
+    switch (left.type) {
+        case CHAR:
+            return create_bool(left.data._char && right.data._char);
+        case SHORT:
+            return create_bool(left.data._short && right.data._short);
+        case INT:
+            return create_bool(left.data._int && right.data._int);
+        case LONG:
+            return create_bool(left.data._long && right.data._long);
+        case BOOL:
+            return create_bool(left.data._bool && right.data._bool);
+        default:
+            var::type_not_found(left);
+            exit(1);
+    }
+}
+
+Var var::boolean_or(const Var& left, const Var& right) {
+    assert(left.type == right.type);
+    switch (left.type) {
+        case CHAR:
+            return create_bool(left.data._char || right.data._char);
+        case SHORT:
+            return create_bool(left.data._short || right.data._short);
+        case INT:
+            return create_bool(left.data._int || right.data._int);
+        case LONG:
+            return create_bool(left.data._long || right.data._long);
+        case BOOL:
+            return create_bool(left.data._bool || right.data._bool);
         default:
             var::type_not_found(left);
             exit(1);

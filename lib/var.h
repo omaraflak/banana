@@ -45,8 +45,6 @@ namespace var {
     Var binary_xor(const Var& left, const Var& right);
     Var binary_and(const Var& left, const Var& right);
     Var binary_or(const Var& left, const Var& right);
-    Var boolean_and(const Var& left, const Var& right);
-    Var boolean_or(const Var& left, const Var& right);
     
     Var lt(const Var& left, const Var& right);
     Var lte(const Var& left, const Var& right);
@@ -54,6 +52,8 @@ namespace var {
     Var gte(const Var& left, const Var& right);
     Var eq(const Var& left, const Var& right);
     Var neq(const Var& left, const Var& right);
+    Var boolean_and(const Var& left, const Var& right);
+    Var boolean_or(const Var& left, const Var& right);
 
     Var binary_not(const Var& var);
     Var boolean_not(const Var& var);
