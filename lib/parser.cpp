@@ -244,7 +244,7 @@ std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::stri
 std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
-        return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_long(token_as_long(token))));
+        return literal_long(token_as_long(token));
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
         if (match(parser, {TOKEN_LEFT_PAREN})) {
