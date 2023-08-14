@@ -483,7 +483,6 @@ Var var::neq(const Var& left, const Var& right) {
     }
 }
 
-
 Var var::binary_not(const Var& var) {
     switch (var.type) {
         case CHAR:
