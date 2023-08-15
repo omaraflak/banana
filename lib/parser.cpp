@@ -402,18 +402,15 @@ std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
     register_function(parser, fun_node, fun_id.value);
     push_frame(parser, fun_node);
     push_scope(parser, fun_node);
-    std::vector<std::shared_ptr<VariableNode>> parameters = fun_parameters(parser);
-    std::shared_ptr<AbstractSyntaxTree> fun_block = block(parser);
-    fun_node->set_body(fun_block);
-    fun_node->set_parameters(parameters);
+    fun_node->set_parameters(fun_parameters(parser));
+    fun_node->set_body(block(parser));
     pop_scope(parser);
     pop_frame(parser);
     return fun_node;
 }
 
 std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
-    if (check(parser, TOKEN_SEMICOLON)) {
-        advance(parser);
+    if (match(parser, {TOKEN_SEMICOLON})) {
         return std::shared_ptr<ReturnNode>(new ReturnNode());
     }
     std::shared_ptr<AbstractSyntaxTree> exp = expression_statement(parser);
@@ -424,18 +421,15 @@ std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& e
     Token fun_id = previous(parser, 2);
     std::shared_ptr<FunctionNode> fun_node = get_function(parser, fun_id.value);
     std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
-    for (;;) {
-        if (check(parser, TOKEN_RIGHT_PAREN)) {
-            advance(parser);
-            break;
-        }
+    for (int i=0; i<fun_node->get_parameters_count(); i++) {
         values.push_back(expression(parser));
-        if (!check(parser, TOKEN_RIGHT_PAREN)) {
-            consume(parser, TOKEN_COMMA, "Expected comma after function parameter.");
+        if (i != fun_node->get_parameters_count() - 1) {
+            consume(parser, TOKEN_COMMA, "Expected ',' after function parameter.");
         }
     }
+    consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after function parameters.");
     if (expect_semicolon) {
-        consume(parser, TOKEN_SEMICOLON, "Expected ';' after function call");
+        consume(parser, TOKEN_SEMICOLON, "Expected ';' after function call.");
     }
     return std::shared_ptr<CallNode>(new CallNode(fun_node, values));
 }
