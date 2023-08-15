@@ -80,9 +80,9 @@ typedef struct {
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
-std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon = true);
+std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const Token& id, const Token& assign, const bool& expect_semicolon = true);
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser);
-std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& expect_semicolon = true);
+std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& id, const bool& expect_semicolon = true);
 bool match_assign(Parser& parser);
 
 void print_error(const Parser& parser, const std::string& message);
@@ -252,7 +252,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
         if (match(parser, {TOKEN_LEFT_PAREN})) {
-            return call_statement(parser, /* expect_semicolon */ false);
+            return call_statement(parser, previous(parser, 2), /* expect_semicolon */ false);
         }
         Token token = previous(parser);
         std::string name = token.value;
@@ -316,14 +316,14 @@ std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
     return std::shared_ptr<PrintNode>(new PrintNode(expression_statement(parser)));
 }
 
-std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser) {
+std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser, const TokenType& type) {
     Token p = peek(parser);
     if (KEYWORDS.find(p.type) != KEYWORDS.end()) {
         print_error(parser, "'" + p.value + "' is a reserved identifier.");
         exit(1);
     }
     Token id = consume(parser, TOKEN_IDENTIFIER, "Expected identifier.");
-    std::shared_ptr<VariableNode> variable = new_variable(parser, id.value, TOKEN_LONG);
+    std::shared_ptr<VariableNode> variable = new_variable(parser, id.value, type);
     consume(parser, TOKEN_EQUAL, "Expected '=' sign after identifier.");
     std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
@@ -413,9 +413,8 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
 
-std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& expect_semicolon) {
-    Token fun_id = previous(parser, 2);
-    std::shared_ptr<FunctionNode> fun_node = get_function(parser, fun_id.value);
+std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& id, const bool& expect_semicolon) {
+    std::shared_ptr<FunctionNode> fun_node = get_function(parser, id.value);
     std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
     for (int i=0; i<fun_node->get_parameters_count(); i++) {
         values.push_back(expression(parser));
@@ -432,15 +431,23 @@ std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const bool& e
 
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser) {
     if (match_assign(parser)) {
-        return assign_statement(parser, /* expect_semicolon */ false);
+        return assign_statement(
+            parser,
+            previous(parser, 2),
+            previous(parser),
+            /* expect_semicolon */ false
+        );
     }
     print_error(parser, "Expected assign expression.");
     exit(1);
 }
 
-std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool& expect_semicolon) {
-    Token assign = previous(parser);
-    Token id = previous(parser, 2);
+std::shared_ptr<AbstractSyntaxTree> assign_statement(
+    Parser& parser,
+    const Token& id,
+    const Token& assign,
+    const bool& expect_semicolon
+) {
     std::shared_ptr<VariableNode> variable = get_variable_by_name(parser, id.value);
     std::shared_ptr<AbstractSyntaxTree> exp;
     switch (assign.type) {
@@ -511,7 +518,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
         return print_statement(parser);
     }
     if (match(parser, {TOKEN_LONG})) {
-        return var_statement(parser);
+        return var_statement(parser, TOKEN_LONG);
     }
     if (match(parser, {TOKEN_IF})) {
         return if_statement(parser);
@@ -523,7 +530,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
         return for_statement(parser);
     }
     if (match_assign(parser)) {
-        return assign_statement(parser);
+        return assign_statement(parser, previous(parser, 2), previous(parser));
     }
     if (match(parser, {TOKEN_FUN})) {
         return fun_statement(parser);
@@ -532,7 +539,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
         return return_statement(parser);
     }
     if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
-        return call_statement(parser);
+        return call_statement(parser, previous(parser, 2));
     }
     return expression_statement(parser);
 }
