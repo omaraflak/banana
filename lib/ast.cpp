@@ -35,8 +35,9 @@ void LiteralNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new PushInstruction(value));
 }
 
-VariableNode::VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame) {
+VariableNode::VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame, const AstVarType& type) {
     this->frame = frame;
+    this->type = type;
     if (frame == nullptr) {
         std::cout << "Trying to get address without a frame" << std::endl;
         exit(1);
@@ -55,6 +56,10 @@ void VariableNode::write(std::vector<const Instruction*>& instructions) {
 
 Address VariableNode::get_address() const {
     return address;
+}
+
+AstVarType VariableNode::get_type() const {
+    return type;
 }
 
 AssignNode::AssignNode(

@@ -34,15 +34,22 @@ class LiteralNode: public AbstractSyntaxTree {
     Var value;
 };
 
+enum AstVarType {
+    AST_TYPE_CHAR, AST_TYPE_SHORT, AST_TYPE_INT,
+    AST_TYPE_LONG, AST_TYPE_BOOL
+};
+
 class VariableNode: public AbstractSyntaxTree {
     public:
-    VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame);
+    VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame, const AstVarType& type);
     void write(std::vector<const Instruction*>& instructions);
     Address get_address() const;
+    AstVarType get_type() const;
     
     private:
     std::shared_ptr<const AbstractSyntaxTree> frame;
     Address address;
+    AstVarType type;
 
     static inline std::map<std::shared_ptr<const AbstractSyntaxTree>, Address> latest_address;
 };
