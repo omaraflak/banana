@@ -8,7 +8,7 @@
 namespace parser {
 const std::string MAIN = "main";
 
-std::map<TokenType, AstBinaryOperation> BIN_OP = {
+const std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_EQUAL_EQUAL, AST_EQ},
     {TOKEN_BANG_EQUAL, AST_NOT_EQ},
     {TOKEN_LESS, AST_LT},
@@ -27,7 +27,7 @@ std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_OR, AST_BOOL_OR},
 };
 
-std::set<TokenType> KEYWORDS = {
+const std::set<TokenType> KEYWORDS = {
     TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
     TOKEN_FOR, TOKEN_WHILE, TOKEN_AND, TOKEN_OR,
     TOKEN_PRINT, TOKEN_CHAR, TOKEN_SHORT, TOKEN_INT,
@@ -60,44 +60,20 @@ bool match_assign(Parser& parser);
 void print_error(const Parser& parser, const std::string& message);
 std::shared_ptr<BlockNode> block(Parser& parser);
 
-std::shared_ptr<LiteralNode> literal_char(const char& value) {
-    return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_char(value)));
-}
-
-std::shared_ptr<LiteralNode> literal_short(const short& value) {
-    return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_short(value)));
-}
-
-std::shared_ptr<LiteralNode> literal_int(const int& value) {
-    return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_int(value)));
-}
-
-std::shared_ptr<LiteralNode> literal_long(const long& value) {
-    return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_long(value)));
-}
-
-std::shared_ptr<LiteralNode> literal_bool(const bool& value) {
-    return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_bool(value)));
-}
-
-char token_as_char(const Token& token) {
-    return stol(token.value);
-}
-
-short token_as_short(const Token& token) {
-    return stol(token.value);
-}
-
-int token_as_int(const Token& token) {
-    return stoi(token.value);
-}
-
-long token_as_long(const Token& token) {
-    return stol(token.value);
-}
-
-bool token_as_bool(const Token& token) {
-    return stoi(token.value);
+std::shared_ptr<LiteralNode> literal(const std::string& value, const TokenType& type) {
+    switch (type) {
+        case TOKEN_BOOL:
+            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_bool(stoi(value))));
+        case TOKEN_CHAR:
+            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_char(stoi(value))));
+        case TOKEN_SHORT:
+            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_short(stoi(value))));
+        case TOKEN_INT:
+            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_int(stoi(value))));
+        case TOKEN_LONG:
+        default:
+            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_long(stol(value))));
+    }
 }
 
 bool eof(const Parser& parser) {
@@ -244,7 +220,7 @@ std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::stri
 std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
-        return literal_long(token_as_long(token));
+        return literal(token.value, TOKEN_LONG);
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
         if (match(parser, {TOKEN_LEFT_PAREN})) {
@@ -267,7 +243,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
 std::shared_ptr<AbstractSyntaxTree> unary_expression(Parser& parser) {
     if (check(parser, TOKEN_MINUS)) {
         advance(parser);
-        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal_long(0), unary_expression(parser), AST_SUB));
+        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal("0", TOKEN_LONG), unary_expression(parser), AST_SUB));
     }
     if (check(parser, TOKEN_BANG)) {
         advance(parser);
@@ -290,7 +266,7 @@ std::shared_ptr<AbstractSyntaxTree> binary_expression(
     }
     std::shared_ptr<AbstractSyntaxTree> left = binary_expression(parser, types, index + 1);
     while (match(parser, types.at(index))) {
-        AstBinaryOperation op = BIN_OP[previous(parser).type];
+        AstBinaryOperation op = BIN_OP.at(previous(parser).type);
         std::shared_ptr<AbstractSyntaxTree> right = binary_expression(parser, types, index + 1);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
     }
@@ -482,10 +458,10 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const bool&
             exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_BIN_OR));
             break;
         case TOKEN_PLUS_PLUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal_long(1), AST_ADD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", TOKEN_LONG), AST_ADD));
             break;
         case TOKEN_MINUS_MINUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal_long(1), AST_SUB));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", TOKEN_LONG), AST_SUB));
             break;
         default:
             print_error(parser, "Could not recognize assignment type!");
