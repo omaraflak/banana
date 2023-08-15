@@ -148,12 +148,12 @@ bool match(Parser& parser, const std::vector<TokenType>& types) {
     return false;
 }
 
-bool match_sequence(Parser& parser, const std::vector<TokenType>& types) {
+bool match_sequence(Parser& parser, const std::vector<std::set<TokenType>>& types) {
     if (parser.current + types.size() >= parser.tokens.size()) {
         return false;
     }
     for (int i = 0; i < types.size(); i++) {
-        if (parser.tokens[parser.current + i].type != types[i]) {
+        if (types[i].find(parser.tokens[parser.current + i].type) == types[i].end()) {
             return false;
         }
     }
@@ -494,16 +494,16 @@ std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
 }
 
 bool match_assign(Parser& parser) {
-    return match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_STAR_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_SLASH_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MOD_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_AMPERSAND_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PIPE_EQUAL}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_PLUS_PLUS}) ||
-        match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_MINUS_MINUS});
+    return match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_PLUS_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_MINUS_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_STAR_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_SLASH_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_MOD_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_AMPERSAND_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_PIPE_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_PLUS_PLUS}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_MINUS_MINUS}});
 }
 
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
@@ -531,7 +531,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_RETURN})) {
         return return_statement(parser);
     }
-    if (match_sequence(parser, {TOKEN_IDENTIFIER, TOKEN_LEFT_PAREN})) {
+    if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
         return call_statement(parser);
     }
     return expression_statement(parser);
