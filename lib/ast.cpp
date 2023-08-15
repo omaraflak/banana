@@ -1,5 +1,4 @@
 #include "ast.h"
-#include "byteutils.h"
 
 AbstractSyntaxTree::AbstractSyntaxTree() {
     written = false;
@@ -46,7 +45,7 @@ VariableNode::VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& fram
         latest_address[frame] = 0;
     }
     address = latest_address[frame];
-    latest_address[frame] += SIZE_OF_LONG;
+    latest_address[frame]++;
 }
 
 void VariableNode::write(std::vector<const Instruction*>& instructions) {
