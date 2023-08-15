@@ -277,10 +277,12 @@ FunctionNode::FunctionNode() : AbstractSyntaxTree() {}
 
 FunctionNode::FunctionNode(
     const std::shared_ptr<AbstractSyntaxTree>& body,
-    const std::vector<std::shared_ptr<VariableNode>>& parameters
+    const std::vector<std::shared_ptr<VariableNode>>& parameters,
+    const AstVarType& return_type
 ) : AbstractSyntaxTree() {
     set_body(body);
     set_parameters(parameters);
+    set_return_type(return_type);
 }
 
 void FunctionNode::write(std::vector<const Instruction*>& instructions) {
@@ -295,6 +297,10 @@ uint8_t FunctionNode::get_parameters_count() const {
     return parameters.size();
 }
 
+AstVarType FunctionNode::get_return_type() const {
+    return return_type;
+}
+
 void FunctionNode::set_body(const std::shared_ptr<AbstractSyntaxTree>& body) {
     this->body = body;
 }
@@ -302,6 +308,10 @@ void FunctionNode::set_body(const std::shared_ptr<AbstractSyntaxTree>& body) {
 void FunctionNode::set_parameters(const std::vector<std::shared_ptr<VariableNode>>& parameters) {
     this->parameters.clear();
     this->parameters.insert(this->parameters.end(), parameters.begin(), parameters.end());
+}
+
+void FunctionNode::set_return_type(const AstVarType& return_type) {
+    this->return_type = return_type;
 }
 
 CallNode::CallNode(

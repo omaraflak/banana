@@ -397,6 +397,7 @@ std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
     register_function(parser, fun_node, fun_id.value);
     push_frame(parser, fun_node);
     push_scope(parser, fun_node);
+    fun_node->set_return_type(AST_TYPE_LONG);
     fun_node->set_parameters(fun_parameters(parser));
     fun_node->set_body(block(parser));
     pop_scope(parser);

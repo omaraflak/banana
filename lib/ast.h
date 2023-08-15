@@ -179,16 +179,23 @@ class PrintStringNode: public AbstractSyntaxTree {
 class FunctionNode: public AbstractSyntaxTree {
     public:
     FunctionNode();
-    FunctionNode(const std::shared_ptr<AbstractSyntaxTree>& body, const std::vector<std::shared_ptr<VariableNode>>& parameters);
+    FunctionNode(
+        const std::shared_ptr<AbstractSyntaxTree>& body,
+        const std::vector<std::shared_ptr<VariableNode>>& parameters,
+        const AstVarType& return_type
+    );
     void write(std::vector<const Instruction*>& instructions);
     uint8_t get_parameters_count() const;
+    AstVarType get_return_type() const;
 
     void set_body(const std::shared_ptr<AbstractSyntaxTree>& body);
     void set_parameters(const std::vector<std::shared_ptr<VariableNode>>& parameters);
+    void set_return_type(const AstVarType& return_type);
 
     private:
     std::shared_ptr<AbstractSyntaxTree> body;
     std::vector<std::shared_ptr<const VariableNode>> parameters;
+    AstVarType return_type;
 };
 
 class CallNode: public AbstractSyntaxTree {
