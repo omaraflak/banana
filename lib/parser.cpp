@@ -361,36 +361,31 @@ std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
 }
 
 std::vector<std::shared_ptr<VariableNode>> fun_parameters(Parser& parser) {
-    consume(parser, TOKEN_LEFT_PAREN, "Expected '(' before 'fun' parameters.");
+    TokenType previous_token = consume(parser, TOKEN_LEFT_PAREN, "Expected '(' before 'fun' parameters.").type;
     std::vector<std::shared_ptr<VariableNode>> parameters;
-    TokenType previous_token = TOKEN_LEFT_PAREN;
     for (;;) {
-        Token p = peek(parser);
-        if (p.type == TOKEN_IDENTIFIER) {
+        if (match(parser, {TOKEN_IDENTIFIER})) {
             if (previous_token != TOKEN_LEFT_PAREN && previous_token != TOKEN_COMMA) {
-                print_error(parser, "Unexpected token '" + p.value + "'.");
+                print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
                 exit(1);
             }
-            parameters.push_back(new_variable(parser, p.value, TOKEN_LONG));
-            advance(parser);
-        } else if (p.type == TOKEN_COMMA) {
+            parameters.push_back(new_variable(parser, previous(parser).value, TOKEN_LONG));
+        } else if (match(parser, {TOKEN_COMMA})) {
             if (previous_token != TOKEN_IDENTIFIER) {
-                print_error(parser, "Unexpected token '" + p.value + "'.");
+                print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
                 exit(1);
             }
-            advance(parser);
-        } else if (p.type == TOKEN_RIGHT_PAREN) {
+        } else if (match(parser, {TOKEN_RIGHT_PAREN})) {
             if (previous_token != TOKEN_LEFT_PAREN && previous_token != TOKEN_IDENTIFIER) {
-                print_error(parser, "Unexpected token '" + p.value + "'.");
+                print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
                 exit(1);
             }
-            advance(parser);
             break;
         } else {
-            print_error(parser, "Unexpected token '" + p.value + "'.");
+            print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
             exit(1);
         }
-        previous_token = p.type;
+        previous_token = previous(parser).type;
     }
     return parameters;
 }
