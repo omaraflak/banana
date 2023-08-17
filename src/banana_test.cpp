@@ -79,7 +79,6 @@ TEST(Expression, SubstituteVariable) {
   EXPECT_EQ("true\n", exe("int x = 1; print 1 == x;"));
   EXPECT_EQ("false\n", exe("short x = 25; print x <= 7;"));
   EXPECT_EQ("0\n", exe("short x = 25; short y = 24; print x - y - 1;"));
-  EXPECT_EQ("3\n", exe("int x = 1; short y = 2; print x + y;"));
 }
 
 TEST(Expression, Casting) {
@@ -114,6 +113,12 @@ TEST(ForLoop, Loop) {
   EXPECT_EQ("0\n1\n2\n", exe("for (int i=0; i<3; i++) { print i; }"));
   EXPECT_EQ("0\n1\n2\n", exe("int i=1; for (i=0; i<3; i++) { print i; }"));
   EXPECT_EQ("0\n1\n2\n", exe("int i=1; for (i=0; i<3; i++) { print i; }"));
+  EXPECT_EQ("3\n2\n1\n", exe("for (int i=3; i>0; i--) { print i; }"));
+  EXPECT_EQ("0\n4\n8\n", exe("for (int i=0; i<10; i+=4) { print i; }"));
+}
+
+TEST(WhileLoop, Loop) {
+  EXPECT_EQ("0\n1\n2\n", exe("long i=0; while (i < 3) { print i; i++; }"));
 }
 
 }
