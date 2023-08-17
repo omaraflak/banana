@@ -23,8 +23,8 @@ TEST(Print, Literal) {
 }
 
 TEST(Print, Variable) {
-  EXPECT_EQ("true\n", exe("bool x = 1; print x;"));
-  EXPECT_EQ("false\n", exe("bool x = 0; print x;"));
+  EXPECT_EQ("true\n", exe("bool x = true; print x;"));
+  EXPECT_EQ("false\n", exe("bool x = false; print x;"));
   EXPECT_EQ("A\n", exe("char x = 65; print x;"));
   EXPECT_EQ("5\n", exe("short x = 5; print x;"));
   EXPECT_EQ("8\n", exe("int x = 8; print x;"));

@@ -84,7 +84,7 @@ std::shared_ptr<BlockNode> block(Parser& parser);
 std::shared_ptr<LiteralNode> literal(const std::string& value, const TokenType& type) {
     switch (type) {
         case TOKEN_BOOL:
-            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_bool(stoi(value))));
+            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_bool(value == "true")));
         case TOKEN_CHAR:
             return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_char(stoi(value))));
         case TOKEN_SHORT:
@@ -248,6 +248,10 @@ std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::stri
 }
 
 std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const TokenType& expected_type) {
+    if (match(parser, {TOKEN_TRUE, TOKEN_FALSE})) {
+        Token token = previous(parser);
+        return literal(token.value, TOKEN_BOOL);
+    }
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
         return literal(token.value, expected_type);

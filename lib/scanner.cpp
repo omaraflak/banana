@@ -268,6 +268,9 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 } else if (match_string(scanner, "fun", /* keyword */ true)) {
                     scanner.current += 3;
                     tokens.push_back(create_token(TOKEN_FUN, scanner));
+                } else if (match_string(scanner, "false", /* keyword */ true)) {
+                    scanner.current += 5;
+                    tokens.push_back(create_token(TOKEN_FALSE, scanner));
                 } else {
                     scanner.current = match_identifier(scanner);
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
@@ -376,6 +379,15 @@ std::vector<Token> scanner::scan(const std::string& code) {
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
                 }
                 break;
+            case 't':
+                if (match_string(scanner, "true", /* keyword */ true)) {
+                    scanner.current += 4;
+                    tokens.push_back(create_token(TOKEN_TRUE, scanner));
+                } else {
+                    scanner.current = match_identifier(scanner);
+                    tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
+                }
+                break;
             case '"': {
                 int quote = match_quote(scanner);
                 if (quote == -1) {
@@ -406,7 +418,6 @@ std::vector<Token> scanner::scan(const std::string& code) {
             case 'k':
             case 'm':
             case 'n':
-            case 't':
             case 'q':
             case 'u':
             case 'x':
