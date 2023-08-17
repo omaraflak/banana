@@ -3,11 +3,28 @@
 #include <iostream>
 #include <cassert>
 #include <sstream>
+#include <map>
 
 namespace var {
 void type_not_found(const Var& var) {
     std::cout << "Type not found: " << var.type << std::endl;
 }
+
+const std::map<DataType, std::string> TYPE_NAME = {
+    {CHAR, "char"},
+    {SHORT, "short"},
+    {INT, "int"},
+    {LONG, "long"},
+    {BOOL, "bool"}
+};
+
+const std::map<std::string, DataType> TYPE_NAME_REVERSED = {
+    {"char", CHAR},
+    {"short", SHORT},
+    {"int", INT},
+    {"long", LONG},
+    {"bool", BOOL}
+};
 }
 
 void var::push(const Var &var, std::vector<uint8_t>& bytes) {
@@ -68,7 +85,7 @@ Var var::read(const std::vector<uint8_t>& bytes, uint64_t* index) {
 
 std::string var::to_string(const Var& var) {
     std::stringstream ss;
-    ss << var.type << " ";
+    ss << TYPE_NAME.at(var.type) << " ";
     switch (var.type) {
         case CHAR:
             ss << (int) var.data._char;
@@ -94,7 +111,7 @@ std::string var::to_string(const Var& var) {
 
 Var var::from_string(const std::vector<std::string>& strings) {
     Var var;
-    var.type = (DataType) stol(strings[0]);
+    var.type = TYPE_NAME_REVERSED.at(strings[0]);
     switch (var.type) {
         case CHAR:
             var.data._char = stol(strings[1]);
