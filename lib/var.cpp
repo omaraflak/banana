@@ -1,7 +1,6 @@
 #include "var.h"
 #include "../lib/byteutils.h"
 #include <iostream>
-#include <cassert>
 #include <sstream>
 #include <map>
 
