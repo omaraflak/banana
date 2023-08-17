@@ -70,6 +70,8 @@ TEST(Expression, BooleanOperators) {
   EXPECT_EQ("true\n", exe("print 1 >= 1;"));
   EXPECT_EQ("true\n", exe("print 1 != 6;"));
   EXPECT_EQ("false\n", exe("print 1 != 1;"));
+  EXPECT_EQ("true\n", exe("print true + true;"));
+  EXPECT_EQ("false\n", exe("print false + false;"));
   EXPECT_EQ("true\n", exe("print true == true;"));
   EXPECT_EQ("true\n", exe("print false == false;"));
   EXPECT_EQ("false\n", exe("print true == false;"));
@@ -77,6 +79,7 @@ TEST(Expression, BooleanOperators) {
 
 TEST(Expression, SubstituteVariable) {
   EXPECT_EQ("true\n", exe("int x = 1; print 1 == x;"));
+  EXPECT_EQ("true\n", exe("int x = 1; print x == 1;"));
   EXPECT_EQ("false\n", exe("short x = 25; print x <= 7;"));
   EXPECT_EQ("0\n", exe("short x = 25; short y = 24; print x - y - 1;"));
 }
