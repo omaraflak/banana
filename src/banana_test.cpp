@@ -133,4 +133,12 @@ TEST(WhileLoop, Loop) {
   EXPECT_EQ("0\n1\n2\n", exe("long i=0; while (i < 3) { print i; i++; }"));
 }
 
+TEST(Function, CallAndReturn) {
+  EXPECT_EQ("13\n", exe("int add(int a, int b) { return a + b; } int main() { int x = add(6, 7); print x; }"));
+  EXPECT_EQ("13\n3\n7\n", exe("int add(int a, int b) { return a + b; } int main() { print add(6, 7); print add(1, 2); print add(3, 4); }"));
+}
+
+TEST(Function, NoParameters) {
+  EXPECT_EQ("true\n", exe("int sayHello() { print true; return 1; } int main() { sayHello(); }"));
+}
 }
