@@ -368,15 +368,17 @@ std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
 }
 
 std::vector<std::shared_ptr<VariableNode>> fun_parameters(Parser& parser) {
-    TokenType previous_token = consume(parser, TOKEN_LEFT_PAREN, "Expected '(' before 'fun' parameters.").type;
     std::vector<std::shared_ptr<VariableNode>> parameters;
+    TokenType previous_token = TOKEN_LEFT_PAREN;
     for (;;) {
-        if (match(parser, {TOKEN_IDENTIFIER})) {
+        if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}})) {
             if (previous_token != TOKEN_LEFT_PAREN && previous_token != TOKEN_COMMA) {
                 print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
                 exit(1);
             }
-            parameters.push_back(new_variable(parser, TOKEN_LONG, previous(parser).value));
+            Token var_type = previous(parser, 2);
+            Token var_id = previous(parser);
+            parameters.push_back(new_variable(parser, var_type.type, var_id.value));
         } else if (match(parser, {TOKEN_COMMA})) {
             if (previous_token != TOKEN_IDENTIFIER) {
                 print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
@@ -397,14 +399,12 @@ std::vector<std::shared_ptr<VariableNode>> fun_parameters(Parser& parser) {
     return parameters;
 }
 
-std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser) {
-    consume(parser, TOKEN_IDENTIFIER, "Expected identifier after 'fun'.");
-    Token fun_id = previous(parser);
+std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser, const Token& type, const Token& id) {
     std::shared_ptr<FunctionNode> fun_node(new FunctionNode());
-    register_function(parser, fun_node, fun_id.value);
+    register_function(parser, fun_node, id.value);
     push_frame(parser, fun_node);
     push_scope(parser, fun_node);
-    fun_node->set_return_type(AST_TYPE_LONG);
+    fun_node->set_return_type(TOKEN_TO_TYPE.at(type.type));
     fun_node->set_parameters(fun_parameters(parser));
     fun_node->set_body(block(parser));
     pop_scope(parser);
@@ -541,14 +541,14 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match_assign(parser)) {
         return assign_statement(parser, previous(parser, 2), previous(parser));
     }
-    if (match(parser, {TOKEN_FUN})) {
-        return fun_statement(parser);
-    }
     if (match(parser, {TOKEN_RETURN})) {
         return return_statement(parser);
     }
     if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_EQUAL}})) {
         return var_statement(parser, previous(parser, 3), previous(parser, 2));
+    }
+    if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
+        return fun_statement(parser, previous(parser, 3), previous(parser, 2));
     }
     if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
         return call_statement(parser, previous(parser, 2));

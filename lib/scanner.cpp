@@ -263,9 +263,6 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 if (match_string(scanner, "for", /* keyword */ true)) {
                     scanner.current += 3;
                     tokens.push_back(create_token(TOKEN_FOR, scanner));
-                } else if (match_string(scanner, "fun", /* keyword */ true)) {
-                    scanner.current += 3;
-                    tokens.push_back(create_token(TOKEN_FUN, scanner));
                 } else if (match_string(scanner, "false", /* keyword */ true)) {
                     scanner.current += 5;
                     tokens.push_back(create_token(TOKEN_FALSE, scanner));
