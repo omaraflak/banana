@@ -27,13 +27,6 @@ const std::map<TokenType, AstBinaryOperation> BIN_OP = {
     {TOKEN_OR, AST_BOOL_OR},
 };
 
-const std::set<TokenType> KEYWORDS = {
-    TOKEN_FUN, TOKEN_RETURN, TOKEN_IF, TOKEN_ELSE,
-    TOKEN_FOR, TOKEN_WHILE, TOKEN_AND, TOKEN_OR,
-    TOKEN_PRINT, TOKEN_CHAR, TOKEN_SHORT, TOKEN_INT,
-    TOKEN_LONG, TOKEN_BOOL
-};
-
 const std::map<TokenType, AstVarType> TOKEN_TO_TYPE = {
     {TOKEN_BOOL, AST_TYPE_BOOL},
     {TOKEN_CHAR, AST_TYPE_CHAR},
@@ -55,11 +48,11 @@ const std::set<TokenType> TYPES = {
 };
 
 const std::map<TokenType, std::string> TYPE_NAME = {
-    {TOKEN_BOOL, "BOOL"},
-    {TOKEN_CHAR, "CHAR"},
-    {TOKEN_SHORT, "SHORT"},
-    {TOKEN_INT, "INT"},
-    {TOKEN_LONG, "LONG"},
+    {TOKEN_BOOL, "bool"},
+    {TOKEN_CHAR, "char"},
+    {TOKEN_SHORT, "short"},
+    {TOKEN_INT, "int"},
+    {TOKEN_LONG, "long"},
 };
 
 typedef std::map<std::string, std::shared_ptr<VariableNode>> Identifiers;
@@ -77,9 +70,9 @@ typedef struct {
     std::map<std::string, std::shared_ptr<FunctionNode>> functions;
 } Parser;
 
-std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser);
+std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser, const TokenType& expected_type);
 std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
-std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser);
+std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser, const TokenType& expected_type);
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const Token& id, const Token& assign, const bool& expect_semicolon = true);
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& id, const bool& expect_semicolon = true);
@@ -165,6 +158,12 @@ void print_error(const Parser& parser, const std::string& message) {
     std::cout << "Line " << peek(parser).line << ": " << message << std::endl;
 }
 
+void print_error_var_type(const Parser& parser, const TokenType& expected, const TokenType& actual) {
+    std::string e = TYPE_NAME.at(expected);
+    std::string a = TYPE_NAME.at(actual);
+    print_error(parser, "Expected to find variable of type '" + e + "', but found '" + a + "' instead.");
+}
+
 std::shared_ptr<AbstractSyntaxTree> current_frame(const Parser& parser) {
     if (parser.frame_stack.empty()) {
         print_error(parser, "Could not find the current frame!");
@@ -216,16 +215,19 @@ std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const s
     exit(1);
 }
 
-std::shared_ptr<VariableNode> new_variable(Parser& parser, const std::string& name, const TokenType& type) {
+std::shared_ptr<VariableNode> new_variable(Parser& parser, const TokenType& type, const std::string& name) {
     std::shared_ptr<AbstractSyntaxTree> frame = current_frame(parser);
     std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
     std::shared_ptr<VariableNode> variable(new VariableNode(frame, TOKEN_TO_TYPE.at(type)));
-    auto& mapping = parser.frames[frame].identifiers[scope];
-    if (mapping.find(name) != mapping.end()) {
-        print_error(parser, "Identifier '" + name + "' already declared in the scope.");
-        exit(1);
+    const Frame& fr = parser.frames.at(frame);
+    for (const auto& scope : fr.scope_stack) {
+        const auto& mapping = fr.identifiers.at(scope);
+        if (mapping.find(name) != mapping.end()) {
+            print_error(parser, "Identifier '" + name + "' already declared in the scope.");
+            exit(1);
+        }
     }
-    mapping[name] = variable;
+    parser.frames[frame].identifiers[scope][name] = variable;
     return variable;
 }
 
@@ -245,21 +247,25 @@ std::shared_ptr<FunctionNode> get_function(const Parser& parser, const std::stri
     return parser.functions.at(name);
 }
 
-std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
+std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const TokenType& expected_type) {
     if (match(parser, {TOKEN_NUMBER, TOKEN_STRING})) {
         Token token = previous(parser);
-        return literal(token.value, TOKEN_LONG);
+        return literal(token.value, expected_type);
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
         if (match(parser, {TOKEN_LEFT_PAREN})) {
             return call_statement(parser, previous(parser, 2), /* expect_semicolon */ false);
         }
         Token token = previous(parser);
-        std::string name = token.value;
-        return get_variable_by_name(parser, name);
+        auto variable = get_variable_by_name(parser, token.value);
+        if (expected_type != TOKEN_BANG && expected_type != TYPE_TO_TOKEN.at(variable->get_type())) {
+            print_error_var_type(parser, expected_type, TYPE_TO_TOKEN.at(variable->get_type()));
+            exit(1);
+        }
+        return variable;
     }
     if (match(parser, {TOKEN_LEFT_PAREN})) {
-        std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
+        std::shared_ptr<AbstractSyntaxTree> exp = expression(parser, expected_type);
         consume(parser, TOKEN_RIGHT_PAREN, "Could not find closing ).");
         return exp;
     }
@@ -268,37 +274,41 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser) {
     exit(1);
 }
 
-std::shared_ptr<AbstractSyntaxTree> unary_expression(Parser& parser) {
+std::shared_ptr<AbstractSyntaxTree> unary_expression(Parser& parser, const TokenType& expected_type) {
     if (match(parser, {TOKEN_MINUS})) {
-        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal("0", TOKEN_LONG), unary_expression(parser), AST_SUB));
+        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal("0", expected_type), unary_expression(parser, expected_type), AST_SUB));
     }
     if (match(parser, {TOKEN_BANG})) {
-        return std::shared_ptr<BooleanNotNode>(new BooleanNotNode(unary_expression(parser)));
+        return std::shared_ptr<BooleanNotNode>(new BooleanNotNode(unary_expression(parser, expected_type)));
     }
     if (match(parser, {TOKEN_TILDE})) {
-        return std::shared_ptr<BinaryNotNode>(new BinaryNotNode(unary_expression(parser)));
+        return std::shared_ptr<BinaryNotNode>(new BinaryNotNode(unary_expression(parser, expected_type)));
     }
-    return primary_expression(parser);
+    return primary_expression(parser, expected_type);
 }
 
 std::shared_ptr<AbstractSyntaxTree> binary_expression(
     Parser& parser,
     const std::vector<std::vector<TokenType>>& types,
+    TokenType expected_type,
     const int& index = 0
 ) {
     if (index == types.size()) {
-        return unary_expression(parser);
+        return unary_expression(parser, expected_type);
     }
-    std::shared_ptr<AbstractSyntaxTree> left = binary_expression(parser, types, index + 1);
+    if (expected_type == TOKEN_BOOL && index <= 2) {
+        expected_type = TOKEN_BANG;
+    }
+    std::shared_ptr<AbstractSyntaxTree> left = binary_expression(parser, types, expected_type, index + 1);
     while (match(parser, types.at(index))) {
         AstBinaryOperation op = BIN_OP.at(previous(parser).type);
-        std::shared_ptr<AbstractSyntaxTree> right = binary_expression(parser, types, index + 1);
+        std::shared_ptr<AbstractSyntaxTree> right = binary_expression(parser, types, expected_type, index + 1);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
     }
     return left;
 }
 
-std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser) {
+std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser, const TokenType& expected_type) {
     return binary_expression(
         parser,
         {
@@ -308,31 +318,24 @@ std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser) {
             {TOKEN_LESS, TOKEN_LESS_EQUAL, TOKEN_GREATER, TOKEN_GREATER_EQUAL},
             {TOKEN_PLUS, TOKEN_MINUS},
             {TOKEN_STAR, TOKEN_SLASH, TOKEN_MOD, TOKEN_XOR, TOKEN_AMPERSAND, TOKEN_PIPE}
-        }
+        },
+        expected_type
     );
 }
 
 std::shared_ptr<AbstractSyntaxTree> print_statement(Parser& parser) {
-    return std::shared_ptr<PrintNode>(new PrintNode(expression_statement(parser)));
+    return std::shared_ptr<PrintNode>(new PrintNode(expression_statement(parser, TOKEN_BANG)));
 }
 
-std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser, const TokenType& type) {
-    Token p = peek(parser);
-    if (KEYWORDS.find(p.type) != KEYWORDS.end()) {
-        print_error(parser, "'" + p.value + "' is a reserved identifier.");
-        exit(1);
-    }
-    Token id = consume(parser, TOKEN_IDENTIFIER, "Expected identifier.");
-    std::shared_ptr<VariableNode> variable = new_variable(parser, id.value, type);
-    consume(parser, TOKEN_EQUAL, "Expected '=' sign after identifier.");
-    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
-    consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
+std::shared_ptr<AbstractSyntaxTree> var_statement(Parser& parser, const Token& type, const Token& id) {
+    std::shared_ptr<VariableNode> variable = new_variable(parser, type.type, id.value);
+    std::shared_ptr<AbstractSyntaxTree> exp = expression_statement(parser, type.type);
     return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
 }
 
 std::shared_ptr<AbstractSyntaxTree> if_statement(Parser& parser) {
     consume(parser, TOKEN_LEFT_PAREN, "Missing '(' after 'if'.");
-    std::shared_ptr<AbstractSyntaxTree> condition = expression(parser);
+    std::shared_ptr<AbstractSyntaxTree> condition = expression(parser, TOKEN_BOOL);
     consume(parser, TOKEN_RIGHT_PAREN, "Missing ')' after 'if' condition.");
     std::shared_ptr<BlockNode> if_block = block(parser);
     std::shared_ptr<BlockNode> else_block = nullptr;
@@ -344,7 +347,7 @@ std::shared_ptr<AbstractSyntaxTree> if_statement(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
     consume(parser, TOKEN_LEFT_PAREN, "Missing '(' after 'while'.");
-    std::shared_ptr<AbstractSyntaxTree> condition = expression(parser);
+    std::shared_ptr<AbstractSyntaxTree> condition = expression(parser, TOKEN_BOOL);
     consume(parser, TOKEN_RIGHT_PAREN, "Missing ')' after 'while' condition.");
     std::shared_ptr<BlockNode> while_block = block(parser);
     return std::shared_ptr<WhileNode>(new WhileNode(condition, while_block));
@@ -353,7 +356,7 @@ std::shared_ptr<AbstractSyntaxTree> while_statement(Parser& parser) {
 std::shared_ptr<AbstractSyntaxTree> for_statement(Parser& parser) {
     consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after 'for'.");
     std::shared_ptr<AbstractSyntaxTree> init = statement(parser);
-    std::shared_ptr<AbstractSyntaxTree> condition = expression_statement(parser);
+    std::shared_ptr<AbstractSyntaxTree> condition = expression_statement(parser, TOKEN_BOOL);
     std::shared_ptr<AbstractSyntaxTree> increment = assign_expression(parser);
     consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after 'for' increment.");
     std::shared_ptr<BlockNode> for_block = block(parser);
@@ -369,7 +372,7 @@ std::vector<std::shared_ptr<VariableNode>> fun_parameters(Parser& parser) {
                 print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
                 exit(1);
             }
-            parameters.push_back(new_variable(parser, previous(parser).value, TOKEN_LONG));
+            parameters.push_back(new_variable(parser, TOKEN_LONG, previous(parser).value));
         } else if (match(parser, {TOKEN_COMMA})) {
             if (previous_token != TOKEN_IDENTIFIER) {
                 print_error(parser, "Unexpected token '" + previous(parser).value + "'.");
@@ -409,7 +412,9 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     if (match(parser, {TOKEN_SEMICOLON})) {
         return std::shared_ptr<ReturnNode>(new ReturnNode());
     }
-    std::shared_ptr<AbstractSyntaxTree> exp = expression_statement(parser);
+    FunctionNode* fun = (FunctionNode*) current_frame(parser).get();
+    TokenType type = TYPE_TO_TOKEN.at(fun->get_return_type());
+    std::shared_ptr<AbstractSyntaxTree> exp = expression_statement(parser, type);
     return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
 
@@ -417,7 +422,8 @@ std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& 
     std::shared_ptr<FunctionNode> fun_node = get_function(parser, id.value);
     std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
     for (int i=0; i<fun_node->get_parameters_count(); i++) {
-        values.push_back(expression(parser));
+        auto type = fun_node->get_parameters().at(i)->get_type();
+        values.push_back(expression(parser, TYPE_TO_TOKEN.at(type)));
         if (i != fun_node->get_parameters_count() - 1) {
             consume(parser, TOKEN_COMMA, "Expected ',' after function parameter.");
         }
@@ -450,39 +456,40 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(
 ) {
     std::shared_ptr<VariableNode> variable = get_variable_by_name(parser, id.value);
     std::shared_ptr<AbstractSyntaxTree> exp;
+    TokenType type = TYPE_TO_TOKEN.at(variable->get_type());
     switch (assign.type) {
         case TOKEN_EQUAL:
-            exp = expression(parser);
+            exp = expression(parser, type);
             break;
         case TOKEN_PLUS_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_ADD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_ADD));
             break;
         case TOKEN_MINUS_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_SUB));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_SUB));
             break;
         case TOKEN_STAR_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_MUL));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_MUL));
             break;
         case TOKEN_SLASH_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_DIV));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_DIV));
             break;
         case TOKEN_MOD_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_MOD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_MOD));
             break;
         case TOKEN_XOR_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_XOR));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_XOR));
             break;
         case TOKEN_AMPERSAND_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_BIN_AND));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_BIN_AND));
             break;
         case TOKEN_PIPE_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser), AST_BIN_OR));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_BIN_OR));
             break;
         case TOKEN_PLUS_PLUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", TOKEN_LONG), AST_ADD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", type), AST_ADD));
             break;
         case TOKEN_MINUS_MINUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", TOKEN_LONG), AST_SUB));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", type), AST_SUB));
             break;
         default:
             print_error(parser, "Could not recognize assignment type!");
@@ -494,8 +501,8 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(
     return std::shared_ptr<AssignNode>(new AssignNode(variable, exp));
 }
 
-std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser) {
-    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser);
+std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser, const TokenType& expected_type) {
+    std::shared_ptr<AbstractSyntaxTree> exp = expression(parser, expected_type);
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after expression.");
     return exp;
 }
@@ -517,9 +524,6 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_PRINT})) {
         return print_statement(parser);
     }
-    if (match(parser, {TOKEN_LONG})) {
-        return var_statement(parser, TOKEN_LONG);
-    }
     if (match(parser, {TOKEN_IF})) {
         return if_statement(parser);
     }
@@ -538,10 +542,14 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_RETURN})) {
         return return_statement(parser);
     }
+    if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_EQUAL}})) {
+        return var_statement(parser, previous(parser, 3), previous(parser, 2));
+    }
     if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
         return call_statement(parser, previous(parser, 2));
     }
-    return expression_statement(parser);
+    print_error(parser, "Invalid statement.");
+    exit(1);
 }
 
 std::shared_ptr<BlockNode> block(Parser& parser) {

@@ -185,6 +185,7 @@ class FunctionNode: public AbstractSyntaxTree {
         const AstVarType& return_type
     );
     void write(std::vector<const Instruction*>& instructions);
+    std::vector<std::shared_ptr<const VariableNode>> get_parameters() const;
     uint8_t get_parameters_count() const;
     AstVarType get_return_type() const;
 

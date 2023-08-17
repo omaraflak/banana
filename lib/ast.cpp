@@ -293,6 +293,10 @@ void FunctionNode::write(std::vector<const Instruction*>& instructions) {
     body->write(instructions);
 }
 
+std::vector<std::shared_ptr<const VariableNode>> FunctionNode::get_parameters() const {
+    return parameters;
+}
+
 uint8_t FunctionNode::get_parameters_count() const {
     return parameters.size();
 }
