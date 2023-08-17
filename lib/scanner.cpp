@@ -206,7 +206,6 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 }
                 break;
             case '%':
-                scanner.current++;
                 if (match_string(scanner, "%=")) {
                     scanner.current += 2;
                     tokens.push_back(create_token(TOKEN_MOD_EQUAL, scanner));
@@ -216,7 +215,6 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 }
                 break;
             case '^':
-                scanner.current++;
                 if (match_string(scanner, "^=")) {
                     scanner.current += 2;
                     tokens.push_back(create_token(TOKEN_XOR_EQUAL, scanner));

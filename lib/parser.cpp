@@ -518,6 +518,7 @@ bool match_assign(Parser& parser) {
         match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_STAR_EQUAL}}) ||
         match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_SLASH_EQUAL}}) ||
         match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_MOD_EQUAL}}) ||
+        match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_XOR_EQUAL}}) ||
         match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_AMPERSAND_EQUAL}}) ||
         match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_PIPE_EQUAL}}) ||
         match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_PLUS_PLUS}}) ||
@@ -552,8 +553,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
         return call_statement(parser, previous(parser, 2));
     }
-    print_error(parser, "Invalid statement.");
-    exit(1);
+    return expression_statement(parser, TOKEN_BANG);
 }
 
 std::shared_ptr<BlockNode> block(Parser& parser) {
