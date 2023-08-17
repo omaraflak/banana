@@ -533,7 +533,7 @@ void var::print(const Var& var) {
             std::cout << var.data._long;
             break;
         case BOOL:
-            std::cout << var.data._bool;
+            std::cout << var.data._bool ? "true" : "false";
             break;
         default:
             var::type_not_found(var);

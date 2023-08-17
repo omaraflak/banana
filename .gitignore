@@ -2,6 +2,10 @@ CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
 Makefile
-*.obj
+_deps
+.vscode
 assembler
 banana
+banana_test
+*.obj
+*.a

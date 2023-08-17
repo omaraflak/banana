@@ -569,6 +569,5 @@ uint8_t LoadInstruction::size() const {
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}
 
 void HaltInstruction::execute(Vm& vm) const {
-    std::cout << "Halt!" << std::endl;
     vm.running = false;
 }
