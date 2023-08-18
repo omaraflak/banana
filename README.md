@@ -5,15 +5,15 @@ Banana 🍌, a toy VM-based programming language.
 # Sample code
 
 ```
-fun fib(n) {
+long fib(n) {
     if (n == 1 or n == 2) {
         return n;
     }
     return fib(n - 1) + fib(n - 2);
 }
 
-fun main() {
-    for (var i = 1; i < 10; i++) {
+long main() {
+    for (long i = 1; i < 10; i++) {
         print fib(i);
     }
 }
