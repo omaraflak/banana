@@ -1,4 +1,4 @@
-fun isprime(n) {
+long isprime(long n) {
     for (long i = 2; i < n; i++) {
         if (n % i == 0) {
             return 0;
@@ -7,7 +7,7 @@ fun isprime(n) {
     return 1;
 }
 
-fun main() {
+long main() {
     long n = 30;
     long i = 3;
     while (n > 1) {
