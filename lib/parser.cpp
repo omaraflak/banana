@@ -30,7 +30,6 @@ const std::map<TokenType, AstBinaryOperation> BIN_OP = {
 const std::map<TokenType, AstVarType> TOKEN_TO_TYPE = {
     {TOKEN_BOOL, AST_TYPE_BOOL},
     {TOKEN_CHAR, AST_TYPE_CHAR},
-    {TOKEN_SHORT, AST_TYPE_SHORT},
     {TOKEN_INT, AST_TYPE_INT},
     {TOKEN_LONG, AST_TYPE_LONG},
 };
@@ -38,19 +37,17 @@ const std::map<TokenType, AstVarType> TOKEN_TO_TYPE = {
 const std::map<AstVarType, TokenType> TYPE_TO_TOKEN = {
     {AST_TYPE_BOOL, TOKEN_BOOL},
     {AST_TYPE_CHAR, TOKEN_CHAR},
-    {AST_TYPE_SHORT, TOKEN_SHORT},
     {AST_TYPE_INT, TOKEN_INT},
     {AST_TYPE_LONG, TOKEN_LONG},
 };
 
 const std::set<TokenType> TYPES = {
-    TOKEN_BOOL, TOKEN_CHAR, TOKEN_SHORT, TOKEN_INT, TOKEN_LONG
+    TOKEN_BOOL, TOKEN_CHAR, TOKEN_INT, TOKEN_LONG
 };
 
 const std::map<TokenType, std::string> TYPE_NAME = {
     {TOKEN_BOOL, "bool"},
     {TOKEN_CHAR, "char"},
-    {TOKEN_SHORT, "short"},
     {TOKEN_INT, "int"},
     {TOKEN_LONG, "long"},
 };
@@ -87,8 +84,6 @@ std::shared_ptr<LiteralNode> literal(const std::string& value, const TokenType& 
             return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_bool(value == "true")));
         case TOKEN_CHAR:
             return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_char(stoi(value))));
-        case TOKEN_SHORT:
-            return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_short(stoi(value))));
         case TOKEN_INT:
             return std::shared_ptr<LiteralNode>(new LiteralNode(var::create_int(stoi(value))));
         case TOKEN_LONG:

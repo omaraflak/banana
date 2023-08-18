@@ -7,15 +7,14 @@
 #include <stdint.h>
 
 union Data {
+    bool _bool;
     char _char;
-    short _short;
     int _int;
     long _long;
-    bool _bool;
 };
 
 enum DataType {
-    CHAR, SHORT, INT, LONG, BOOL
+    BOOL, CHAR, INT, LONG
 };
 
 struct Var {
@@ -25,20 +24,22 @@ struct Var {
 
 namespace var {
 const std::map<DataType, std::string> TYPE_NAME = {
+    {BOOL, "bool"},
     {CHAR, "char"},
-    {SHORT, "short"},
     {INT, "int"},
     {LONG, "long"},
-    {BOOL, "bool"}
 };
 
-const std::map<std::string, DataType> TYPE_NAME_REVERSED = {
-    {"char", CHAR},
-    {"short", SHORT},
-    {"int", INT},
-    {"long", LONG},
-    {"bool", BOOL}
-};
+template <class K, class V>
+std::map<V, K> reverse_map(const std::map<K, V>& m) {
+    std::map<V, K> result;
+    for (const auto& pair : m) {
+        result[pair.second] = pair.first;
+    }
+    return result;
+}
+
+const std::map<std::string, DataType> TYPE_NAME_REVERSED = reverse_map(TYPE_NAME);
 
 void push(const Var &var, std::vector<uint8_t>& bytes);
 Var read(const std::vector<uint8_t>& bytes, uint64_t* index);
@@ -50,7 +51,6 @@ uint8_t size(const Var& var);
 Var convert(const Var& var, const DataType& type);
 
 Var create_char(const char& value);
-Var create_short(const short& value);
 Var create_int(const int& value);
 Var create_long(const long& value);
 Var create_bool(const bool& value);

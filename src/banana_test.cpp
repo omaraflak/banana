@@ -26,7 +26,6 @@ TEST(Print, Variable) {
   EXPECT_EQ("true\n", exe("bool x = true; print x;"));
   EXPECT_EQ("false\n", exe("bool x = false; print x;"));
   EXPECT_EQ("A\n", exe("char x = 65; print x;"));
-  EXPECT_EQ("5\n", exe("short x = 5; print x;"));
   EXPECT_EQ("8\n", exe("int x = 8; print x;"));
   EXPECT_EQ("-13\n", exe("long x = -13; print x;"));
 }
@@ -80,30 +79,23 @@ TEST(Expression, BooleanOperators) {
 TEST(Expression, SubstituteVariable) {
   EXPECT_EQ("true\n", exe("int x = 1; print 1 == x;"));
   EXPECT_EQ("true\n", exe("int x = 1; print x == 1;"));
-  EXPECT_EQ("false\n", exe("short x = 25; print x <= 7;"));
-  EXPECT_EQ("0\n", exe("short x = 25; short y = 24; print x - y - 1;"));
+  EXPECT_EQ("false\n", exe("int x = 25; print x <= 7;"));
+  EXPECT_EQ("0\n", exe("int x = 25; int y = 24; print x - y - 1;"));
 }
 
 TEST(Expression, CrossType) {
   EXPECT_EQ("2\n", exe("bool x = 1; char y = 1; print x + y;"));
-  EXPECT_EQ("2\n", exe("bool x = 1; short y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("bool x = 1; int y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("bool x = 1; long y = 1; print x + y;"));
-  EXPECT_EQ("2\n", exe("char x = 1; short y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("char x = 1; int y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("char x = 1; long y = 1; print x + y;"));
-  EXPECT_EQ("2\n", exe("short x = 1; int y = 1; print x + y;"));
-  EXPECT_EQ("2\n", exe("short x = 1; long y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("int x = 1; long y = 1; print x + y;"));
   EXPECT_EQ("\x2\n", exe("bool x = 1; char y = 1; char z = x + y; print z;"));
-  EXPECT_EQ("2\n", exe("bool x = 1; short y = 1; short z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("bool x = 1; int y = 1; int z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("bool x = 1; long y = 1; long z = x + y; print z;"));
-  EXPECT_EQ("2\n", exe("char x = 1; short y = 1; short z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("char x = 1; int y = 1; int z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("char x = 1; long y = 1; long z = x + y; print z;"));
-  EXPECT_EQ("2\n", exe("short x = 1; int y = 1; int z = x + y; print z;"));
-  EXPECT_EQ("2\n", exe("short x = 1; long y = 1; long z = x + y; print z;"));
+  EXPECT_EQ("2\n", exe("int x = 1; long y = 1; long z = x + y; print z;"));
 }
 
 TEST(IfCondition, EvaluateCondition) {

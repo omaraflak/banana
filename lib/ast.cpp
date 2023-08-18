@@ -6,7 +6,6 @@ namespace ast {
 std::map<AstVarType, DataType> AST_TO_VAR = {
     {AST_TYPE_BOOL, BOOL},
     {AST_TYPE_CHAR, CHAR},
-    {AST_TYPE_SHORT, SHORT},
     {AST_TYPE_INT, INT},
     {AST_TYPE_LONG, LONG},
 };

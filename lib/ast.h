@@ -35,8 +35,7 @@ class LiteralNode: public AbstractSyntaxTree {
 };
 
 enum AstVarType {
-    AST_TYPE_CHAR, AST_TYPE_SHORT, AST_TYPE_INT,
-    AST_TYPE_LONG, AST_TYPE_BOOL
+    AST_TYPE_BOOL, AST_TYPE_CHAR, AST_TYPE_INT, AST_TYPE_LONG,
 };
 
 class VariableNode: public AbstractSyntaxTree {
