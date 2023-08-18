@@ -1,4 +1,16 @@
 #include "ast.h"
+#include "var.h"
+#include <map>
+
+namespace ast {
+std::map<AstVarType, DataType> AST_TO_VAR = {
+    {AST_TYPE_BOOL, BOOL},
+    {AST_TYPE_CHAR, CHAR},
+    {AST_TYPE_SHORT, SHORT},
+    {AST_TYPE_INT, INT},
+    {AST_TYPE_LONG, LONG},
+};
+}
 
 AbstractSyntaxTree::AbstractSyntaxTree() {
     written = false;
@@ -352,6 +364,17 @@ void ReturnNode::write(std::vector<const Instruction*>& instructions) {
         value->write(instructions);
     }
     instructions.push_back(new RetInstruction(values.size()));
+}
+
+ConvertNode::ConvertNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const AstVarType& type) : AbstractSyntaxTree() {
+    this->expression = expression;
+    this->type = type;
+}
+
+void ConvertNode::write(std::vector<const Instruction*>& instructions) {
+    AbstractSyntaxTree::write(instructions);
+    expression->write(instructions);
+    instructions.push_back(new ConvertInstruction(ast::AST_TO_VAR.at(type)));
 }
 
 HaltNode::HaltNode() : AbstractSyntaxTree() {}

@@ -218,6 +218,16 @@ class ReturnNode: public AbstractSyntaxTree {
     std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
 };
 
+class ConvertNode: public AbstractSyntaxTree {
+    public:
+    ConvertNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const AstVarType& type);
+    void write(std::vector<const Instruction*>& instructions);
+
+    private:
+    std::shared_ptr<AbstractSyntaxTree> expression;
+    AstVarType type;
+};
+
 class HaltNode: public AbstractSyntaxTree {
     public:
     HaltNode();

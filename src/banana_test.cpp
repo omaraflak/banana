@@ -95,7 +95,7 @@ TEST(Expression, CrossType) {
   EXPECT_EQ("2\n", exe("short x = 1; int y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("short x = 1; long y = 1; print x + y;"));
   EXPECT_EQ("2\n", exe("int x = 1; long y = 1; print x + y;"));
-  EXPECT_EQ("2\n", exe("bool x = 1; char y = 1; char z = x + y; print z;"));
+  EXPECT_EQ("\x2\n", exe("bool x = 1; char y = 1; char z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("bool x = 1; short y = 1; short z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("bool x = 1; int y = 1; int z = x + y; print z;"));
   EXPECT_EQ("2\n", exe("bool x = 1; long y = 1; long z = x + y; print z;"));

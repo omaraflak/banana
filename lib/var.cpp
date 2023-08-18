@@ -2,7 +2,6 @@
 #include "../lib/byteutils.h"
 #include <iostream>
 #include <sstream>
-#include <map>
 
 #define BINARY_OPERATION(left, right, op) \
     switch (left.type) { \
@@ -19,7 +18,7 @@
                 case BOOL: \
                     return create_bool(left.data._char op (char) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case SHORT: \
@@ -35,7 +34,7 @@
                 case BOOL: \
                     return create_bool(left.data._short op (short) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case INT: \
@@ -51,7 +50,7 @@
                 case BOOL: \
                     return create_bool(left.data._int op (int) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case LONG: \
@@ -67,7 +66,7 @@
                 case BOOL: \
                     return create_bool(left.data._long op (long) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case BOOL: \
@@ -83,11 +82,11 @@
                 case BOOL: \
                     return create_bool(left.data._bool op right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         default: \
-            var::type_not_found(left); \
+            var::type_not_found(left.type); \
             exit(1); \
     } \
 
@@ -106,7 +105,7 @@
                 case BOOL: \
                     return create_bool(left.data._char op (char) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case SHORT: \
@@ -122,7 +121,7 @@
                 case BOOL: \
                     return create_bool(left.data._short op (short) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case INT: \
@@ -138,7 +137,7 @@
                 case BOOL: \
                     return create_bool(left.data._int op (int) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case LONG: \
@@ -154,7 +153,7 @@
                 case BOOL: \
                     return create_bool(left.data._long op (long) right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         case BOOL: \
@@ -170,11 +169,11 @@
                 case BOOL: \
                     return create_bool(left.data._bool op right.data._bool); \
                 default: \
-                    var::type_not_found(right); \
+                    var::type_not_found(right.type); \
                     exit(1); \
             } \
         default: \
-            var::type_not_found(left); \
+            var::type_not_found(left.type); \
             exit(1); \
     } \
 
@@ -191,30 +190,14 @@
         case BOOL: \
             return create_bool(op value.data._bool); \
         default: \
-            var::type_not_found(value); \
+            var::type_not_found(value.type); \
             exit(1); \
     } \
 
 namespace var {
-void type_not_found(const Var& var) {
-    std::cout << "Type not found: " << var.type << std::endl;
+void type_not_found(const DataType& type) {
+    std::cout << "Type not found: " << type << std::endl;
 }
-
-const std::map<DataType, std::string> TYPE_NAME = {
-    {CHAR, "char"},
-    {SHORT, "short"},
-    {INT, "int"},
-    {LONG, "long"},
-    {BOOL, "bool"}
-};
-
-const std::map<std::string, DataType> TYPE_NAME_REVERSED = {
-    {"char", CHAR},
-    {"short", SHORT},
-    {"int", INT},
-    {"long", LONG},
-    {"bool", BOOL}
-};
 }
 
 void var::push(const Var &var, std::vector<uint8_t>& bytes) {
@@ -236,7 +219,7 @@ void var::push(const Var &var, std::vector<uint8_t>& bytes) {
             bytes.push_back(var.data._bool);
             break;
         default:
-            var::type_not_found(var);
+            var::type_not_found(var.type);
             exit(1);
     }
 }
@@ -267,7 +250,7 @@ Var var::read(const std::vector<uint8_t>& bytes, uint64_t* index) {
             *index += SIZE_OF_BYTE;
             break;
         default:
-            var::type_not_found(var);
+            var::type_not_found(var.type);
             exit(1);
     }
     return var;
@@ -293,7 +276,7 @@ std::string var::to_string(const Var& var) {
             ss << var.data._bool;
             break;
         default:
-            var::type_not_found(var);
+            var::type_not_found(var.type);
             exit(1);
     }
     return ss.str();
@@ -319,7 +302,7 @@ Var var::from_string(const std::vector<std::string>& strings) {
             var.data._bool = stol(strings[1]);
             break;
         default:
-            var::type_not_found(var);
+            var::type_not_found(var.type);
             exit(1);
     }
     return var;
@@ -344,10 +327,98 @@ uint8_t var::size(const Var& var) {
             size += SIZE_OF_BYTE;
             break;
         default:
-            var::type_not_found(var);
+            var::type_not_found(var.type);
             exit(1);
     }
     return size;
+}
+
+Var var::convert(const Var& var, const DataType& type) {
+    switch (var.type) {
+        case CHAR:
+            switch (type) {
+                case CHAR:
+                    return var;
+                case SHORT:
+                    return create_short(var.data._char);
+                case INT:
+                    return create_int(var.data._char);
+                case LONG:
+                    return create_long(var.data._char);
+                case BOOL:
+                    return create_bool(var.data._char);
+                default:
+                    var::type_not_found(var.type);
+                    exit(1);
+            }
+        case SHORT:
+            switch (type) {
+                case CHAR:
+                    return create_char(var.data._short);
+                case SHORT:
+                    return var;
+                case INT:
+                    return create_int(var.data._short);
+                case LONG:
+                    return create_long(var.data._short);
+                case BOOL:
+                    return create_bool(var.data._short);
+                default:
+                    var::type_not_found(var.type);
+                    exit(1);
+            }
+        case INT:
+            switch (type) {
+                case CHAR:
+                    return create_char(var.data._int);
+                case SHORT:
+                    return create_short(var.data._int);
+                case INT:
+                    return var;
+                case LONG:
+                    return create_long(var.data._int);
+                case BOOL:
+                    return create_bool(var.data._int);
+                default:
+                    var::type_not_found(var.type);
+                    exit(1);
+            }
+        case LONG:
+            switch (type) {
+                case CHAR:
+                    return create_char(var.data._long);
+                case SHORT:
+                    return create_short(var.data._long);
+                case INT:
+                    return create_int(var.data._long);
+                case LONG:
+                    return var;
+                case BOOL:
+                    return create_bool(var.data._long);
+                default:
+                    var::type_not_found(var.type);
+                    exit(1);
+            }
+        case BOOL:
+            switch (type) {
+                case CHAR:
+                    return create_char(var.data._bool);
+                case SHORT:
+                    return create_short(var.data._bool);
+                case INT:
+                    return create_int(var.data._bool);
+                case LONG:
+                    return create_long(var.data._bool);
+                case BOOL:
+                    return var;
+                default:
+                    var::type_not_found(var.type);
+                    exit(1);
+            }
+        default:
+            var::type_not_found(var.type);
+            exit(1);
+    }
 }
 
 Var var::create_char(const char& value) {
@@ -475,7 +546,7 @@ void var::print(const Var& var) {
             std::cout << (var.data._bool ? "true" : "false");
             break;
         default:
-            var::type_not_found(var);
+            var::type_not_found(var.type);
             exit(1);
     }
 }

@@ -158,12 +158,6 @@ void print_error(const Parser& parser, const std::string& message) {
     std::cout << "Line " << peek(parser).line << ": " << message << std::endl;
 }
 
-void print_error_var_type(const Parser& parser, const TokenType& expected, const TokenType& actual) {
-    std::string e = TYPE_NAME.at(expected);
-    std::string a = TYPE_NAME.at(actual);
-    print_error(parser, "Expected to find variable of type '" + e + "', but found '" + a + "' instead.");
-}
-
 std::shared_ptr<AbstractSyntaxTree> current_frame(const Parser& parser) {
     if (parser.frame_stack.empty()) {
         print_error(parser, "Could not find the current frame!");
@@ -263,8 +257,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const Tok
         Token token = previous(parser);
         auto variable = get_variable_by_name(parser, token.value);
         if (expected_type != TOKEN_BANG && expected_type != TYPE_TO_TOKEN.at(variable->get_type())) {
-            print_error_var_type(parser, expected_type, TYPE_TO_TOKEN.at(variable->get_type()));
-            exit(1);
+            return std::shared_ptr<ConvertNode>(new ConvertNode(variable, TOKEN_TO_TYPE.at(expected_type)));
         }
         return variable;
     }

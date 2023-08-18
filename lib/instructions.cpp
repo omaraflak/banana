@@ -58,6 +58,7 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_PRINT, "print"},
     {OP_STORE, "store"},
     {OP_LOAD, "load"},
+    {OP_CONVERT, "convert"},
     {OP_HALT, "halt"},
 };
 
@@ -143,6 +144,8 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new StoreInstruction();
         case OP_LOAD:
             return new LoadInstruction();
+        case OP_CONVERT:
+            return new ConvertInstruction();
         case OP_HALT:
             return new HaltInstruction();
     }
@@ -564,6 +567,41 @@ std::string LoadInstruction::to_string() const {
 
 uint8_t LoadInstruction::size() const {
     return Instruction::size() + SIZE_OF_LONG;
+}
+
+ConvertInstruction::ConvertInstruction() : Instruction(OP_CONVERT) {}
+
+ConvertInstruction::ConvertInstruction(const DataType& type) : Instruction(OP_CONVERT) {
+    this->type = type;
+}
+
+void ConvertInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
+    type = (DataType) buffer[*index];
+    *index += SIZE_OF_BYTE;
+}
+
+void ConvertInstruction::write(std::vector<uint8_t>& buffer) const {
+    Instruction::write(buffer);
+    buffer.push_back(type);
+}
+
+void ConvertInstruction::execute(Vm& vm) const {
+    Var var = instructions::pop_var(vm.stack);
+    vm.stack->push_back(var::convert(var, type));
+}
+
+void ConvertInstruction::read_string(const std::vector<std::string>& strings) {
+    type = (DataType) stoi(strings[0]);
+}
+
+std::string ConvertInstruction::to_string() const {
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << var::TYPE_NAME.at(type);
+    return ss.str();
+}
+
+uint8_t ConvertInstruction::size() const {
+    return Instruction::size() + SIZE_OF_BYTE;
 }
 
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}

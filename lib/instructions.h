@@ -38,6 +38,7 @@ enum {
     OP_PRINT,
     OP_STORE,
     OP_LOAD,
+    OP_CONVERT,
     OP_HALT
 };
 
@@ -280,6 +281,21 @@ class LoadInstruction: public Instruction {
 
     private:
     Address address;
+};
+
+class ConvertInstruction: public Instruction {
+    public:
+    ConvertInstruction();
+    ConvertInstruction(const DataType& type);
+    void read(const std::vector<uint8_t>& buffer, Address* index);
+    void write(std::vector<uint8_t>& buffer) const;
+    void execute(Vm& vm) const;
+    void read_string(const std::vector<std::string>& strings);
+    std::string to_string() const;
+    uint8_t size() const;
+
+    private:
+    DataType type;
 };
 
 class HaltInstruction: public Instruction {
