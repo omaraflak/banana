@@ -138,4 +138,21 @@ TEST(Function, ParametersConversion) {
   EXPECT_EQ("11\n", exe("long add(long x, long y) { return x + y; } int main() { int x = add(5, 6); print x; }"));
   EXPECT_EQ("A\n", exe("long num() { return 65; } int main() { char z = num(); print z; }"));
 }
+
+TEST(FIBO, RECURSION) {
+  std::string code = "\
+    long fib(long n) { \
+        if (n == 1 or n == 2) { \
+            return n; \
+        } \
+        return fib(n - 1) + fib(n - 2); \
+    } \
+    int main() { \
+        for (long i = 1; i < 10; i++) { \
+            print fib(i); \
+        } \
+    } \
+  ";
+  EXPECT_EQ("1\n2\n3\n5\n8\n13\n21\n34\n55\n", exe(code));
+}
 }
