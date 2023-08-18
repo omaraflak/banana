@@ -139,7 +139,7 @@ TEST(Function, ParametersConversion) {
   EXPECT_EQ("A\n", exe("long num() { return 65; } int main() { char z = num(); print z; }"));
 }
 
-TEST(FIBO, RECURSION) {
+TEST(FIBONACCI, RECURSION) {
   std::string code = "\
     long fib(long n) { \
         if (n == 1 or n == 2) { \
