@@ -36,9 +36,9 @@ Run program:
 
 Currently, the language is very limited and supports the following features.
 
-**Types**: variables are typed using the `var` keyword, but currently it only supports numbers.
+**Types**: `bool`, `char`, `short`, `int`, `long`.
 
-**Constructs**: `fun`, `if`, `else`, `for`, `while`, `return`.
+**Constructs**: `if`, `else`, `for`, `while`, `return`.
 
 **Binary Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `and`, `or`, `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`.
 
@@ -69,11 +69,11 @@ $ ./banana -c source.na
 #### Print VM instructions from source file
 
 ```
-fun add(a, b) {
+int add(int a, int b) {
     return a + b;
 }
 
-fun main() {
+int main() {
     print add(5, 6);
 }
 ```
@@ -82,16 +82,16 @@ fun main() {
 $ ./banana -a source.na
 0       jump 48
 9       store 0
-18      store 8
+18      store 1
 27      load 0
-36      load 8
+36      load 1
 45      add
 46      ret 1
-48      push 6
-57      push 5
-66      call 9 2
-76      print
-77      push 10
-86      printc
-87      halt
+48      push int 6
+54      push int 5
+60      call 9 2
+70      print
+71      push char 10
+74      print
+75      halt
 ```

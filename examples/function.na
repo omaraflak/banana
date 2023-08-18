@@ -1,7 +1,7 @@
-fun add(a, b) {
+int add(int a, int b) {
     return a + b;
 }
 
-fun main() {
+int main() {
     print add(5, 6);
 }
