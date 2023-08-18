@@ -75,7 +75,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser);
 std::shared_ptr<AbstractSyntaxTree> expression_statement(Parser& parser, const TokenType& expected_type);
 std::shared_ptr<AbstractSyntaxTree> assign_statement(Parser& parser, const Token& id, const Token& assign, const bool& expect_semicolon = true);
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser);
-std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& id, const bool& expect_semicolon = true);
+std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& id, const TokenType& expected_type, const bool& expect_semicolon = true);
 bool match_assign(Parser& parser);
 
 void print_error(const Parser& parser, const std::string& message);
@@ -252,7 +252,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const Tok
     }
     if (match(parser, {TOKEN_IDENTIFIER})) {
         if (match(parser, {TOKEN_LEFT_PAREN})) {
-            return call_statement(parser, previous(parser, 2), /* expect_semicolon */ false);
+            return call_statement(parser, previous(parser, 2), expected_type, /* expect_semicolon */ false);
         }
         Token token = previous(parser);
         auto variable = get_variable_by_name(parser, token.value);
@@ -415,7 +415,12 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
 
-std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& id, const bool& expect_semicolon) {
+std::shared_ptr<AbstractSyntaxTree> call_statement(
+    Parser& parser,
+    const Token& id,
+    const TokenType& expected_type,
+    const bool& expect_semicolon
+) {
     std::shared_ptr<FunctionNode> fun_node = get_function(parser, id.value);
     std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
     for (int i=0; i<fun_node->get_parameters_count(); i++) {
@@ -429,7 +434,11 @@ std::shared_ptr<AbstractSyntaxTree> call_statement(Parser& parser, const Token& 
     if (expect_semicolon) {
         consume(parser, TOKEN_SEMICOLON, "Expected ';' after function call.");
     }
-    return std::shared_ptr<CallNode>(new CallNode(fun_node, values));
+    std::shared_ptr<CallNode> call_node(new CallNode(fun_node, values));
+    if (expected_type != TOKEN_BANG && fun_node->get_return_type() != TOKEN_TO_TYPE.at(expected_type)) {
+        return std::shared_ptr<ConvertNode>(new ConvertNode(call_node, TOKEN_TO_TYPE.at(expected_type)));
+    }
+    return call_node;
 }
 
 std::shared_ptr<AbstractSyntaxTree> assign_expression(Parser& parser) {
@@ -544,7 +553,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
         return fun_statement(parser, previous(parser, 3), previous(parser, 2));
     }
     if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
-        return call_statement(parser, previous(parser, 2));
+        return call_statement(parser, previous(parser, 2), TOKEN_BANG);
     }
     return expression_statement(parser, TOKEN_BANG);
 }
