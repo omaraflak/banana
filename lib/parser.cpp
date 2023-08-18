@@ -261,8 +261,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const Tok
         consume(parser, TOKEN_RIGHT_PAREN, "Could not find closing ).");
         return exp;
     }
-    std::cout << "Reached end of primary expression without any matches." << std::endl;
-    std::cout << "Token: '" << peek(parser).value << "'" << std::endl;
+    print_error(parser, "Reached end of primary expression without any matches. Token: " + peek(parser).value);
     exit(1);
 }
 
