@@ -158,15 +158,9 @@ Instruction* Instruction::from_opstring(const std::string& opstring) {
 }
 
 Instruction* Instruction::from_string(const std::string& str) {
-    std::string opstring = str;
-    int index = str.find(" ");
-    if (index != -1) {
-        opstring = str.substr(0, index);
-    }
-    std::string rest = index == -1 ? "" : str.substr(index + 1);
-    uint8_t opcode = OP_STRINGS_REV.at(opstring);
-    Instruction* instruction = Instruction::from_opcode(opcode);
-    instruction->read_string(instructions::split_string(rest, ' '));
+    std::vector<std::string> parts = instructions::split_string(str, ' ');
+    Instruction* instruction = Instruction::from_opcode(OP_STRINGS_REV.at(parts[0]));
+    instruction->read_string(std::vector<std::string>(parts.begin() + 1, parts.end()));
     return instruction;
 }
 
