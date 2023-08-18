@@ -38,6 +38,8 @@ Currently, the language is very limited and supports the following features.
 
 **Types**: `bool`, `char`, `short`, `int`, `long`.
 
+The language supports automatic casting of types when needed.
+
 **Constructs**: `if`, `else`, `for`, `while`, `return`.
 
 **Binary Operators**: `+`, `-`, `*`, `/`, `%`, `^`, `&`, `|`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `and`, `or`, `+=`, `-=`, `*=`, `/=`, `%=`, `^=`, `&=`, `|=`.
