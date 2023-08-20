@@ -54,7 +54,7 @@ The language supports automatic casting of types when needed.
 
 **Std library**: `print`.
 
-### Native C calls
+**Native C Calls**: `@native()`
 
 You can call native C code from Banana, provided that you expose the code in a shared library.
 
@@ -101,8 +101,6 @@ Provide the shared library directory with `--lib` when running the code:
 ```
 ./banana -i myscript.na --lib lib_folder
 ```
-
-**Native C call**: `@native()`
 
 # CLI
 
