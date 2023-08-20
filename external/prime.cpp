@@ -12,7 +12,7 @@ bool is_prime(const long& n) {
 long nth_prime(long n) {
     long i = 3;
     long l = i;
-    while (n >= 0) {
+    while (n > 1) {
         if (is_prime(i)) {
             n--;
             l = i;

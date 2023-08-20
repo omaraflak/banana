@@ -1,0 +1,6 @@
+@native("math", "prime")
+long nthPrime(long n);
+
+int main() {
+    print nthPrime(1000);
+}

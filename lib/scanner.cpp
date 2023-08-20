@@ -379,10 +379,21 @@ std::vector<Token> scanner::scan(const std::string& code) {
                 if (quote == -1) {
                     std::cout << "Closing string quote is missing on line " << scanner.line << std::endl;
                 }
-                scanner.current = quote;
+                scanner.start++;
+                scanner.current = quote - 1;
                 tokens.push_back(create_token(TOKEN_STRING, scanner));
+                scanner.current = quote;
                 break;
             }
+            case '@':
+                if (match_string(scanner, "@native", /* keyword */ true)) {
+                    scanner.current += 7;
+                    tokens.push_back(create_token(TOKEN_AT_NATIVE, scanner));
+                } else {
+                    std::cout << "Line: " << scanner.line << ". Identifier cannot begin with '@'." << std::endl;
+                    exit(1);
+                }
+                break;
             case '0':
             case '1':
             case '2':

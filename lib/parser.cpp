@@ -405,6 +405,38 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
 
+std::shared_ptr<AbstractSyntaxTree> native_statement(Parser& parser) {
+    consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after '@native' statement.");
+    Token module_name = consume(parser, TOKEN_STRING, "Expected module as first argument of '@native'.");
+    consume(parser, TOKEN_COMMA, "Expected ',' after 'module' argument of '@native'.");
+    Token function_name = consume(parser, TOKEN_STRING, "Expected module as second argument of '@native'.");
+    consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after '@native' arguments.");
+
+    if (!match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
+        print_error(parser, "Expected function signature after '@native' declaration.");
+    }
+    Token return_type = previous(parser, 3);
+    Token fun_id = previous(parser, 2);
+
+    std::shared_ptr<FunctionNode> fun_node(new FunctionNode());
+    register_function(parser, fun_node, fun_id.value);
+    push_frame(parser, fun_node);
+    push_scope(parser, fun_node);
+    fun_node->set_return_type(TOKEN_TO_AST.at(return_type.type));
+    
+    auto parameters = fun_parameters(parser);
+    fun_node->set_parameters(parameters);
+    
+    consume(parser, TOKEN_SEMICOLON, "Expected ';' after '@native' function signature.");
+
+    auto native_call_result = std::shared_ptr<NativeNode>(new NativeNode(module_name.value, function_name.value, parameters));
+    fun_node->set_body(std::shared_ptr<ReturnNode>(new ReturnNode({native_call_result})));
+
+    pop_scope(parser);
+    pop_frame(parser);
+    return fun_node;
+}
+
 std::shared_ptr<AbstractSyntaxTree> call_statement(
     Parser& parser,
     const Token& id,
@@ -530,11 +562,14 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match(parser, {TOKEN_FOR})) {
         return for_statement(parser);
     }
-    if (match_assign(parser)) {
-        return assign_statement(parser, previous(parser, 2), previous(parser));
-    }
     if (match(parser, {TOKEN_RETURN})) {
         return return_statement(parser);
+    }
+    if (match(parser, {TOKEN_AT_NATIVE})) {
+        return native_statement(parser);
+    }
+    if (match_assign(parser)) {
+        return assign_statement(parser, previous(parser, 2), previous(parser));
     }
     if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_EQUAL}})) {
         return var_statement(parser, previous(parser, 3), previous(parser, 2));
