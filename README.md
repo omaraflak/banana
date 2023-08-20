@@ -19,6 +19,12 @@ int main() {
 }
 ```
 
+Prerequisites:
+
+```
+sudo apt install libffi-dev
+```
+
 Compile 🍌:
 
 ```
@@ -47,6 +53,56 @@ The language supports automatic casting of types when needed.
 **Unary Operators**: `=`, `-`, `!`, `~`, `++`, `--`.
 
 **Std library**: `print`.
+
+### Native C calls
+
+You can call native C code from Banana, provided that you expose the code in a shared library.
+
+`mylib.cpp`:
+
+```cpp
+#include "../lib/c_function.h"
+
+long some_native_c_function(long n) {
+    // something complicated here
+    return 2 * n;
+}
+
+class MyNativeFunction : public CFunction {
+    cfunction::ArgType get_return_type() const { return cfunction::LONG; }
+    std::vector<cfunction::ArgType> get_arg_types() const { return {cfunction::LONG}; }
+    std::string get_module_name() const { return "math"; }
+    std::string get_function_name() const { return "times_two"; }
+    void* get_function() const { return (void*) nth_prime; }
+};
+
+CFunction* get_factory() { return new MyNativeFunction(); }
+```
+
+Compile this as a shared library:
+
+```
+g++ mylib.cpp -o lib_folder/mylib.so -shared -fPIC
+```
+
+Bind it in Banana:
+
+```
+@native("math", "times_two")
+long timesTwo(long n);
+
+int main() {
+    print timesTwo(10);
+}
+```
+
+Provide the shared library directory with `--lib` when running the code:
+
+```
+./banana -i myscript.na --lib lib_folder
+```
+
+**Native C call**: `@native()`
 
 # CLI
 
