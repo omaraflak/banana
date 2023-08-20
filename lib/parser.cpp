@@ -8,37 +8,37 @@
 namespace parser {
 const std::string MAIN = "main";
 
-const std::map<TokenType, AstBinaryOperation> BIN_OP = {
-    {TOKEN_EQUAL_EQUAL, AST_EQ},
-    {TOKEN_BANG_EQUAL, AST_NOT_EQ},
-    {TOKEN_LESS, AST_LT},
-    {TOKEN_LESS_EQUAL, AST_LTE},
-    {TOKEN_GREATER, AST_GT},
-    {TOKEN_GREATER_EQUAL, AST_GTE},
-    {TOKEN_PLUS, AST_ADD},
-    {TOKEN_MINUS, AST_SUB},
-    {TOKEN_STAR, AST_MUL},
-    {TOKEN_SLASH, AST_DIV},
-    {TOKEN_MOD, AST_MOD},
-    {TOKEN_XOR, AST_XOR},
-    {TOKEN_AMPERSAND, AST_BIN_AND},
-    {TOKEN_PIPE, AST_BIN_OR},
-    {TOKEN_AND, AST_BOOL_AND},
-    {TOKEN_OR, AST_BOOL_OR},
+const std::map<TokenType, ast::AstBinaryOperation> BIN_OP = {
+    {TOKEN_EQUAL_EQUAL, ast::EQ},
+    {TOKEN_BANG_EQUAL, ast::NOT_EQ},
+    {TOKEN_LESS, ast::LT},
+    {TOKEN_LESS_EQUAL, ast::LTE},
+    {TOKEN_GREATER, ast::GT},
+    {TOKEN_GREATER_EQUAL, ast::GTE},
+    {TOKEN_PLUS, ast::ADD},
+    {TOKEN_MINUS, ast::SUB},
+    {TOKEN_STAR, ast::MUL},
+    {TOKEN_SLASH, ast::DIV},
+    {TOKEN_MOD, ast::MOD},
+    {TOKEN_XOR, ast::XOR},
+    {TOKEN_AMPERSAND, ast::BIN_AND},
+    {TOKEN_PIPE, ast::BIN_OR},
+    {TOKEN_AND, ast::BOOL_AND},
+    {TOKEN_OR, ast::BOOL_OR},
 };
 
-const std::map<TokenType, AstVarType> TOKEN_TO_TYPE = {
-    {TOKEN_BOOL, AST_TYPE_BOOL},
-    {TOKEN_CHAR, AST_TYPE_CHAR},
-    {TOKEN_INT, AST_TYPE_INT},
-    {TOKEN_LONG, AST_TYPE_LONG},
+const std::map<TokenType, ast::AstVarType> TOKEN_TO_TYPE = {
+    {TOKEN_BOOL, ast::BOOL},
+    {TOKEN_CHAR, ast::CHAR},
+    {TOKEN_INT, ast::INT},
+    {TOKEN_LONG, ast::LONG},
 };
 
-const std::map<AstVarType, TokenType> TYPE_TO_TOKEN = {
-    {AST_TYPE_BOOL, TOKEN_BOOL},
-    {AST_TYPE_CHAR, TOKEN_CHAR},
-    {AST_TYPE_INT, TOKEN_INT},
-    {AST_TYPE_LONG, TOKEN_LONG},
+const std::map<ast::AstVarType, TokenType> TYPE_TO_TOKEN = {
+    {ast::BOOL, TOKEN_BOOL},
+    {ast::CHAR, TOKEN_CHAR},
+    {ast::INT, TOKEN_INT},
+    {ast::LONG, TOKEN_LONG},
 };
 
 const std::set<TokenType> TYPES = {
@@ -267,7 +267,7 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const Tok
 
 std::shared_ptr<AbstractSyntaxTree> unary_expression(Parser& parser, const TokenType& expected_type) {
     if (match(parser, {TOKEN_MINUS})) {
-        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal("0", expected_type), unary_expression(parser, expected_type), AST_SUB));
+        return std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(literal("0", expected_type), unary_expression(parser, expected_type), ast::SUB));
     }
     if (match(parser, {TOKEN_BANG})) {
         return std::shared_ptr<BooleanNotNode>(new BooleanNotNode(unary_expression(parser, expected_type)));
@@ -292,7 +292,7 @@ std::shared_ptr<AbstractSyntaxTree> binary_expression(
     }
     std::shared_ptr<AbstractSyntaxTree> left = binary_expression(parser, types, expected_type, index + 1);
     while (match(parser, types.at(index))) {
-        AstBinaryOperation op = BIN_OP.at(previous(parser).type);
+        ast::AstBinaryOperation op = BIN_OP.at(previous(parser).type);
         std::shared_ptr<AbstractSyntaxTree> right = binary_expression(parser, types, expected_type, index + 1);
         left = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(left, right, op));
     }
@@ -462,34 +462,34 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(
             exp = expression(parser, type);
             break;
         case TOKEN_PLUS_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_ADD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::ADD));
             break;
         case TOKEN_MINUS_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_SUB));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::SUB));
             break;
         case TOKEN_STAR_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_MUL));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::MUL));
             break;
         case TOKEN_SLASH_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_DIV));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::DIV));
             break;
         case TOKEN_MOD_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_MOD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::MOD));
             break;
         case TOKEN_XOR_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_XOR));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::XOR));
             break;
         case TOKEN_AMPERSAND_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_BIN_AND));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::BIN_AND));
             break;
         case TOKEN_PIPE_EQUAL:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), AST_BIN_OR));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, expression(parser, type), ast::BIN_OR));
             break;
         case TOKEN_PLUS_PLUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", type), AST_ADD));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", type), ast::ADD));
             break;
         case TOKEN_MINUS_MINUS:
-            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", type), AST_SUB));
+            exp = std::shared_ptr<BinaryOperationNode>(new BinaryOperationNode(variable, literal("1", type), ast::SUB));
             break;
         default:
             print_error(parser, "Could not recognize assignment type!");

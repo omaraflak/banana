@@ -4,10 +4,10 @@
 
 namespace ast {
 std::map<AstVarType, var::DataType> AST_TO_VAR = {
-    {AST_TYPE_BOOL, var::BOOL},
-    {AST_TYPE_CHAR, var::CHAR},
-    {AST_TYPE_INT, var::INT},
-    {AST_TYPE_LONG, var::LONG},
+    {ast::BOOL, var::BOOL},
+    {ast::CHAR, var::CHAR},
+    {ast::INT, var::INT},
+    {ast::LONG, var::LONG},
 };
 }
 
@@ -46,7 +46,7 @@ void LiteralNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new PushInstruction(value));
 }
 
-VariableNode::VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame, const AstVarType& type) {
+VariableNode::VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame, const ast::AstVarType& type) {
     this->frame = frame;
     this->type = type;
     if (frame == nullptr) {
@@ -69,7 +69,7 @@ Address VariableNode::get_address() const {
     return address;
 }
 
-AstVarType VariableNode::get_type() const {
+ast::AstVarType VariableNode::get_type() const {
     return type;
 }
 
@@ -103,7 +103,7 @@ void BlockNode::add(const std::shared_ptr<AbstractSyntaxTree>& node) {
 BinaryOperationNode::BinaryOperationNode(
     const std::shared_ptr<AbstractSyntaxTree>& left,
     const std::shared_ptr<AbstractSyntaxTree>& right,
-    const AstBinaryOperation& operation
+    const ast::AstBinaryOperation& operation
 ) : AbstractSyntaxTree() {
     this->left = left;
     this->right = right;
@@ -115,52 +115,52 @@ void BinaryOperationNode::write(std::vector<const Instruction*>& instructions) {
     left->write(instructions);
     right->write(instructions);
     switch (operation) {
-        case AST_ADD:
+        case ast::ADD:
             instructions.push_back(new AddInstruction());
             break;
-        case AST_SUB:
+        case ast::SUB:
             instructions.push_back(new SubInstruction());
             break;
-        case AST_MUL:
+        case ast::MUL:
             instructions.push_back(new MulInstruction());
             break;
-        case AST_DIV:
+        case ast::DIV:
             instructions.push_back(new DivInstruction());
             break;
-        case AST_MOD:
+        case ast::MOD:
             instructions.push_back(new ModInstruction());
             break;
-        case AST_XOR:
+        case ast::XOR:
             instructions.push_back(new XorInstruction());
             break;
-        case AST_BIN_AND:
+        case ast::BIN_AND:
             instructions.push_back(new BinaryAndInstruction());
             break;
-        case AST_BIN_OR:
+        case ast::BIN_OR:
             instructions.push_back(new BinaryOrInstruction());
             break;
-        case AST_LT:
+        case ast::LT:
             instructions.push_back(new LtInstruction());
             break;
-        case AST_LTE:
+        case ast::LTE:
             instructions.push_back(new LteInstruction());
             break;
-        case AST_GT:
+        case ast::GT:
             instructions.push_back(new GtInstruction());
             break;
-        case AST_GTE:
+        case ast::GTE:
             instructions.push_back(new GteInstruction());
             break;
-        case AST_EQ:
+        case ast::EQ:
             instructions.push_back(new EqInstruction());
             break;
-        case AST_NOT_EQ:
+        case ast::NOT_EQ:
             instructions.push_back(new NotEqInstruction());
             break;
-        case AST_BOOL_AND:
+        case ast::BOOL_AND:
             instructions.push_back(new BooleanAndInstruction());
             break;
-        case AST_BOOL_OR:
+        case ast::BOOL_OR:
             instructions.push_back(new BooleanOrInstruction());
             break;
         default:
@@ -289,7 +289,7 @@ FunctionNode::FunctionNode() : AbstractSyntaxTree() {}
 FunctionNode::FunctionNode(
     const std::shared_ptr<AbstractSyntaxTree>& body,
     const std::vector<std::shared_ptr<VariableNode>>& parameters,
-    const AstVarType& return_type
+    const ast::AstVarType& return_type
 ) : AbstractSyntaxTree() {
     set_body(body);
     set_parameters(parameters);
@@ -312,7 +312,7 @@ uint8_t FunctionNode::get_parameters_count() const {
     return parameters.size();
 }
 
-AstVarType FunctionNode::get_return_type() const {
+ast::AstVarType FunctionNode::get_return_type() const {
     return return_type;
 }
 
@@ -325,7 +325,7 @@ void FunctionNode::set_parameters(const std::vector<std::shared_ptr<VariableNode
     this->parameters.insert(this->parameters.end(), parameters.begin(), parameters.end());
 }
 
-void FunctionNode::set_return_type(const AstVarType& return_type) {
+void FunctionNode::set_return_type(const ast::AstVarType& return_type) {
     this->return_type = return_type;
 }
 
@@ -365,7 +365,10 @@ void ReturnNode::write(std::vector<const Instruction*>& instructions) {
     instructions.push_back(new RetInstruction(values.size()));
 }
 
-ConvertNode::ConvertNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const AstVarType& type) : AbstractSyntaxTree() {
+ConvertNode::ConvertNode(
+    const std::shared_ptr<AbstractSyntaxTree>& expression,
+    const ast::AstVarType& type
+) : AbstractSyntaxTree() {
     this->expression = expression;
     this->type = type;
 }

@@ -34,46 +34,50 @@ class LiteralNode: public AbstractSyntaxTree {
     Var value;
 };
 
+namespace ast {
 enum AstVarType {
-    AST_TYPE_BOOL, AST_TYPE_CHAR, AST_TYPE_INT, AST_TYPE_LONG,
+    BOOL, CHAR, INT, LONG,
 };
+}
 
 class VariableNode: public AbstractSyntaxTree {
     public:
-    VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame, const AstVarType& type);
+    VariableNode(const std::shared_ptr<const AbstractSyntaxTree>& frame, const ast::AstVarType& type);
     void write(std::vector<const Instruction*>& instructions);
     Address get_address() const;
-    AstVarType get_type() const;
+    ast::AstVarType get_type() const;
     
     private:
     std::shared_ptr<const AbstractSyntaxTree> frame;
     Address address;
-    AstVarType type;
+    ast::AstVarType type;
 
     static inline std::map<std::shared_ptr<const AbstractSyntaxTree>, Address> latest_address;
 };
 
+namespace ast {
 enum AstBinaryOperation {
-    AST_ADD, AST_SUB, AST_MUL, AST_DIV,
-    AST_MOD, AST_BIN_AND, AST_BIN_OR,
-    AST_XOR, AST_LT, AST_LTE, AST_GT,
-    AST_GTE, AST_EQ, AST_NOT_EQ,
-    AST_BOOL_AND, AST_BOOL_OR
+    ADD, SUB, MUL, DIV,
+    MOD, BIN_AND, BIN_OR,
+    XOR, LT, LTE, GT,
+    GTE, EQ, NOT_EQ,
+    BOOL_AND, BOOL_OR
 };
+}
 
 class BinaryOperationNode: public AbstractSyntaxTree {
     public:
     BinaryOperationNode(
         const std::shared_ptr<AbstractSyntaxTree>& left,
         const std::shared_ptr<AbstractSyntaxTree>& right,
-        const AstBinaryOperation& operation
+        const ast::AstBinaryOperation& operation
     );
     void write(std::vector<const Instruction*>& instructions);
 
     private:
     std::shared_ptr<AbstractSyntaxTree> left;
     std::shared_ptr<AbstractSyntaxTree> right;
-    AstBinaryOperation operation;
+    ast::AstBinaryOperation operation;
 };
 
 class BooleanNotNode: public AbstractSyntaxTree {
@@ -181,21 +185,21 @@ class FunctionNode: public AbstractSyntaxTree {
     FunctionNode(
         const std::shared_ptr<AbstractSyntaxTree>& body,
         const std::vector<std::shared_ptr<VariableNode>>& parameters,
-        const AstVarType& return_type
+        const ast::AstVarType& return_type
     );
     void write(std::vector<const Instruction*>& instructions);
     std::vector<std::shared_ptr<const VariableNode>> get_parameters() const;
     uint8_t get_parameters_count() const;
-    AstVarType get_return_type() const;
+    ast::AstVarType get_return_type() const;
 
     void set_body(const std::shared_ptr<AbstractSyntaxTree>& body);
     void set_parameters(const std::vector<std::shared_ptr<VariableNode>>& parameters);
-    void set_return_type(const AstVarType& return_type);
+    void set_return_type(const ast::AstVarType& return_type);
 
     private:
     std::shared_ptr<AbstractSyntaxTree> body;
     std::vector<std::shared_ptr<const VariableNode>> parameters;
-    AstVarType return_type;
+    ast::AstVarType return_type;
 };
 
 class CallNode: public AbstractSyntaxTree {
@@ -219,12 +223,12 @@ class ReturnNode: public AbstractSyntaxTree {
 
 class ConvertNode: public AbstractSyntaxTree {
     public:
-    ConvertNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const AstVarType& type);
+    ConvertNode(const std::shared_ptr<AbstractSyntaxTree>& expression, const ast::AstVarType& type);
     void write(std::vector<const Instruction*>& instructions);
 
     private:
     std::shared_ptr<AbstractSyntaxTree> expression;
-    AstVarType type;
+    ast::AstVarType type;
 };
 
 class HaltNode: public AbstractSyntaxTree {
