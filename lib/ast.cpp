@@ -380,11 +380,9 @@ void ConvertNode::write(std::vector<const Instruction*>& instructions) {
 }
 
 NativeNode::NativeNode(
-    const std::string& module_name,
     const std::string& function_name,
     const std::vector<std::shared_ptr<VariableNode>>& values
 ) : AbstractSyntaxTree() {
-    this->module_name = module_name;
     this->function_name = function_name;
     this->values.insert(this->values.begin(), values.begin(), values.end());
 }
@@ -393,7 +391,7 @@ void NativeNode::write(std::vector<const Instruction*>& instructions) {
     for (const auto& value : values) {
         value->write(instructions);
     }
-    instructions.push_back(new NativeInstruction(module_name, function_name));
+    instructions.push_back(new NativeInstruction(function_name));
 }
 
 HaltNode::HaltNode() : AbstractSyntaxTree() {}

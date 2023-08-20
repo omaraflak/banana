@@ -234,14 +234,12 @@ class ConvertNode: public AbstractSyntaxTree {
 class NativeNode: public AbstractSyntaxTree {
     public:
     NativeNode(
-        const std::string& module_name,
         const std::string& function_name,
         const std::vector<std::shared_ptr<VariableNode>>& values
     );
     void write(std::vector<const Instruction*>& instructions);
 
     private:
-    std::string module_name;
     std::string function_name;
     std::vector<std::shared_ptr<VariableNode>> values;
 };

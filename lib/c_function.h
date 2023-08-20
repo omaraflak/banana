@@ -16,8 +16,7 @@ class CFunction {
 
     virtual cfunction::ArgType get_return_type() const = 0;
     virtual std::vector<cfunction::ArgType> get_arg_types() const = 0;
-    virtual std::string get_module_name() const = 0;
-    virtual std::string get_function_name() const = 0;
+    virtual std::string get_name() const = 0;
     virtual void* get_function() const = 0;
 };
 

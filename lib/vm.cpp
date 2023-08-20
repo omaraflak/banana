@@ -62,6 +62,6 @@ void Vm::load_libraries(const std::vector<std::string>& shared_libraries) {
         }
         std::function<CFunction*()> factory = reinterpret_cast<CFunction*(*)()>(ptr);
         std::shared_ptr<CFunction> c_function(factory());
-        c_functions[hasher(c_function->get_module_name())][hasher(c_function->get_function_name())] = c_function;
+        c_functions[hasher(c_function->get_name())] = c_function;
     }
 }

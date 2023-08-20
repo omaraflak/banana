@@ -1,4 +1,4 @@
-@native("math", "prime")
+@native("math::prime")
 long nthPrime(long n);
 
 int main() {

@@ -302,10 +302,7 @@ class ConvertInstruction: public Instruction {
 class NativeInstruction: public Instruction {
     public:
     NativeInstruction();
-    NativeInstruction(
-        const std::string& module_name,
-        const std::string& function_name
-    );
+    NativeInstruction(const std::string& function_name);
     void read(const std::vector<uint8_t>& buffer, Address* index);
     void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
@@ -314,10 +311,10 @@ class NativeInstruction: public Instruction {
     uint8_t size() const;
 
     private:
-    std::string module_name;
     std::string function_name;
-    uint64_t module_hash;
     uint64_t function_hash;
+    
+    static std::hash<std::string> hasher;
 };
 
 class HaltInstruction: public Instruction {

@@ -31,12 +31,8 @@ class PrimeFunction : public CFunction {
         return {cfunction::LONG};
     }
 
-    std::string get_module_name() const {
-        return "math";
-    }
-
-    std::string get_function_name() const {
-        return "prime";
+    std::string get_name() const {
+        return "math::prime";
     }
 
     void* get_function() const {

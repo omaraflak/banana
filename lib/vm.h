@@ -28,7 +28,7 @@ class Vm {
     uint64_t ip;
     bool running;
 
-    std::map<uint64_t, std::map<uint64_t, std::shared_ptr<CFunction>>> c_functions;
+    std::map<uint64_t, std::shared_ptr<CFunction>> c_functions;
 
     private:
     void load_libraries(const std::vector<std::string>& shared_libraries);

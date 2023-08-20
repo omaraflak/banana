@@ -34,17 +34,12 @@ const std::map<cfunction::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
     {cfunction::LONG, var::LONG},
 };
 
-std::shared_ptr<CFunction> get_library_function(const Vm& vm, const uint64_t& module, const uint64_t& function) {
-    if (vm.c_functions.find(module) == vm.c_functions.end()) {
-        std::cout << "Could not find module " << module << std::endl;
+std::shared_ptr<CFunction> get_library_function(const Vm& vm, const uint64_t& hash) {
+    if (vm.c_functions.find(hash) == vm.c_functions.end()) {
+        std::cout << "Could not find function " << hash << std::endl;
         exit(1);
     }
-    const auto& library = vm.c_functions.at(module);
-    if (library.find(function) == library.end()) {
-        std::cout << "Could not find function " << function << std::endl;
-        exit(1);
-    }
-    return library.at(function);
+    return vm.c_functions.at(hash);
 }
 
 const std::map<uint8_t, std::string> OP_STRINGS = {
@@ -622,32 +617,23 @@ uint8_t ConvertInstruction::size() const {
 
 NativeInstruction::NativeInstruction() : Instruction(OP_NATIVE) {}
 
-NativeInstruction::NativeInstruction(
-    const std::string& module_name,
-    const std::string& function_name
-) : Instruction(OP_NATIVE) {
-    this->module_name = module_name;
+NativeInstruction::NativeInstruction(const std::string& function_name) : Instruction(OP_NATIVE) {
     this->function_name = function_name;
-    std::hash<std::string> hasher;
-    this->module_hash = hasher(module_name);
-    this->function_hash = hasher(function_name);
+    this->function_hash = NativeInstruction::hasher(function_name);
 }
 
 void NativeInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    module_hash = byteutils::read_long(buffer, *index);
-    *index += SIZE_OF_LONG;
     function_hash = byteutils::read_long(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void NativeInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, module_hash);
     byteutils::push_long(buffer, function_hash);
 }
 
 void NativeInstruction::execute(Vm& vm) const {
-    const auto& fun = instructions::get_library_function(vm, module_hash, function_hash);
+    const auto& fun = instructions::get_library_function(vm, function_hash);
     std::vector<Var> args;
     for (const auto& c_type : fun->get_arg_types()) {
         var::DataType data_type = instructions::C_TYPE_TO_DATA_TYPE.at(c_type);
@@ -663,21 +649,18 @@ void NativeInstruction::execute(Vm& vm) const {
 }
 
 void NativeInstruction::read_string(const std::vector<std::string>& strings) {
-    module_name = strings[0];
-    function_name = strings[1];
-    std::hash<std::string> hasher;
-    module_hash = hasher(module_name);
-    function_hash = hasher(function_name);
+    function_name = strings[0];
+    function_hash = NativeInstruction::hasher(function_name);
 }
 
 std::string NativeInstruction::to_string() const {
     std::stringstream ss;
-    ss << Instruction::to_string() << " " << module_name << " " << function_name;
+    ss << Instruction::to_string() << " " << function_name;
     return ss.str();
 }
 
 uint8_t NativeInstruction::size() const {
-    return Instruction::size() + 2 * SIZE_OF_LONG;
+    return Instruction::size() + SIZE_OF_LONG;
 }
 
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}

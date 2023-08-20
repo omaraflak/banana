@@ -407,9 +407,7 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
 
 std::shared_ptr<AbstractSyntaxTree> native_statement(Parser& parser) {
     consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after '@native' statement.");
-    Token module_name = consume(parser, TOKEN_STRING, "Expected module as first argument of '@native'.");
-    consume(parser, TOKEN_COMMA, "Expected ',' after 'module' argument of '@native'.");
-    Token function_name = consume(parser, TOKEN_STRING, "Expected module as second argument of '@native'.");
+    Token function_name = consume(parser, TOKEN_STRING, "Expected function name as argument of '@native'.");
     consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after '@native' arguments.");
 
     if (!match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
@@ -429,7 +427,7 @@ std::shared_ptr<AbstractSyntaxTree> native_statement(Parser& parser) {
     
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after '@native' function signature.");
 
-    auto native_call_result = std::shared_ptr<NativeNode>(new NativeNode(module_name.value, function_name.value, parameters));
+    auto native_call_result = std::shared_ptr<NativeNode>(new NativeNode(function_name.value, parameters));
     fun_node->set_body(std::shared_ptr<ReturnNode>(new ReturnNode({native_call_result})));
 
     pop_scope(parser);
