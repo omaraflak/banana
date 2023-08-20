@@ -71,8 +71,7 @@ long some_native_c_function(long n) {
 class MyNativeFunction : public CFunction {
     cfunction::ArgType get_return_type() const { return cfunction::LONG; }
     std::vector<cfunction::ArgType> get_arg_types() const { return {cfunction::LONG}; }
-    std::string get_module_name() const { return "math"; }
-    std::string get_function_name() const { return "times_two"; }
+    std::string get_name() const { return "math::times_two"; }
     void* get_function() const { return (void*) nth_prime; }
 };
 
@@ -88,7 +87,7 @@ g++ mylib.cpp -o lib_folder/mylib.so -shared -fPIC
 Bind it in Banana:
 
 ```
-@native("math", "times_two")
+@native("math::times_two")
 long timesTwo(long n);
 
 int main() {
