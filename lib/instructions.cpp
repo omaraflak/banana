@@ -565,12 +565,12 @@ uint8_t LoadInstruction::size() const {
 
 ConvertInstruction::ConvertInstruction() : Instruction(OP_CONVERT) {}
 
-ConvertInstruction::ConvertInstruction(const DataType& type) : Instruction(OP_CONVERT) {
+ConvertInstruction::ConvertInstruction(const var::DataType& type) : Instruction(OP_CONVERT) {
     this->type = type;
 }
 
 void ConvertInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    type = (DataType) buffer[*index];
+    type = (var::DataType) buffer[*index];
     *index += SIZE_OF_BYTE;
 }
 
@@ -585,7 +585,7 @@ void ConvertInstruction::execute(Vm& vm) const {
 }
 
 void ConvertInstruction::read_string(const std::vector<std::string>& strings) {
-    type = (DataType) stoi(strings[0]);
+    type = (var::DataType) stoi(strings[0]);
 }
 
 std::string ConvertInstruction::to_string() const {

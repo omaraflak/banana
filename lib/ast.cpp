@@ -3,11 +3,11 @@
 #include <map>
 
 namespace ast {
-std::map<AstVarType, DataType> AST_TO_VAR = {
-    {AST_TYPE_BOOL, BOOL},
-    {AST_TYPE_CHAR, CHAR},
-    {AST_TYPE_INT, INT},
-    {AST_TYPE_LONG, LONG},
+std::map<AstVarType, var::DataType> AST_TO_VAR = {
+    {AST_TYPE_BOOL, var::BOOL},
+    {AST_TYPE_CHAR, var::CHAR},
+    {AST_TYPE_INT, var::INT},
+    {AST_TYPE_LONG, var::LONG},
 };
 }
 

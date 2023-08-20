@@ -13,13 +13,15 @@ union Data {
     long _long;
 };
 
+namespace var {
 enum DataType {
     BOOL, CHAR, INT, LONG
 };
+}
 
 struct Var {
     Data data;
-    DataType type;
+    var::DataType type;
 };
 
 namespace var {

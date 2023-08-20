@@ -286,7 +286,7 @@ class LoadInstruction: public Instruction {
 class ConvertInstruction: public Instruction {
     public:
     ConvertInstruction();
-    ConvertInstruction(const DataType& type);
+    ConvertInstruction(const var::DataType& type);
     void read(const std::vector<uint8_t>& buffer, Address* index);
     void write(std::vector<uint8_t>& buffer) const;
     void execute(Vm& vm) const;
@@ -295,7 +295,7 @@ class ConvertInstruction: public Instruction {
     uint8_t size() const;
 
     private:
-    DataType type;
+    var::DataType type;
 };
 
 class HaltInstruction: public Instruction {
