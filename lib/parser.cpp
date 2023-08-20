@@ -1,3 +1,4 @@
+#include "maputils.h"
 #include "parser.h"
 #include "var.h"
 #include <sstream>
@@ -27,19 +28,14 @@ const std::map<TokenType, ast::AstBinaryOperation> BIN_OP = {
     {TOKEN_OR, ast::BOOL_OR},
 };
 
-const std::map<TokenType, ast::AstVarType> TOKEN_TO_TYPE = {
+const std::map<TokenType, ast::AstVarType> TOKEN_TO_AST = {
     {TOKEN_BOOL, ast::BOOL},
     {TOKEN_CHAR, ast::CHAR},
     {TOKEN_INT, ast::INT},
     {TOKEN_LONG, ast::LONG},
 };
 
-const std::map<ast::AstVarType, TokenType> TYPE_TO_TOKEN = {
-    {ast::BOOL, TOKEN_BOOL},
-    {ast::CHAR, TOKEN_CHAR},
-    {ast::INT, TOKEN_INT},
-    {ast::LONG, TOKEN_LONG},
-};
+const std::map<ast::AstVarType, TokenType> AST_TO_TOKEN = maputils::reverse(TOKEN_TO_AST);
 
 const std::set<TokenType> TYPES = {
     TOKEN_BOOL, TOKEN_CHAR, TOKEN_INT, TOKEN_LONG
@@ -207,7 +203,7 @@ std::shared_ptr<VariableNode> get_variable_by_name(const Parser& parser, const s
 std::shared_ptr<VariableNode> new_variable(Parser& parser, const TokenType& type, const std::string& name) {
     std::shared_ptr<AbstractSyntaxTree> frame = current_frame(parser);
     std::shared_ptr<AbstractSyntaxTree> scope = current_scope(parser);
-    std::shared_ptr<VariableNode> variable(new VariableNode(frame, TOKEN_TO_TYPE.at(type)));
+    std::shared_ptr<VariableNode> variable(new VariableNode(frame, TOKEN_TO_AST.at(type)));
     const Frame& fr = parser.frames.at(frame);
     for (const auto& scope : fr.scope_stack) {
         const auto& mapping = fr.identifiers.at(scope);
@@ -251,8 +247,8 @@ std::shared_ptr<AbstractSyntaxTree> primary_expression(Parser& parser, const Tok
         }
         Token token = previous(parser);
         auto variable = get_variable_by_name(parser, token.value);
-        if (expected_type != TOKEN_BANG && expected_type != TYPE_TO_TOKEN.at(variable->get_type())) {
-            return std::shared_ptr<ConvertNode>(new ConvertNode(variable, TOKEN_TO_TYPE.at(expected_type)));
+        if (expected_type != TOKEN_BANG && expected_type != AST_TO_TOKEN.at(variable->get_type())) {
+            return std::shared_ptr<ConvertNode>(new ConvertNode(variable, TOKEN_TO_AST.at(expected_type)));
         }
         return variable;
     }
@@ -391,7 +387,7 @@ std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser, const Token& t
     register_function(parser, fun_node, id.value);
     push_frame(parser, fun_node);
     push_scope(parser, fun_node);
-    fun_node->set_return_type(TOKEN_TO_TYPE.at(type.type));
+    fun_node->set_return_type(TOKEN_TO_AST.at(type.type));
     fun_node->set_parameters(fun_parameters(parser));
     fun_node->set_body(block(parser));
     pop_scope(parser);
@@ -404,7 +400,7 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
         return std::shared_ptr<ReturnNode>(new ReturnNode());
     }
     FunctionNode* fun = (FunctionNode*) current_frame(parser).get();
-    TokenType type = TYPE_TO_TOKEN.at(fun->get_return_type());
+    TokenType type = AST_TO_TOKEN.at(fun->get_return_type());
     std::shared_ptr<AbstractSyntaxTree> exp = expression_statement(parser, type);
     return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
@@ -419,7 +415,7 @@ std::shared_ptr<AbstractSyntaxTree> call_statement(
     std::vector<std::shared_ptr<AbstractSyntaxTree>> values;
     for (int i=0; i<fun_node->get_parameters_count(); i++) {
         auto type = fun_node->get_parameters().at(i)->get_type();
-        values.push_back(expression(parser, TYPE_TO_TOKEN.at(type)));
+        values.push_back(expression(parser, AST_TO_TOKEN.at(type)));
         if (i != fun_node->get_parameters_count() - 1) {
             consume(parser, TOKEN_COMMA, "Expected ',' after function parameter.");
         }
@@ -429,8 +425,8 @@ std::shared_ptr<AbstractSyntaxTree> call_statement(
         consume(parser, TOKEN_SEMICOLON, "Expected ';' after function call.");
     }
     std::shared_ptr<CallNode> call_node(new CallNode(fun_node, values));
-    if (expected_type != TOKEN_BANG && fun_node->get_return_type() != TOKEN_TO_TYPE.at(expected_type)) {
-        return std::shared_ptr<ConvertNode>(new ConvertNode(call_node, TOKEN_TO_TYPE.at(expected_type)));
+    if (expected_type != TOKEN_BANG && fun_node->get_return_type() != TOKEN_TO_AST.at(expected_type)) {
+        return std::shared_ptr<ConvertNode>(new ConvertNode(call_node, TOKEN_TO_AST.at(expected_type)));
     }
     return call_node;
 }
@@ -456,7 +452,7 @@ std::shared_ptr<AbstractSyntaxTree> assign_statement(
 ) {
     std::shared_ptr<VariableNode> variable = get_variable_by_name(parser, id.value);
     std::shared_ptr<AbstractSyntaxTree> exp;
-    TokenType type = TYPE_TO_TOKEN.at(variable->get_type());
+    TokenType type = AST_TO_TOKEN.at(variable->get_type());
     switch (assign.type) {
         case TOKEN_EQUAL:
             exp = expression(parser, type);

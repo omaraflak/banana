@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
+#include "maputils.h"
 
 union Data {
     bool _bool;
@@ -32,16 +33,7 @@ const std::map<DataType, std::string> TYPE_NAME = {
     {LONG, "long"},
 };
 
-template <class K, class V>
-std::map<V, K> reverse_map(const std::map<K, V>& m) {
-    std::map<V, K> result;
-    for (const auto& pair : m) {
-        result[pair.second] = pair.first;
-    }
-    return result;
-}
-
-const std::map<std::string, DataType> TYPE_NAME_REVERSED = reverse_map(TYPE_NAME);
+const std::map<std::string, DataType> TYPE_NAME_REVERSED = maputils::reverse(TYPE_NAME);
 
 void push(const Var &var, std::vector<uint8_t>& bytes);
 Var read(const std::vector<uint8_t>& bytes, uint64_t* index);
