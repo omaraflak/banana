@@ -3,9 +3,10 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 _deps
-.vscode
+.vscode/
 assembler
 banana
 banana_test
 *.obj
 *.a
+*.asm

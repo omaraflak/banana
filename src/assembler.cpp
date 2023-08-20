@@ -57,8 +57,13 @@ std::map<std::string, uint64_t> create_labels_map(const std::vector<std::string>
             labels[line] = position;
             continue;
         }
-        std::string opstring = split_string(line)[0];
-        Instruction* instruction = Instruction::from_opstring(opstring);
+        Instruction* instruction;
+        if (line.find('.') == -1) {
+            instruction = Instruction::from_string(line);
+        } else {
+            std::string opstring = split_string(line)[0];
+            instruction = Instruction::from_opstring(opstring);
+        }
         position += instruction->size();
         delete instruction;
     }
