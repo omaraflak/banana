@@ -3,7 +3,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ldl -lffi")
 
 project (banana)
 
@@ -12,6 +12,9 @@ file(GLOB SOURCES "lib/*.cpp")
 add_executable(banana src/banana.cpp ${SOURCES})
 add_executable(assembler src/assembler.cpp ${SOURCES})
 add_executable(banana_test src/banana_test.cpp ${SOURCES})
+TARGET_LINK_LIBRARIES(banana -lffi)
+TARGET_LINK_LIBRARIES(assembler -lffi)
+TARGET_LINK_LIBRARIES(banana_test -lffi)
 
 # gtest
 include(FetchContent)

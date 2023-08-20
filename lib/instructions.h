@@ -1,7 +1,7 @@
 #if !defined(INSTRUCTIONS)
 #define INSTRUCTIONS
 
-#include <iostream>
+#include <functional>
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -39,6 +39,7 @@ enum {
     OP_STORE,
     OP_LOAD,
     OP_CONVERT,
+    OP_NATIVE,
     OP_HALT
 };
 
@@ -296,6 +297,27 @@ class ConvertInstruction: public Instruction {
 
     private:
     var::DataType type;
+};
+
+class NativeInstruction: public Instruction {
+    public:
+    NativeInstruction();
+    NativeInstruction(
+        const std::string& module_name,
+        const std::string& function_name
+    );
+    void read(const std::vector<uint8_t>& buffer, Address* index);
+    void write(std::vector<uint8_t>& buffer) const;
+    void execute(Vm& vm) const;
+    void read_string(const std::vector<std::string>& strings);
+    std::string to_string() const;
+    uint8_t size() const;
+
+    private:
+    std::string module_name;
+    std::string function_name;
+    uint64_t module_hash;
+    uint64_t function_hash;
 };
 
 class HaltInstruction: public Instruction {

@@ -227,10 +227,10 @@ Var var::from_string(const std::vector<std::string>& strings) {
     var.type = TYPE_NAME_REVERSED.at(strings[0]);
     switch (var.type) {
         case BOOL:
-            var.data._bool = stol(strings[1]);
+            var.data._bool = stoi(strings[1]);
             break;
         case CHAR:
-            var.data._char = stol(strings[1]);
+            var.data._char = stoi(strings[1]);
             break;
         case INT:
             var.data._int = stoi(strings[1]);
@@ -325,6 +325,22 @@ Var var::convert(const Var& var, const DataType& type) {
                     var::type_not_found(var.type);
                     exit(1);
             }
+        default:
+            var::type_not_found(var.type);
+            exit(1);
+    }
+}
+
+void* var::to_ptr(const Var& var) {
+    switch (var.type) {
+        case BOOL:
+            return (void*) &var.data._bool;
+        case CHAR:
+            return (void*) &var.data._char;
+        case INT:
+            return (void*) &var.data._int;
+        case LONG:
+            return (void*) &var.data._long;
         default:
             var::type_not_found(var.type);
             exit(1);

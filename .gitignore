@@ -10,3 +10,4 @@ banana_test
 *.obj
 *.a
 *.asm
+*.so

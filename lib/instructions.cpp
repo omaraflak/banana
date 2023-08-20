@@ -1,7 +1,13 @@
 #include "instructions.h"
-#include "byteutils.h"
 #include "maputils.h"
+#include "byteutils.h"
+#include "c_function.h"
+#include "c_function_caller.h"
+#include <iostream>
 #include <sstream>
+#include <cassert>
+#include <ffi.h>
+#include <cmath>
 #include <map>
 
 namespace instructions {
@@ -20,6 +26,25 @@ Var pop_var(std::vector<Var>* vars) {
     vars->pop_back();
     return var;
 }
+
+const std::map<cfunction::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
+    {cfunction::BOOL, var::BOOL},
+    {cfunction::CHAR, var::CHAR},
+    {cfunction::INT, var::INT},
+    {cfunction::LONG, var::LONG},
+};
+
+std::shared_ptr<CFunction> get_library_function(const Vm& vm, const uint64_t& module, const uint64_t& function) {
+    if (vm.c_functions.find(module) == vm.c_functions.end()) {
+        std::cout << "Could not find module " << module << std::endl;
+        exit(1);
+    }
+    const auto& library = vm.c_functions.at(module);
+    if (library.find(function) == library.end()) {
+        std::cout << "Could not find function " << function << std::endl;
+        exit(1);
+    }
+    return library.at(function);
 }
 
 const std::map<uint8_t, std::string> OP_STRINGS = {
@@ -51,10 +76,13 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_STORE, "store"},
     {OP_LOAD, "load"},
     {OP_CONVERT, "convert"},
+    {OP_NATIVE, "native"},
     {OP_HALT, "halt"},
 };
 
 const std::map<std::string, uint8_t> OP_STRINGS_REV = maputils::reverse(OP_STRINGS);
+}
+
 
 Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
@@ -73,7 +101,7 @@ void Instruction::execute(Vm& vm) const {}
 void Instruction::read_string(const std::vector<std::string>& strings) {}
 
 std::string Instruction::to_string() const {
-    return OP_STRINGS.at(opcode);
+    return instructions::OP_STRINGS.at(opcode);
 }
 
 uint8_t Instruction::size() const {
@@ -138,6 +166,8 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
             return new LoadInstruction();
         case OP_CONVERT:
             return new ConvertInstruction();
+        case OP_NATIVE:
+            return new NativeInstruction();
         case OP_HALT:
             return new HaltInstruction();
     }
@@ -146,12 +176,12 @@ Instruction* Instruction::from_opcode(const uint8_t& opcode) {
 }
 
 Instruction* Instruction::from_opstring(const std::string& opstring) {
-    return Instruction::from_opcode(OP_STRINGS_REV.at(opstring));
+    return Instruction::from_opcode(instructions::OP_STRINGS_REV.at(opstring));
 }
 
 Instruction* Instruction::from_string(const std::string& str) {
     std::vector<std::string> parts = instructions::split_string(str, ' ');
-    Instruction* instruction = Instruction::from_opcode(OP_STRINGS_REV.at(parts[0]));
+    Instruction* instruction = Instruction::from_opcode(instructions::OP_STRINGS_REV.at(parts[0]));
     instruction->read_string(std::vector<std::string>(parts.begin() + 1, parts.end()));
     return instruction;
 }
@@ -588,6 +618,66 @@ std::string ConvertInstruction::to_string() const {
 
 uint8_t ConvertInstruction::size() const {
     return Instruction::size() + SIZE_OF_BYTE;
+}
+
+NativeInstruction::NativeInstruction() : Instruction(OP_NATIVE) {}
+
+NativeInstruction::NativeInstruction(
+    const std::string& module_name,
+    const std::string& function_name
+) : Instruction(OP_NATIVE) {
+    this->module_name = module_name;
+    this->function_name = function_name;
+    std::hash<std::string> hasher;
+    this->module_hash = hasher(module_name);
+    this->function_hash = hasher(function_name);
+}
+
+void NativeInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
+    module_hash = byteutils::read_long(buffer, *index);
+    *index += SIZE_OF_LONG;
+    function_hash = byteutils::read_long(buffer, *index);
+    *index += SIZE_OF_LONG;
+}
+
+void NativeInstruction::write(std::vector<uint8_t>& buffer) const {
+    Instruction::write(buffer);
+    byteutils::push_long(buffer, module_hash);
+    byteutils::push_long(buffer, function_hash);
+}
+
+void NativeInstruction::execute(Vm& vm) const {
+    const auto& fun = instructions::get_library_function(vm, module_hash, function_hash);
+    std::vector<Var> args;
+    for (const auto& c_type : fun->get_arg_types()) {
+        var::DataType data_type = instructions::C_TYPE_TO_DATA_TYPE.at(c_type);
+        Var arg = instructions::pop_var(vm.stack);
+        if (arg.type != data_type) {
+            std::cout << "Expected arg '" << var::TYPE_NAME.at(data_type) << "', but got '" << var::TYPE_NAME.at(arg.type) << "' instead. "<< std::endl;
+            exit(1);
+        }
+        args.push_back(arg);
+    }
+    Var result = cfunctioncaller::call(fun, args);
+    vm.stack->push_back(result);
+}
+
+void NativeInstruction::read_string(const std::vector<std::string>& strings) {
+    module_name = strings[0];
+    function_name = strings[1];
+    std::hash<std::string> hasher;
+    module_hash = hasher(module_name);
+    function_hash = hasher(function_name);
+}
+
+std::string NativeInstruction::to_string() const {
+    std::stringstream ss;
+    ss << Instruction::to_string() << " " << module_name << " " << function_name;
+    return ss.str();
+}
+
+uint8_t NativeInstruction::size() const {
+    return Instruction::size() + 2 * SIZE_OF_LONG;
 }
 
 HaltInstruction::HaltInstruction() : Instruction(OP_HALT) {}

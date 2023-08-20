@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iterator>
+#include <filesystem>
 
 std::vector<uint8_t> fileutils::read_bytes(const std::string& filename) {
     std::ifstream is(filename.c_str(), std::ios::binary);
@@ -54,4 +55,14 @@ void fileutils::write_lines(const std::vector<std::string>& lines, const std::st
     std::ostream_iterator<std::string> output_iterator(os);
     std::copy(lines.begin(), lines.end(), output_iterator);
     os.close();
+}
+
+std::vector<std::string> fileutils::list_files(const std::string& directory, const std::string& extension) {
+    std::vector<std::string> files;
+    for (const auto &p : std::filesystem::recursive_directory_iterator(directory)) {
+        if (p.path().extension() == extension) {
+            files.push_back(p.path().string());
+        }
+    }
+    return files;
 }

@@ -44,6 +44,8 @@ Var from_string(const std::vector<std::string>& strings);
 uint8_t size(const Var& var);
 Var convert(const Var& var, const DataType& type);
 
+void* to_ptr(const Var& var);
+
 Var create_char(const char& value);
 Var create_int(const int& value);
 Var create_long(const long& value);

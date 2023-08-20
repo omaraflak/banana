@@ -2,14 +2,18 @@
 #define VM
 #define HEAP_MEMORY (2 << 16)
 
+#include <map>
 #include <stack>
+#include <memory>
 #include <vector>
 #include <stdint.h>
+#include "c_function.h"
 #include "var.h"
 
 class Vm {
     public:
-    Vm(const std::vector<uint8_t>& program);
+    ~Vm();
+    Vm(const std::vector<uint8_t>& program, const std::vector<std::string>& shared_libraries = std::vector<std::string>());
 
     void execute();
     void push_frame();
@@ -23,6 +27,12 @@ class Vm {
     std::stack<Var*> heaps;
     uint64_t ip;
     bool running;
+
+    std::map<uint64_t, std::map<uint64_t, std::shared_ptr<CFunction>>> c_functions;
+
+    private:
+    void load_libraries(const std::vector<std::string>& shared_libraries);
+    std::vector<void*> handles;
 };
 
 #endif // VM
