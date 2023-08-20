@@ -294,7 +294,7 @@ void JumpInstruction::execute(Vm& vm) const {
 }
 
 void JumpInstruction::read_string(const std::vector<std::string>& strings) {
-    address = stol(strings[0]);
+    address = stoul(strings[0]);
 }
 
 std::string JumpInstruction::to_string() const {
@@ -362,7 +362,7 @@ void CallInstruction::execute(Vm& vm) const {
 }
 
 void CallInstruction::read_string(const std::vector<std::string>& strings) {
-    address = stol(strings[0]);
+    address = stoul(strings[0]);
     param_count = stol(strings[1]);
 }
 
@@ -516,7 +516,7 @@ void StoreInstruction::execute(Vm& vm) const {
 }
 
 void StoreInstruction::read_string(const std::vector<std::string>& strings) {
-    address = stol(strings[0]);
+    address = stoul(strings[0]);
 }
 
 std::string StoreInstruction::to_string() const {
@@ -550,7 +550,7 @@ void LoadInstruction::execute(Vm& vm) const {
 }
 
 void LoadInstruction::read_string(const std::vector<std::string>& strings) {
-    address = stol(strings[0]);
+    address = stoul(strings[0]);
 }
 
 std::string LoadInstruction::to_string() const {
