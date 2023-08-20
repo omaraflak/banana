@@ -119,6 +119,7 @@ TEST(ForLoop, Loop) {
   EXPECT_EQ("0\n1\n2\n", exe("int i=1; for (i=0; i<3; i++) { print i; }"));
   EXPECT_EQ("3\n2\n1\n", exe("for (int i=3; i>0; i--) { print i; }"));
   EXPECT_EQ("0\n4\n8\n", exe("for (int i=0; i<10; i+=4) { print i; }"));
+  EXPECT_EQ("-2\n-1\n0\n1\n", exe("for (int i=-2; i<2; i++) { print i; }"));
 }
 
 TEST(WhileLoop, Loop) {

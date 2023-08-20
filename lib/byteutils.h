@@ -19,13 +19,13 @@
 #define SIZE_OF_LONG 8
 
 namespace byteutils {
-void push_short(std::vector<uint8_t>& stack, const uint16_t& value);
-void push_int(std::vector<uint8_t>& stack, const uint32_t& value);
-void push_long(std::vector<uint8_t>& stack, const uint64_t& value);
+void push_short(std::vector<uint8_t>& stack, const int16_t& value);
+void push_int(std::vector<uint8_t>& stack, const int32_t& value);
+void push_long(std::vector<uint8_t>& stack, const int64_t& value);
 
-uint16_t read_short(const std::vector<uint8_t>& stack, const uint64_t& index);
-uint32_t read_int(const std::vector<uint8_t>& stack, const uint64_t& index);
-uint64_t read_long(const std::vector<uint8_t>& stack, const uint64_t& index);
+int16_t read_short(const std::vector<uint8_t>& stack, const uint64_t& index);
+int32_t read_int(const std::vector<uint8_t>& stack, const uint64_t& index);
+int64_t read_long(const std::vector<uint8_t>& stack, const uint64_t& index);
 }
 
 #endif // BYTE_UTILS
