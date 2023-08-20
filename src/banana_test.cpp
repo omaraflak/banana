@@ -7,12 +7,12 @@
 #include "gtest/gtest.h"
 
 namespace {
-std::string exe(const std::string& code) {
+std::string exe(const std::string& code, const std::vector<std::string>& shared_libraries = std::vector<std::string>()) {
     std::vector<Token> tokens = scanner::scan(code.c_str());
     std::shared_ptr<AbstractSyntaxTree> root = parser::parse(tokens);
     std::stringstream ss;
     auto origin = std::cout.rdbuf(ss.rdbuf());
-    Vm(ast::to_bytes(ast::to_instructions(root))).execute();
+    Vm(ast::to_bytes(ast::to_instructions(root)), shared_libraries).execute();
     std::cout.rdbuf(origin);
     return ss.str();
 }
@@ -137,6 +137,12 @@ TEST(Function, NoParameters) {
 TEST(Function, ParametersConversion) {
   EXPECT_EQ("11\n", exe("long add(long x, long y) { return x + y; } int main() { int x = add(5, 6); print x; }"));
   EXPECT_EQ("A\n", exe("long num() { return 65; } int main() { char z = num(); print z; }"));
+}
+
+TEST(NATIVE, PRIMES) {
+  system("g++ ./external/prime.cpp -o ./external/prime.so -shared -fPIC");
+  std::vector<std::string> libs = {"./external/prime.so"};
+  EXPECT_EQ("541\n", exe("@native(\"math\", \"prime\") long nthPrime(long n); int main() { print nthPrime(100); }", libs));
 }
 
 TEST(FIBONACCI, RECURSION) {
