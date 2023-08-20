@@ -55,13 +55,14 @@ void Vm::load_libraries(const std::vector<std::string>& shared_libraries) {
             exit(1);
         }
         handles.push_back(handle);
-        void* ptr = dlsym(handle, "get_factory");
+        void* ptr = dlsym(handle, "get_classes");
         if (ptr == nullptr) {
             std::cout << dlerror() << std::endl;
             exit(1);
         }
-        std::function<CFunction*()> factory = reinterpret_cast<CFunction*(*)()>(ptr);
-        std::shared_ptr<CFunction> c_function(factory());
-        c_functions[hasher(c_function->get_name())] = c_function;
+        std::function<std::vector<CFunction*>()> get_classes = reinterpret_cast<std::vector<CFunction*>(*)()>(ptr);
+        for (auto c_function_ptr : get_classes()) {
+            c_functions[hasher(c_function_ptr->get_name())] = std::shared_ptr<CFunction>(c_function_ptr);
+        }
     }
 }

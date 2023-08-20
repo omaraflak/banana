@@ -20,6 +20,6 @@ class CFunction {
     virtual void* get_function() const = 0;
 };
 
-extern "C" CFunction* get_factory();
+extern "C" std::vector<CFunction*> get_classes();
 
 #endif // C_FUNCTION

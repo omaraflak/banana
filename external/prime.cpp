@@ -40,6 +40,6 @@ class PrimeFunction : public CFunction {
     }
 };
 
-CFunction* get_factory() {
-    return new PrimeFunction();
+std::vector<CFunction*> get_classes() {
+    return {new PrimeFunction()};
 }

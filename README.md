@@ -75,7 +75,7 @@ class MyNativeFunction : public CFunction {
     void* get_function() const { return (void*) nth_prime; }
 };
 
-CFunction* get_factory() { return new MyNativeFunction(); }
+std::vector<CFunction*> get_factory() { return {new MyNativeFunction()}; }
 ```
 
 Compile this as a shared library:
