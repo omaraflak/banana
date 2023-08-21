@@ -63,7 +63,7 @@ You can call native C code from Banana, provided that you expose the code in a s
 ```cpp
 #include "../lib/c_function.h"
 
-long some_native_c_function(long n) {
+long do_something(long n) {
     // something complicated here
     return 2 * n;
 }
@@ -71,8 +71,8 @@ long some_native_c_function(long n) {
 class MyNativeFunction : public CFunction {
     cfunction::ArgType get_return_type() const { return cfunction::LONG; }
     std::vector<cfunction::ArgType> get_arg_types() const { return {cfunction::LONG}; }
-    std::string get_name() const { return "math::times_two"; }
-    void* get_function() const { return (void*) nth_prime; }
+    std::string get_name() const { return "math::do_something"; }
+    void* get_function() const { return (void*) do_something; }
 };
 
 std::vector<CFunction*> get_classes() { return {new MyNativeFunction()}; }
@@ -87,11 +87,11 @@ g++ mylib.cpp -o lib_folder/mylib.so -shared -fPIC
 Bind it in Banana:
 
 ```
-@native("math::times_two")
-long timesTwo(long n);
+@native("math::do_something")
+long doSomething(long n);
 
 int main() {
-    print timesTwo(10);
+    print doSomething(10);
 }
 ```
 
