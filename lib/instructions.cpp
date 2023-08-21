@@ -297,13 +297,13 @@ JumpInstruction::JumpInstruction(const uint8_t& opcode, const Address& address) 
 }
 
 void JumpInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = byteutils::read_long(buffer, *index);
+    address = byteutils::read_ulong(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void JumpInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, address);
+    byteutils::push_ulong(buffer, address);
 }
 
 void JumpInstruction::execute(Vm& vm) const {
@@ -356,7 +356,7 @@ CallInstruction::CallInstruction(const Address& address, const uint8_t& param_co
 }
 
 void CallInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = byteutils::read_long(buffer, *index);
+    address = byteutils::read_ulong(buffer, *index);
     *index += SIZE_OF_LONG;
     param_count = buffer[*index];
     *index += SIZE_OF_BYTE;
@@ -364,7 +364,7 @@ void CallInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
 
 void CallInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, address);
+    byteutils::push_ulong(buffer, address);
     buffer.push_back(param_count);
 }
 
@@ -519,13 +519,13 @@ StoreInstruction::StoreInstruction(const Address& address) : Instruction(OP_STOR
 }
 
 void StoreInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = byteutils::read_long(buffer, *index);
+    address = byteutils::read_ulong(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void StoreInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, address);
+    byteutils::push_ulong(buffer, address);
 }
 
 void StoreInstruction::execute(Vm& vm) const {
@@ -553,13 +553,13 @@ LoadInstruction::LoadInstruction(const Address& address) : Instruction(OP_LOAD) 
 }
 
 void LoadInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    address = byteutils::read_long(buffer, *index);
+    address = byteutils::read_ulong(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void LoadInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, address);
+    byteutils::push_ulong(buffer, address);
 }
 
 void LoadInstruction::execute(Vm& vm) const {
