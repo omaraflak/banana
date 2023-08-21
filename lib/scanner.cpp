@@ -55,7 +55,7 @@ int match_quote(const Scanner& scanner) {
 
 int match_number(const Scanner& scanner) {
     int p = scanner.current;
-    while ('0' <= scanner.code[p] && scanner.code[p] <= '9') {
+    while (is_digit(scanner.code[p])) {
          p++;
     }
     return p;

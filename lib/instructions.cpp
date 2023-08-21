@@ -623,13 +623,13 @@ NativeInstruction::NativeInstruction(const std::string& function_name) : Instruc
 }
 
 void NativeInstruction::read(const std::vector<uint8_t>& buffer, Address* index) {
-    function_hash = byteutils::read_long(buffer, *index);
+    function_hash = byteutils::read_ulong(buffer, *index);
     *index += SIZE_OF_LONG;
 }
 
 void NativeInstruction::write(std::vector<uint8_t>& buffer) const {
     Instruction::write(buffer);
-    byteutils::push_long(buffer, function_hash);
+    byteutils::push_ulong(buffer, function_hash);
 }
 
 void NativeInstruction::execute(Vm& vm) const {

@@ -23,9 +23,17 @@ void push_short(std::vector<uint8_t>& stack, const int16_t& value);
 void push_int(std::vector<uint8_t>& stack, const int32_t& value);
 void push_long(std::vector<uint8_t>& stack, const int64_t& value);
 
+void push_ushort(std::vector<uint8_t>& stack, const uint16_t& value);
+void push_uint(std::vector<uint8_t>& stack, const uint32_t& value);
+void push_ulong(std::vector<uint8_t>& stack, const uint64_t& value);
+
 int16_t read_short(const std::vector<uint8_t>& stack, const uint64_t& index);
 int32_t read_int(const std::vector<uint8_t>& stack, const uint64_t& index);
 int64_t read_long(const std::vector<uint8_t>& stack, const uint64_t& index);
+
+uint16_t read_ushort(const std::vector<uint8_t>& stack, const uint64_t& index);
+uint32_t read_uint(const std::vector<uint8_t>& stack, const uint64_t& index);
+uint64_t read_ulong(const std::vector<uint8_t>& stack, const uint64_t& index);
 }
 
 #endif // BYTE_UTILS
