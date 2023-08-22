@@ -1,7 +1,7 @@
 #include "instructions.h"
 #include "maputils.h"
 #include "byteutils.h"
-#include "c_function.h"
+#include "c_interface.h"
 #include "c_functions.h"
 #include <iostream>
 #include <sstream>
@@ -27,11 +27,11 @@ Var pop_var(std::vector<Var>* vars) {
     return var;
 }
 
-const std::map<cfunction::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
-    {cfunction::BOOL, var::BOOL},
-    {cfunction::CHAR, var::CHAR},
-    {cfunction::INT, var::INT},
-    {cfunction::LONG, var::LONG},
+const std::map<cinterface::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
+    {cinterface::BOOL, var::BOOL},
+    {cinterface::CHAR, var::CHAR},
+    {cinterface::INT, var::INT},
+    {cinterface::LONG, var::LONG},
 };
 
 const std::map<uint8_t, std::string> OP_STRINGS = {

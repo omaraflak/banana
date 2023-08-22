@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 #include <stdint.h>
-#include "c_function.h"
+#include "c_interface.h"
 #include "c_functions.h"
 #include "var.h"
 

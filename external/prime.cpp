@@ -1,4 +1,4 @@
-#include "../lib/c_function.h"
+#include "../lib/c_interface.h"
 
 bool is_prime(const long& n) {
     for (long i=2; i<n; i++) {
@@ -22,13 +22,13 @@ long nth_prime(long n) {
     return l;
 }
 
-class PrimeFunction : public CFunction {
-    cfunction::ArgType get_return_type() const {
-        return cfunction::LONG;
+class PrimeFunction : public CInterface {
+    cinterface::ArgType get_return_type() const {
+        return cinterface::LONG;
     }
 
-    std::vector<cfunction::ArgType> get_arg_types() const {
-        return {cfunction::LONG};
+    std::vector<cinterface::ArgType> get_arg_types() const {
+        return {cinterface::LONG};
     }
 
     std::string get_name() const {
@@ -40,6 +40,6 @@ class PrimeFunction : public CFunction {
     }
 };
 
-std::vector<CFunction*> get_classes() {
+std::vector<CInterface*> get_classes() {
     return {new PrimeFunction()};
 }

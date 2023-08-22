@@ -4,8 +4,6 @@
 #include <dlfcn.h>
 #include <ffi.h>
 
-CFunctions::CFunctions() {}
-
 CFunctions::~CFunctions() {
     functions.clear();
     functions_by_hash.clear();
@@ -26,19 +24,19 @@ void CFunctions::load(const std::vector<std::string>& shared_libraries) {
             std::cout << dlerror() << std::endl;
             exit(1);
         }
-        std::function<std::vector<CFunction*>()> get_classes = reinterpret_cast<std::vector<CFunction*>(*)()>(ptr);
+        std::function<std::vector<CInterface*>()> get_classes = reinterpret_cast<std::vector<CInterface*>(*)()>(ptr);
         for (auto c_function_ptr : get_classes()) {
-            functions.push_back(std::shared_ptr<CFunction>(c_function_ptr));
+            functions.push_back(std::shared_ptr<CInterface>(c_function_ptr));
             functions_by_hash[CFunctions::hasher(functions.back()->get_name())] = functions.back();
         }
     }
 }
 
-std::shared_ptr<CFunction> CFunctions::get_function(const std::string& name) const {
+std::shared_ptr<CInterface> CFunctions::get_function(const std::string& name) const {
     return get_function(CFunctions::hasher(name));
 }
 
-std::shared_ptr<CFunction> CFunctions::get_function(const size_t& hash) const {
+std::shared_ptr<CInterface> CFunctions::get_function(const size_t& hash) const {
     if (functions_by_hash.find(hash) == functions_by_hash.end()) {
         std::cout << "Could not find function " << hash << std::endl;
         exit(1);
@@ -55,15 +53,15 @@ std::map<var::DataType, ffi_type*> DATA_TYPE_TO_FFI_TYPE = {
     {var::LONG, &ffi_type_slong},
 };
 
-const std::map<cfunction::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
-    {cfunction::BOOL, var::BOOL},
-    {cfunction::CHAR, var::CHAR},
-    {cfunction::INT, var::INT},
-    {cfunction::LONG, var::LONG},
+const std::map<cinterface::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
+    {cinterface::BOOL, var::BOOL},
+    {cinterface::CHAR, var::CHAR},
+    {cinterface::INT, var::INT},
+    {cinterface::LONG, var::LONG},
 };
 }
 
-Var CFunctions::call(const std::shared_ptr<CFunction>& function, const std::vector<Var>& args) {
+Var CFunctions::call(const std::shared_ptr<CInterface>& function, const std::vector<Var>& args) {
     const int args_num = args.size();
 
     // argument types
