@@ -5,7 +5,6 @@
 #include <ffi.h>
 
 CFunctions::~CFunctions() {
-    functions.clear();
     functions_by_hash.clear();
     for (auto& handle : handles) {
         dlclose(handle);
@@ -26,14 +25,19 @@ void CFunctions::load(const std::vector<std::string>& shared_libraries) {
         }
         std::function<std::vector<CInterface*>()> get_classes = reinterpret_cast<std::vector<CInterface*>(*)()>(ptr);
         for (auto c_function_ptr : get_classes()) {
-            functions.push_back(std::shared_ptr<CInterface>(c_function_ptr));
-            functions_by_hash[CFunctions::hasher(functions.back()->get_name())] = functions.back();
+            const auto& fun = std::shared_ptr<CInterface>(c_function_ptr);
+            functions_by_hash[CFunctions::hasher(fun->get_name())] = fun;
         }
     }
 }
 
 std::shared_ptr<CInterface> CFunctions::get_function(const std::string& name) const {
-    return get_function(CFunctions::hasher(name));
+    size_t hash = CFunctions::hasher(name);
+    if (functions_by_hash.find(hash) == functions_by_hash.end()) {
+        std::cout << "Could not find function " << name << std::endl;
+        exit(1);
+    }
+    return functions_by_hash.at(hash);
 }
 
 std::shared_ptr<CInterface> CFunctions::get_function(const size_t& hash) const {

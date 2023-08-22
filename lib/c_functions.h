@@ -20,7 +20,6 @@ class CFunctions {
 
     private:
     std::vector<void*> handles;
-    std::vector<std::shared_ptr<CInterface>> functions;
     std::map<size_t, std::shared_ptr<CInterface>> functions_by_hash;
 
     static std::hash<std::string> hasher;

@@ -1,3 +1,4 @@
+#include "c_functions.h"
 #include "maputils.h"
 #include "parser.h"
 #include "var.h"
@@ -48,6 +49,27 @@ const std::map<TokenType, std::string> TYPE_NAME = {
     {TOKEN_LONG, "long"},
 };
 
+const std::map<cinterface::ArgType, std::string> C_TYPE_NAME = {
+    {cinterface::BOOL, "bool"},
+    {cinterface::CHAR, "char"},
+    {cinterface::INT, "int"},
+    {cinterface::LONG, "long"},
+};
+
+const std::map<ast::AstVarType, std::string> AST_TYPE_NAME = {
+    {ast::BOOL, "bool"},
+    {ast::CHAR, "char"},
+    {ast::INT, "int"},
+    {ast::LONG, "long"},
+};
+
+const std::map<cinterface::ArgType, ast::AstVarType> C_TYPE_TO_AST_TYPE = {
+    {cinterface::BOOL, ast::BOOL},
+    {cinterface::CHAR, ast::CHAR},
+    {cinterface::INT, ast::INT},
+    {cinterface::LONG, ast::LONG},
+};
+
 typedef std::map<std::string, std::shared_ptr<VariableNode>> Identifiers;
 
 typedef struct {
@@ -61,6 +83,7 @@ typedef struct {
     std::map<std::shared_ptr<AbstractSyntaxTree>, Frame> frames;
     std::stack<std::shared_ptr<AbstractSyntaxTree>> frame_stack;
     std::map<std::string, std::shared_ptr<FunctionNode>> functions;
+    CFunctions c_functions;
 } Parser;
 
 std::shared_ptr<AbstractSyntaxTree> expression(Parser& parser, const TokenType& expected_type);
@@ -405,9 +428,55 @@ std::shared_ptr<AbstractSyntaxTree> return_statement(Parser& parser) {
     return std::shared_ptr<ReturnNode>(new ReturnNode({exp}));
 }
 
+void check_native_function(
+    Parser& parser,
+    const std::string& name,
+    const std::string& id,
+    const std::shared_ptr<FunctionNode>& node
+) {
+    const auto& fun = parser.c_functions.get_function(name);
+    const auto& expected_types = fun->get_arg_types();
+    const auto& actual_types = node->get_parameters();
+    
+    bool same_parameters_type = expected_types.size() == actual_types.size();
+    if (same_parameters_type) {
+        for (int i = 0; i < expected_types.size(); i++) {
+            if (C_TYPE_TO_AST_TYPE.at(expected_types.at(i)) != actual_types.at(i)->get_type()) {
+                same_parameters_type = false;
+                break;
+            }
+        }
+
+        bool same_return_type = C_TYPE_TO_AST_TYPE.at(fun->get_return_type()) == node->get_return_type();
+        if (same_return_type && same_parameters_type) {
+            return;
+        }
+    }
+
+    std::cout << "Expected following function signature: " << C_TYPE_NAME.at(fun->get_return_type()) << " " << id << "(";
+    for (int i = 0; i < expected_types.size(); i++) {
+        std::cout << C_TYPE_NAME.at(expected_types.at(i));
+        if (i + 1 < expected_types.size()) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << ");";
+
+    std::cout << std::endl << "But got this instead: " << AST_TYPE_NAME.at(node->get_return_type()) << " " << id << "(";
+    for (int i = 0; i < node->get_parameters_count(); i++) {
+        std::cout << AST_TYPE_NAME.at(actual_types.at(i)->get_type());
+        if (i + 1 < node->get_parameters_count()) {
+            std::cout << ", ";
+        }
+    }
+    std::cout << ");" << std::endl;
+
+    exit(1);
+}
+
 std::shared_ptr<AbstractSyntaxTree> native_statement(Parser& parser) {
     consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after '@native' statement.");
-    Token function_name = consume(parser, TOKEN_STRING, "Expected function name as argument of '@native'.");
+    Token fun_name = consume(parser, TOKEN_STRING, "Expected function name as argument of '@native'.");
     consume(parser, TOKEN_RIGHT_PAREN, "Expected ')' after '@native' arguments.");
 
     if (!match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
@@ -427,11 +496,12 @@ std::shared_ptr<AbstractSyntaxTree> native_statement(Parser& parser) {
     
     consume(parser, TOKEN_SEMICOLON, "Expected ';' after '@native' function signature.");
 
-    auto native_call_result = std::shared_ptr<NativeNode>(new NativeNode(function_name.value, parameters));
+    auto native_call_result = std::shared_ptr<NativeNode>(new NativeNode(fun_name.value, parameters));
     fun_node->set_body(std::shared_ptr<ReturnNode>(new ReturnNode({native_call_result})));
 
     pop_scope(parser);
     pop_frame(parser);
+    check_native_function(parser, fun_name.value, fun_id.value, fun_node);
     return fun_node;
 }
 
@@ -625,9 +695,13 @@ std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
 }
 }
 
-std::shared_ptr<AbstractSyntaxTree> parser::parse(const std::vector<Token>& tokens) {
+std::shared_ptr<AbstractSyntaxTree> parser::parse(
+    const std::vector<Token>& tokens,
+    const std::vector<std::string>& shared_libraries
+) {
     Parser parser;
     parser.current = 0;
     parser.tokens = tokens;
+    parser.c_functions.load(shared_libraries);
     return program(parser);
 }

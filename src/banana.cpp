@@ -6,28 +6,31 @@
 #include "../lib/parser.h"
 #include "../lib/fileutils.h"
 
-std::vector<std::unique_ptr<const Instruction>> get_instructions(const std::string& filename) {
+std::vector<std::unique_ptr<const Instruction>> get_instructions(
+    const std::string& filename,
+    const std::vector<std::string>& shared_libraries
+) {
     std::string content = fileutils::read_string(filename);
     std::vector<Token> tokens = scanner::scan(content.c_str());
-    std::shared_ptr<AbstractSyntaxTree> root = parser::parse(tokens);
+    std::shared_ptr<AbstractSyntaxTree> root = parser::parse(tokens, shared_libraries);
     return ast::to_instructions(root);
 }
 
-void compile(const std::string& filename, const std::string& output) {
-    auto bytes = ast::to_bytes(get_instructions(filename));
+void compile(const std::string& filename, const std::string& output, const std::vector<std::string>& shared_libraries) {
+    auto bytes = ast::to_bytes(get_instructions(filename, shared_libraries));
     fileutils::write_bytes(bytes, output);
 }
 
 void compile_and_execute(const std::string& filename, const std::vector<std::string>& shared_libraries) {
-    Vm(ast::to_bytes(get_instructions(filename)), shared_libraries).execute();
+    Vm(ast::to_bytes(get_instructions(filename, shared_libraries)), shared_libraries).execute();
 }
 
 void execute(const std::string& filename, const std::vector<std::string>& shared_libraries) {
     Vm(fileutils::read_bytes(filename), shared_libraries).execute();
 }
 
-void print_assembly(const std::string& filename) {
-    for (auto pair : ast::to_asm(get_instructions(filename))) {
+void print_assembly(const std::string& filename, const std::vector<std::string>& shared_libraries) {
+    for (auto pair : ast::to_asm(get_instructions(filename, shared_libraries))) {
         std::cout << pair.first << "\t" << pair.second << std::endl;
     }
 }
@@ -85,11 +88,11 @@ int main(int argc, char** argv) {
     }
 
     if (has_flag(flags, "-c")) {
-        compile(filename, replace_extension(filename, "obj"));
+        compile(filename, replace_extension(filename, "obj"), shared_libraries);
         return 0;
     }
     if (has_flag(flags, "-a")) {
-        print_assembly(filename);
+        print_assembly(filename, shared_libraries);
         return 0;
     }
     if (has_flag(flags, "-i")) {
