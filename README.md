@@ -61,21 +61,21 @@ You can call native C code from Banana, provided that you expose the code in a s
 `mylib.cpp`:
 
 ```cpp
-#include "../lib/c_function.h"
+#include "../lib/c_interface.h"
 
 long do_something(long n) {
     // something complicated here
     return 2 * n;
 }
 
-class MyNativeFunction : public CFunction {
-    cfunction::ArgType get_return_type() const { return cfunction::LONG; }
-    std::vector<cfunction::ArgType> get_arg_types() const { return {cfunction::LONG}; }
+class MyNativeFunction : public CInterface {
+    cinterface::ArgType get_return_type() const { return cinterface::LONG; }
+    std::vector<cinterface::ArgType> get_arg_types() const { return {cinterface::LONG}; }
     std::string get_name() const { return "math::do_something"; }
     void* get_function() const { return (void*) do_something; }
 };
 
-std::vector<CFunction*> get_classes() { return {new MyNativeFunction()}; }
+std::vector<CInterface*> get_classes() { return {new MyNativeFunction()}; }
 ```
 
 Compile this as a shared library:
