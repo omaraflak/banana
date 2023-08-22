@@ -34,14 +34,6 @@ const std::map<cfunction::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
     {cfunction::LONG, var::LONG},
 };
 
-std::shared_ptr<CFunction> get_library_function(const Vm& vm, const uint64_t& hash) {
-    if (vm.c_functions.find(hash) == vm.c_functions.end()) {
-        std::cout << "Could not find function " << hash << std::endl;
-        exit(1);
-    }
-    return vm.c_functions.at(hash);
-}
-
 const std::map<uint8_t, std::string> OP_STRINGS = {
     {OP_ADD, "add"},
     {OP_SUB, "sub"},
@@ -633,7 +625,7 @@ void NativeInstruction::write(std::vector<uint8_t>& buffer) const {
 }
 
 void NativeInstruction::execute(Vm& vm) const {
-    const auto& fun = instructions::get_library_function(vm, function_hash);
+    const auto& fun = vm.c_functions.get_function(function_hash);
     std::vector<Var> args;
     for (const auto& c_type : fun->get_arg_types()) {
         var::DataType data_type = instructions::C_TYPE_TO_DATA_TYPE.at(c_type);

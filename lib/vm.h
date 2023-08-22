@@ -8,11 +8,11 @@
 #include <vector>
 #include <stdint.h>
 #include "c_function.h"
+#include "c_function_loader.h"
 #include "var.h"
 
 class Vm {
     public:
-    ~Vm();
     Vm(const std::vector<uint8_t>& program, const std::vector<std::string>& shared_libraries = std::vector<std::string>());
 
     void execute();
@@ -27,12 +27,7 @@ class Vm {
     std::stack<Var*> heaps;
     uint64_t ip;
     bool running;
-
-    std::map<uint64_t, std::shared_ptr<CFunction>> c_functions;
-
-    private:
-    void load_libraries(const std::vector<std::string>& shared_libraries);
-    std::vector<void*> handles;
+    CFunctionLoader c_functions;
 };
 
 #endif // VM
