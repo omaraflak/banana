@@ -8,10 +8,10 @@
 #include <vector>
 #include <memory>
 
-class CFunctionLoader {
+class CFunctions {
     public:
-    CFunctionLoader();
-    ~CFunctionLoader();
+    CFunctions();
+    ~CFunctions();
 
     void load(const std::vector<std::string>& shared_libraries);
     std::shared_ptr<CFunction> get_function(const std::string& name) const;

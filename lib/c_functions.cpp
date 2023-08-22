@@ -1,12 +1,12 @@
-#include "c_function_loader.h"
+#include "c_functions.h"
 #include <iostream>
 #include <functional>
 #include <dlfcn.h>
 #include <ffi.h>
 
-CFunctionLoader::CFunctionLoader() {}
+CFunctions::CFunctions() {}
 
-CFunctionLoader::~CFunctionLoader() {
+CFunctions::~CFunctions() {
     functions.clear();
     functions_by_hash.clear();
     for (auto& handle : handles) {
@@ -14,7 +14,7 @@ CFunctionLoader::~CFunctionLoader() {
     }
 }
 
-void CFunctionLoader::load(const std::vector<std::string>& shared_libraries) {
+void CFunctions::load(const std::vector<std::string>& shared_libraries) {
     for (auto path : shared_libraries) {
         void* handle = dlopen(path.c_str(), RTLD_NOW);
         if (handle == nullptr) {
@@ -29,16 +29,16 @@ void CFunctionLoader::load(const std::vector<std::string>& shared_libraries) {
         std::function<std::vector<CFunction*>()> get_classes = reinterpret_cast<std::vector<CFunction*>(*)()>(ptr);
         for (auto c_function_ptr : get_classes()) {
             functions.push_back(std::shared_ptr<CFunction>(c_function_ptr));
-            functions_by_hash[CFunctionLoader::hasher(functions.back()->get_name())] = functions.back();
+            functions_by_hash[CFunctions::hasher(functions.back()->get_name())] = functions.back();
         }
     }
 }
 
-std::shared_ptr<CFunction> CFunctionLoader::get_function(const std::string& name) const {
-    return get_function(CFunctionLoader::hasher(name));
+std::shared_ptr<CFunction> CFunctions::get_function(const std::string& name) const {
+    return get_function(CFunctions::hasher(name));
 }
 
-std::shared_ptr<CFunction> CFunctionLoader::get_function(const size_t& hash) const {
+std::shared_ptr<CFunction> CFunctions::get_function(const size_t& hash) const {
     if (functions_by_hash.find(hash) == functions_by_hash.end()) {
         std::cout << "Could not find function " << hash << std::endl;
         exit(1);
@@ -47,7 +47,7 @@ std::shared_ptr<CFunction> CFunctionLoader::get_function(const size_t& hash) con
 }
 
 
-namespace cfunctionloader {
+namespace cfunctions {
 std::map<var::DataType, ffi_type*> DATA_TYPE_TO_FFI_TYPE = {
     {var::BOOL, &ffi_type_schar},
     {var::CHAR, &ffi_type_schar},
@@ -63,13 +63,13 @@ const std::map<cfunction::ArgType, var::DataType> C_TYPE_TO_DATA_TYPE {
 };
 }
 
-Var CFunctionLoader::call(const std::shared_ptr<CFunction>& function, const std::vector<Var>& args) {
+Var CFunctions::call(const std::shared_ptr<CFunction>& function, const std::vector<Var>& args) {
     const int args_num = args.size();
 
     // argument types
     ffi_type *ffi_args[args_num];
     for (int i = 0; i < args_num; i++) {
-        ffi_args[i] = cfunctionloader::DATA_TYPE_TO_FFI_TYPE.at(args.at(i).type);
+        ffi_args[i] = cfunctions::DATA_TYPE_TO_FFI_TYPE.at(args.at(i).type);
     }
     
     // argument values
@@ -79,8 +79,8 @@ Var CFunctionLoader::call(const std::shared_ptr<CFunction>& function, const std:
     }
 
     // function return type
-    var::DataType return_type = cfunctionloader::C_TYPE_TO_DATA_TYPE.at(function->get_return_type());
-    auto ffi_return_type = cfunctionloader::DATA_TYPE_TO_FFI_TYPE.at(return_type);
+    var::DataType return_type = cfunctions::C_TYPE_TO_DATA_TYPE.at(function->get_return_type());
+    auto ffi_return_type = cfunctions::DATA_TYPE_TO_FFI_TYPE.at(return_type);
 
     // function to call
     void (*f)() = reinterpret_cast<void (*)()>(function->get_function());

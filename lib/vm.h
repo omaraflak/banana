@@ -8,7 +8,7 @@
 #include <vector>
 #include <stdint.h>
 #include "c_function.h"
-#include "c_function_loader.h"
+#include "c_functions.h"
 #include "var.h"
 
 class Vm {
@@ -27,7 +27,7 @@ class Vm {
     std::stack<Var*> heaps;
     uint64_t ip;
     bool running;
-    CFunctionLoader c_functions;
+    CFunctions c_functions;
 };
 
 #endif // VM

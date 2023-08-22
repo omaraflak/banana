@@ -2,6 +2,7 @@
 #include "maputils.h"
 #include "byteutils.h"
 #include "c_function.h"
+#include "c_functions.h"
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -635,7 +636,7 @@ void NativeInstruction::execute(Vm& vm) const {
         }
         args.push_back(arg);
     }
-    Var result = CFunctionLoader::call(fun, args);
+    Var result = CFunctions::call(fun, args);
     vm.stack->push_back(result);
 }
 
