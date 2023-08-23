@@ -9,7 +9,7 @@
 namespace {
 std::string exe(const std::string& code, const std::vector<std::string>& shared_libraries = std::vector<std::string>()) {
     std::vector<Token> tokens = scanner::scan(code.c_str());
-    std::shared_ptr<AbstractSyntaxTree> root = parser::parse(tokens);
+    std::shared_ptr<AbstractSyntaxTree> root = parser::parse(tokens, shared_libraries);
     std::stringstream ss;
     auto origin = std::cout.rdbuf(ss.rdbuf());
     Vm(ast::to_bytes(ast::to_instructions(root)), shared_libraries).execute();

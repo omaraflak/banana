@@ -7,14 +7,18 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ldl -lffi")
 
 project (banana)
 
-include_directories(lib)
 file(GLOB SOURCES "lib/*.cpp")
-add_executable(banana src/banana.cpp ${SOURCES})
-add_executable(assembler src/assembler.cpp ${SOURCES})
-add_executable(banana_test src/banana_test.cpp ${SOURCES})
-TARGET_LINK_LIBRARIES(banana -lffi)
-TARGET_LINK_LIBRARIES(assembler -lffi)
-TARGET_LINK_LIBRARIES(banana_test -lffi)
+add_library(banana_lib ${SOURCES})
+target_link_libraries(banana_lib -lffi)
+
+add_executable(banana src/banana.cpp)
+target_link_libraries(banana -lffi banana_lib)
+
+add_executable(assembler src/assembler.cpp)
+target_link_libraries(assembler -lffi banana_lib)
+
+add_executable(banana_test src/banana_test.cpp)
+target_link_libraries(banana_test -lffi banana_lib)
 
 # gtest
 include(FetchContent)
