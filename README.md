@@ -5,7 +5,7 @@ Banana 🍌, a toy VM-based programming language.
 # Sample code
 
 ```
-long fib(n) {
+long fib(long n) {
     if (n == 1 or n == 2) {
         return n;
     }
