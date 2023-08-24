@@ -1,6 +1,6 @@
 # Banana programming language
 
-Banana 🍌, a toy VM-based programming language.
+Banana, a toy VM-based programming language.
 
 # Sample code
 
@@ -25,7 +25,7 @@ Prerequisites:
 sudo apt install libffi-dev
 ```
 
-Compile 🍌:
+Compile Banana:
 
 ```
 cmake .
