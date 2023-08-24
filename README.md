@@ -22,7 +22,7 @@ int main() {
 Prerequisites:
 
 ```
-sudo apt install libffi-dev
+sudo apt install g++ cmake libffi-dev
 ```
 
 Compile Banana:
