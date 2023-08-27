@@ -13,7 +13,6 @@ std::map<AstVarType, var::DataType> AST_TO_VAR = {
 
 AbstractSyntaxTree::AbstractSyntaxTree() {
     written = false;
-    main = nullptr;
 }
 
 void AbstractSyntaxTree::write(std::vector<const Instruction*>& instructions) {
@@ -27,14 +26,6 @@ Address AbstractSyntaxTree::get_program_address() const {
 
 bool AbstractSyntaxTree::is_written() const {
     return written;
-}
-
-void AbstractSyntaxTree::set_main(AbstractSyntaxTree* main) {
-    this->main = main;
-}
-
-AbstractSyntaxTree* AbstractSyntaxTree::get_main() const {
-    return main;
 }
 
 LiteralNode::LiteralNode(const Var& value) : AbstractSyntaxTree() {
@@ -284,24 +275,26 @@ void PrintStringNode::write(std::vector<const Instruction*>& instructions) {
     }
 }
 
-FunctionNode::FunctionNode() : AbstractSyntaxTree() {}
-
-FunctionNode::FunctionNode(
-    const std::shared_ptr<AbstractSyntaxTree>& body,
-    const std::vector<std::shared_ptr<VariableNode>>& parameters,
-    const ast::AstVarType& return_type
-) : AbstractSyntaxTree() {
-    set_body(body);
-    set_parameters(parameters);
-    set_return_type(return_type);
+FunctionNode::FunctionNode(const bool& is_main) : AbstractSyntaxTree() {
+    this->is_main = is_main;
 }
 
 void FunctionNode::write(std::vector<const Instruction*>& instructions) {
+    JumpInstruction* jump = nullptr;
+    if (!is_main) {
+        jump = new JumpInstruction();
+        instructions.push_back(jump);
+    }
+
     AbstractSyntaxTree::write(instructions);
     for (auto parameter : parameters) {
         instructions.push_back(new StoreInstruction(parameter->get_address()));
     }
     body->write(instructions);
+
+    if (!is_main) {
+        jump->set_address(ast::count_bytes(instructions));
+    }
 }
 
 std::vector<std::shared_ptr<const VariableNode>> FunctionNode::get_parameters() const {
@@ -411,14 +404,7 @@ Address ast::count_bytes(const std::vector<const Instruction*>& instructions) {
 
 std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(const std::shared_ptr<AbstractSyntaxTree>& root) {
     std::vector<const Instruction*> instructions;
-    if (root->get_main() == nullptr) {
-        root->write(instructions);
-    } else {
-        JumpInstruction* jump = new JumpInstruction();
-        instructions.push_back(jump);
-        root->write(instructions);
-        jump->set_address(root->get_main()->get_program_address());
-    }
+    root->write(instructions);
     instructions.push_back(new HaltInstruction());
 
     std::vector<std::unique_ptr<const Instruction>> instructions_ptr;

@@ -406,7 +406,7 @@ std::vector<std::shared_ptr<VariableNode>> fun_parameters(Parser& parser) {
 }
 
 std::shared_ptr<AbstractSyntaxTree> fun_statement(Parser& parser, const Token& type, const Token& id) {
-    std::shared_ptr<FunctionNode> fun_node(new FunctionNode());
+    std::shared_ptr<FunctionNode> fun_node(new FunctionNode(id.value == MAIN));
     register_function(parser, fun_node, id.value);
     push_frame(parser, fun_node);
     push_scope(parser, fun_node);
@@ -673,14 +673,6 @@ std::shared_ptr<BlockNode> block(Parser& parser) {
     return block;
 }
 
-void jump_to_main(Parser& parser, const std::shared_ptr<AbstractSyntaxTree>& root) {
-    if (parser.functions.find(MAIN) == parser.functions.end()) {
-        // find beginning of script;
-        return;
-    }
-    root->set_main(parser.functions.at(MAIN).get());
-}
-
 std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
     std::shared_ptr<BlockNode> root(new BlockNode());
     push_frame(parser, root);
@@ -690,7 +682,6 @@ std::shared_ptr<AbstractSyntaxTree> program(Parser& parser) {
     }
     pop_scope(parser);
     pop_frame(parser);
-    jump_to_main(parser, root);
     return root;
 }
 }

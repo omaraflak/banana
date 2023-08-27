@@ -16,11 +16,7 @@ class AbstractSyntaxTree {
     Address get_program_address() const;
     bool is_written() const;
 
-    void set_main(AbstractSyntaxTree* main);
-    AbstractSyntaxTree* get_main() const;
-
     protected:
-    AbstractSyntaxTree* main;
     Address program_address;
     bool written;
 };
@@ -181,12 +177,7 @@ class PrintStringNode: public AbstractSyntaxTree {
 
 class FunctionNode: public AbstractSyntaxTree {
     public:
-    FunctionNode();
-    FunctionNode(
-        const std::shared_ptr<AbstractSyntaxTree>& body,
-        const std::vector<std::shared_ptr<VariableNode>>& parameters,
-        const ast::AstVarType& return_type
-    );
+    FunctionNode(const bool& is_main = false);
     void write(std::vector<const Instruction*>& instructions);
     std::vector<std::shared_ptr<const VariableNode>> get_parameters() const;
     uint8_t get_parameters_count() const;
@@ -200,6 +191,7 @@ class FunctionNode: public AbstractSyntaxTree {
     std::shared_ptr<AbstractSyntaxTree> body;
     std::vector<std::shared_ptr<const VariableNode>> parameters;
     ast::AstVarType return_type;
+    bool is_main;
 };
 
 class CallNode: public AbstractSyntaxTree {
