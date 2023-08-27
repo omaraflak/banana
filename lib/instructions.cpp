@@ -70,7 +70,6 @@ const std::map<uint8_t, std::string> OP_STRINGS = {
 const std::map<std::string, uint8_t> OP_STRINGS_REV = maputils::reverse(OP_STRINGS);
 }
 
-
 Instruction::Instruction(const uint8_t& opcode) {
     this->opcode = opcode;
 }
@@ -95,80 +94,21 @@ uint8_t Instruction::size() const {
     return SIZE_OF_BYTE;
 }
 
-Instruction* Instruction::from_opcode(const uint8_t& opcode) {
-    switch (opcode) {
-        case OP_ADD:
-            return new AddInstruction();
-        case OP_SUB:
-            return new SubInstruction();
-        case OP_MUL:
-            return new MulInstruction();
-        case OP_DIV:
-            return new DivInstruction();
-        case OP_MOD:
-            return new ModInstruction();
-        case OP_XOR:
-            return new XorInstruction();
-        case OP_BINARY_AND:
-            return new BinaryAndInstruction();
-        case OP_BINARY_OR:
-            return new BinaryOrInstruction();
-        case OP_BINARY_NOT:
-            return new BinaryNotInstruction();
-        case OP_PUSH:
-            return new PushInstruction();
-        case OP_JUMP:
-            return new JumpInstruction();
-        case OP_JUMP_IF:
-            return new JumpIfInstruction();
-        case OP_JUMP_IF_FALSE:
-            return new JumpIfFalseInstruction();
-        case OP_CALL:
-            return new CallInstruction();
-        case OP_RET:
-            return new RetInstruction();
-        case OP_LT:
-            return new LtInstruction();
-        case OP_LTE:
-            return new LteInstruction();
-        case OP_GT:
-            return new GtInstruction();
-        case OP_GTE:
-            return new GteInstruction();
-        case OP_EQ:
-            return new EqInstruction();
-        case OP_NOT_EQ:
-            return new NotEqInstruction();
-        case OP_BOOLEAN_AND:
-            return new BooleanAndInstruction();
-        case OP_BOOLEAN_OR:
-            return new BooleanOrInstruction();
-        case OP_BOOLEAN_NOT:
-            return new BooleanNotInstruction();
-        case OP_PRINT:
-            return new PrintInstruction();
-        case OP_STORE:
-            return new StoreInstruction();
-        case OP_LOAD:
-            return new LoadInstruction();
-        case OP_CONVERT:
-            return new ConvertInstruction();
-        case OP_NATIVE:
-            return new NativeInstruction();
-        case OP_HALT:
-            return new HaltInstruction();
+std::shared_ptr<Instruction> Instruction::from_opcode(const uint8_t& opcode) {
+    if (opcode < OP_OPERATIONS_COUNT) {
+        return instructions::INSTANCES[opcode];
     }
     std::cout << "Opcode not recognized: " << (int) opcode << std::endl;
     exit(1);
 }
 
-Instruction* Instruction::from_opstring(const std::string& opstring) {
+std::shared_ptr<Instruction> Instruction::from_opstring(const std::string& opstring) {
     return Instruction::from_opcode(instructions::OP_STRINGS_REV.at(opstring));
 }
 
-Instruction* Instruction::from_string(const std::string& str) {
+std::shared_ptr<Instruction> Instruction::from_string(const std::string& str) {
     std::vector<std::string> parts = instructions::split_string(str, ' ');
-    Instruction* instruction = Instruction::from_opcode(instructions::OP_STRINGS_REV.at(parts[0]));
+    auto instruction = Instruction::from_opcode(instructions::OP_STRINGS_REV.at(parts[0]));
     instruction->read_string(std::vector<std::string>(parts.begin() + 1, parts.end()));
     return instruction;
 }

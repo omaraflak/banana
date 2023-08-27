@@ -40,7 +40,8 @@ enum {
     OP_LOAD,
     OP_CONVERT,
     OP_NATIVE,
-    OP_HALT
+    OP_HALT,
+    OP_OPERATIONS_COUNT
 };
 
 class Instruction {
@@ -54,9 +55,9 @@ class Instruction {
     virtual std::string to_string() const;
     virtual uint8_t size() const;
 
-    static Instruction* from_opcode(const uint8_t& opcode);
-    static Instruction* from_opstring(const std::string& opstring);
-    static Instruction* from_string(const std::string& str);
+    static std::shared_ptr<Instruction> from_opcode(const uint8_t& opcode);
+    static std::shared_ptr<Instruction> from_opstring(const std::string& opstring);
+    static std::shared_ptr<Instruction> from_string(const std::string& str);
 
     private:
     uint8_t opcode;
@@ -322,5 +323,41 @@ class HaltInstruction: public Instruction {
     HaltInstruction();
     void execute(Vm& vm) const;
 };
+
+// Must be ordered like OP_* enum
+namespace instructions {
+const std::shared_ptr<Instruction> INSTANCES[OP_OPERATIONS_COUNT] = {
+    std::shared_ptr<Instruction>((Instruction*) new AddInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new SubInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new MulInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new DivInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new ModInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new XorInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new BinaryAndInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new BinaryOrInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new BinaryNotInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new PushInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new JumpInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new JumpIfInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new JumpIfFalseInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new CallInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new RetInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new LtInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new LteInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new GtInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new GteInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new EqInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new NotEqInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new BooleanAndInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new BooleanOrInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new BooleanNotInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new PrintInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new StoreInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new LoadInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new ConvertInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new NativeInstruction()),
+    std::shared_ptr<Instruction>((Instruction*) new HaltInstruction()),
+};
+}
 
 #endif // INSTRUCTIONS

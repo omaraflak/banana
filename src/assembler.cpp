@@ -57,7 +57,7 @@ std::map<std::string, uint64_t> create_labels_map(const std::vector<std::string>
             labels[line] = position;
             continue;
         }
-        Instruction* instruction;
+        std::shared_ptr<Instruction> instruction;
         if (line.find('.') == -1) {
             instruction = Instruction::from_string(line);
         } else {
@@ -65,7 +65,6 @@ std::map<std::string, uint64_t> create_labels_map(const std::vector<std::string>
             instruction = Instruction::from_opstring(opstring);
         }
         position += instruction->size();
-        delete instruction;
     }
     return labels;
 }
@@ -96,9 +95,8 @@ std::vector<std::string> parse_program(const std::vector<std::string>& lines) {
 std::vector<uint8_t> to_binary(const std::vector<std::string>& lines) {
     std::vector<uint8_t> bytes;
     for (const std::string& line : lines) {
-        Instruction* instruction = Instruction::from_string(line);
+        auto instruction = Instruction::from_string(line);
         instruction->write(bytes);
-        delete instruction;
     }
     return bytes;
 }

@@ -16,10 +16,9 @@ Vm::Vm(const std::vector<uint8_t>& program, const std::vector<std::string>& shar
 void Vm::execute() {
     while (running) {
         uint8_t opcode = program[ip++];
-        Instruction* instruction = Instruction::from_opcode(opcode);
+        auto instruction = Instruction::from_opcode(opcode);
         instruction->read(program, &ip);
         instruction->execute(*this);
-        delete instruction;
     }
 }
 
