@@ -324,40 +324,4 @@ class HaltInstruction: public Instruction {
     void execute(Vm& vm) const;
 };
 
-// Must be ordered like OP_* enum
-namespace instructions {
-const std::shared_ptr<Instruction> INSTANCES[OP_OPERATIONS_COUNT] = {
-    std::shared_ptr<Instruction>((Instruction*) new AddInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new SubInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new MulInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new DivInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new ModInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new XorInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new BinaryAndInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new BinaryOrInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new BinaryNotInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new PushInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new JumpInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new JumpIfInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new JumpIfFalseInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new CallInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new RetInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new LtInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new LteInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new GtInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new GteInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new EqInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new NotEqInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new BooleanAndInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new BooleanOrInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new BooleanNotInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new PrintInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new StoreInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new LoadInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new ConvertInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new NativeInstruction()),
-    std::shared_ptr<Instruction>((Instruction*) new HaltInstruction()),
-};
-}
-
 #endif // INSTRUCTIONS

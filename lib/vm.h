@@ -13,6 +13,7 @@
 
 class Vm {
     public:
+    ~Vm();
     Vm(const std::vector<uint8_t>& program, const std::vector<std::string>& shared_libraries = std::vector<std::string>());
 
     void execute();

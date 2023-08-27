@@ -95,8 +95,67 @@ uint8_t Instruction::size() const {
 }
 
 std::shared_ptr<Instruction> Instruction::from_opcode(const uint8_t& opcode) {
-    if (opcode < OP_OPERATIONS_COUNT) {
-        return instructions::INSTANCES[opcode];
+    switch (opcode) {
+        case OP_ADD:
+            return std::shared_ptr<Instruction>(new AddInstruction());
+        case OP_SUB:
+            return std::shared_ptr<Instruction>(new SubInstruction());
+        case OP_MUL:
+            return std::shared_ptr<Instruction>(new MulInstruction());
+        case OP_DIV:
+            return std::shared_ptr<Instruction>(new DivInstruction());
+        case OP_MOD:
+            return std::shared_ptr<Instruction>(new ModInstruction());
+        case OP_XOR:
+            return std::shared_ptr<Instruction>(new XorInstruction());
+        case OP_BINARY_AND:
+            return std::shared_ptr<Instruction>(new BinaryAndInstruction());
+        case OP_BINARY_OR:
+            return std::shared_ptr<Instruction>(new BinaryOrInstruction());
+        case OP_BINARY_NOT:
+            return std::shared_ptr<Instruction>(new BinaryNotInstruction());
+        case OP_PUSH:
+            return std::shared_ptr<Instruction>(new PushInstruction());
+        case OP_JUMP:
+            return std::shared_ptr<Instruction>(new JumpInstruction());
+        case OP_JUMP_IF:
+            return std::shared_ptr<Instruction>(new JumpIfInstruction());
+        case OP_JUMP_IF_FALSE:
+            return std::shared_ptr<Instruction>(new JumpIfFalseInstruction());
+        case OP_CALL:
+            return std::shared_ptr<Instruction>(new CallInstruction());
+        case OP_RET:
+            return std::shared_ptr<Instruction>(new RetInstruction());
+        case OP_LT:
+            return std::shared_ptr<Instruction>(new LtInstruction());
+        case OP_LTE:
+            return std::shared_ptr<Instruction>(new LteInstruction());
+        case OP_GT:
+            return std::shared_ptr<Instruction>(new GtInstruction());
+        case OP_GTE:
+            return std::shared_ptr<Instruction>(new GteInstruction());
+        case OP_EQ:
+            return std::shared_ptr<Instruction>(new EqInstruction());
+        case OP_NOT_EQ:
+            return std::shared_ptr<Instruction>(new NotEqInstruction());
+        case OP_BOOLEAN_AND:
+            return std::shared_ptr<Instruction>(new BooleanAndInstruction());
+        case OP_BOOLEAN_OR:
+            return std::shared_ptr<Instruction>(new BooleanOrInstruction());
+        case OP_BOOLEAN_NOT:
+            return std::shared_ptr<Instruction>(new BooleanNotInstruction());
+        case OP_PRINT:
+            return std::shared_ptr<Instruction>(new PrintInstruction());
+        case OP_STORE:
+            return std::shared_ptr<Instruction>(new StoreInstruction());
+        case OP_LOAD:
+            return std::shared_ptr<Instruction>(new LoadInstruction());
+        case OP_CONVERT:
+            return std::shared_ptr<Instruction>(new ConvertInstruction());
+        case OP_NATIVE:
+            return std::shared_ptr<Instruction>(new NativeInstruction());
+        case OP_HALT:
+            return std::shared_ptr<Instruction>(new HaltInstruction());
     }
     std::cout << "Opcode not recognized: " << (int) opcode << std::endl;
     exit(1);
