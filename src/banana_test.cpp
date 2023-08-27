@@ -127,23 +127,24 @@ TEST(WhileLoop, Loop) {
 }
 
 TEST(Function, CallAndReturn) {
+  EXPECT_EQ("13\n", exe("int add(int a, int b) { return a + b; } int x = add(6, 7); print x;"));
   EXPECT_EQ("13\n", exe("int add(int a, int b) { return a + b; } int main() { int x = add(6, 7); print x; }"));
-  EXPECT_EQ("13\n3\n7\n", exe("int add(int a, int b) { return a + b; } int main() { print add(6, 7); print add(1, 2); print add(3, 4); }"));
+  EXPECT_EQ("13\n3\n7\n", exe("int add(int a, int b) { return a + b; } print add(6, 7); print add(1, 2); print add(3, 4);"));
 }
 
 TEST(Function, NoParameters) {
-  EXPECT_EQ("true\n", exe("int sayHello() { print true; return 1; } int main() { sayHello(); }"));
+  EXPECT_EQ("true\n", exe("int sayHello() { print true; return 1; } sayHello();"));
 }
 
 TEST(Function, ParametersConversion) {
-  EXPECT_EQ("11\n", exe("long add(long x, long y) { return x + y; } int main() { int x = add(5, 6); print x; }"));
-  EXPECT_EQ("A\n", exe("long num() { return 65; } int main() { char z = num(); print z; }"));
+  EXPECT_EQ("11\n", exe("long add(long x, long y) { return x + y; } int x = add(5, 6); print x;"));
+  EXPECT_EQ("A\n", exe("long num() { return 65; } char z = num(); print z;"));
 }
 
 TEST(NATIVE, PRIMES) {
   system("g++ ./external/prime.cpp -o ./external/prime.so -shared -fPIC");
   std::vector<std::string> libs = {"./external/prime.so"};
-  EXPECT_EQ("541\n", exe("@native(\"math::prime\") long nthPrime(long n); int main() { print nthPrime(100); }", libs));
+  EXPECT_EQ("541\n", exe("@native(\"math::prime\") long nthPrime(long n); print nthPrime(100);", libs));
 }
 
 TEST(FIBONACCI, RECURSION) {
