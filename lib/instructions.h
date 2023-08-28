@@ -2,6 +2,7 @@
 #define INSTRUCTIONS
 
 #include <functional>
+#include <memory>
 #include <vector>
 #include <string>
 #include <stdint.h>
@@ -60,6 +61,8 @@ class Instruction {
     static std::shared_ptr<Instruction> from_string(const std::string& str);
     static std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
     static std::vector<std::pair<Address, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
+    static std::shared_ptr<Instruction> const OP_INSTANCES[OP_OPERATIONS_COUNT];
+    static Instruction* const OP_INSTANCES_PTR[OP_OPERATIONS_COUNT];
 
     private:
     uint8_t opcode;
