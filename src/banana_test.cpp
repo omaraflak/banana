@@ -142,9 +142,8 @@ TEST(Function, ParametersConversion) {
 }
 
 TEST(NATIVE, PRIMES) {
-  system("g++ ./external/prime.cpp -o ./external/prime.so -shared -fPIC");
-  std::vector<std::string> libs = {"./external/prime.so"};
-  EXPECT_EQ("541\n", exe("@native(\"math::prime\") long nthPrime(long n); print nthPrime(100);", libs));
+  EXPECT_EQ(system("g++ ./external/prime.cpp -o ./external/prime.so -shared -fPIC"), 0);
+  EXPECT_EQ("541\n", exe("@native(\"math::prime\") long nthPrime(long n); print nthPrime(100);", {"./external/prime.so"}));
 }
 
 TEST(FIBONACCI, RECURSION) {
