@@ -1,10 +1,10 @@
 #include <iostream>
 #include <sstream>
+#include <gtest/gtest.h>
 #include "lib/ast.h"
 #include "lib/scanner.h"
 #include "lib/parser.h"
 #include "lib/vm.h"
-#include "gtest/gtest.h"
 
 namespace {
 std::string exe(const std::string& code, const std::vector<std::string>& shared_libraries = std::vector<std::string>()) {

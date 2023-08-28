@@ -11,3 +11,4 @@ banana_test
 *.a
 *.asm
 *.so
+build
