@@ -1,8 +1,11 @@
 #include <iostream>
 #include <sstream>
+#include <cstdio>
+#include <filesystem>
 #include <gtest/gtest.h>
 #include "lib/ast.h"
 #include "lib/scanner.h"
+#include "lib/fileutils.h"
 #include "lib/parser.h"
 #include "lib/vm.h"
 
@@ -142,8 +145,26 @@ TEST(Function, ParametersConversion) {
 }
 
 TEST(NATIVE, PRIMES) {
-  EXPECT_EQ(system("g++ ./native/prime.cpp -o ./native/prime.so -shared -fPIC"), 0);
-  EXPECT_EQ("541\n", exe("@native(\"math::prime\") long nthPrime(long n); print nthPrime(100);", {"./native/prime.so"}));
+  std::string cwd = std::filesystem::current_path();
+  std::string include = cwd + "/src/lib/c_interface.h";
+  std::string code =
+    "#include \"" + include + "\"\n"
+    "long twice(long n) { return 2 * n; } "
+    "class MyNativeFunction : public CInterface { "
+    "   cinterface::ArgType get_return_type() const { return cinterface::LONG; } "
+    "   std::vector<cinterface::ArgType> get_arg_types() const { return {cinterface::LONG}; } "
+    "   std::string get_name() const { return \"math::twice\"; } "
+    "   void* get_function() const { return (void*) twice; } "
+    "}; "
+    "std::vector<CInterface*> get_classes() { return {new MyNativeFunction()}; }";
+  std::string tmp = std::tmpnam(nullptr);
+  std::string source = tmp + ".cpp";
+  std::string compiled = tmp + ".so";
+  fileutils::write_lines({code}, source);
+  std::string cmd = "g++ " + source + " -o " + compiled + " -shared -fPIC";
+  EXPECT_EQ(system(cmd.c_str()), 0);
+
+  EXPECT_EQ("200\n", exe("@native(\"math::twice\") long twice(long n); print twice(100);", {compiled}));
 }
 
 TEST(FIBONACCI, RECURSION) {

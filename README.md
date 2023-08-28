@@ -63,7 +63,7 @@ You can call native C code from Banana, provided that you expose the code in a s
 `mylib.cpp`:
 
 ```cpp
-#include "../lib/c_interface.h"
+#include "../src/lib/c_interface.h"
 
 long do_something(long n) {
     // something complicated here
