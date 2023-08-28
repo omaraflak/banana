@@ -37,7 +37,7 @@ jobs:
       run: ${{github.workspace}}/build/banana_test
 
     - name: Run benchmark
-      run: ${{github.workspace}}/build/benchmarks --benchmark_format=json > benchmarks/benchmark_results.json
+      run: ${{github.workspace}}/build/benchmarks --benchmark_format=json > ${{github.workspace}}/benchmarks/benchmark_results.json
 
     - name: Store benchmark results
       uses: benchmark-action/github-action-benchmark@v1
