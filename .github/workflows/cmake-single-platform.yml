@@ -35,8 +35,6 @@ jobs:
       run: ${{github.workspace}}/build/banana_test
 
   benchmark:
-    if: github.ref == 'refs/heads/master'
-
     runs-on: ubuntu-latest
 
     steps:
