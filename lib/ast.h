@@ -245,8 +245,6 @@ class HaltNode: public AbstractSyntaxTree {
 namespace ast {
     Address count_bytes(const std::vector<const Instruction*>& instructions);
     std::vector<std::unique_ptr<const Instruction>> to_instructions(const std::shared_ptr<AbstractSyntaxTree>& root);
-    std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
-    std::vector<std::pair<Address, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
 };
 
 #endif // AST

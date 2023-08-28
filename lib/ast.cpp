@@ -396,7 +396,7 @@ void HaltNode::write(std::vector<const Instruction*>& instructions) {
 
 Address ast::count_bytes(const std::vector<const Instruction*>& instructions) {
     Address size = 0;
-    for (const Instruction* instruction : instructions) {
+    for (const auto& instruction : instructions) {
         size += instruction->size();
     }
     return size;
@@ -412,22 +412,4 @@ std::vector<std::unique_ptr<const Instruction>> ast::to_instructions(const std::
         instructions_ptr.push_back(std::unique_ptr<const Instruction>(ptr));
     }
     return instructions_ptr;
-}
-
-std::vector<uint8_t> ast::to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
-    std::vector<uint8_t> bytes;
-    for (const auto& instruction : instructions) {
-        instruction->write(bytes);
-    }
-    return bytes;
-}
-
-std::vector<std::pair<Address, std::string>> ast::to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
-    std::vector<std::pair<Address, std::string>> strings;
-    Address index = 0;
-    for (const auto& instruction : instructions) {
-        strings.push_back(std::make_pair(index, instruction->to_string()));
-        index += instruction->size();
-    }
-    return strings;
 }

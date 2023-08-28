@@ -58,6 +58,8 @@ class Instruction {
     static std::shared_ptr<Instruction> from_opcode(const uint8_t& opcode);
     static std::shared_ptr<Instruction> from_opstring(const std::string& opstring);
     static std::shared_ptr<Instruction> from_string(const std::string& str);
+    static std::vector<uint8_t> to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions);
+    static std::vector<std::pair<Address, std::string>> to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions);
 
     private:
     uint8_t opcode;

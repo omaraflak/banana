@@ -12,7 +12,7 @@ std::string exe(const std::string& code, const std::vector<std::string>& shared_
     std::shared_ptr<AbstractSyntaxTree> root = parser::parse(tokens, shared_libraries);
     std::stringstream ss;
     auto origin = std::cout.rdbuf(ss.rdbuf());
-    Vm(ast::to_bytes(ast::to_instructions(root)), shared_libraries).execute();
+    Vm(Instruction::to_bytes(ast::to_instructions(root)), shared_libraries).execute();
     std::cout.rdbuf(origin);
     return ss.str();
 }

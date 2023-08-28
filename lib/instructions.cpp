@@ -172,6 +172,24 @@ std::shared_ptr<Instruction> Instruction::from_string(const std::string& str) {
     return instruction;
 }
 
+std::vector<uint8_t> Instruction::to_bytes(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
+    std::vector<uint8_t> bytes;
+    for (const auto& instruction : instructions) {
+        instruction->write(bytes);
+    }
+    return bytes;
+}
+
+std::vector<std::pair<Address, std::string>> Instruction::to_asm(const std::vector<std::unique_ptr<const Instruction>>& instructions) {
+    std::vector<std::pair<Address, std::string>> strings;
+    Address index = 0;
+    for (const auto& instruction : instructions) {
+        strings.push_back(std::make_pair(index, instruction->to_string()));
+        index += instruction->size();
+    }
+    return strings;
+}
+
 AddInstruction::AddInstruction() : Instruction(OP_ADD) {}
 
 void AddInstruction::execute(Vm& vm) const {

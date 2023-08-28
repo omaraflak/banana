@@ -17,12 +17,12 @@ std::vector<std::unique_ptr<const Instruction>> get_instructions(
 }
 
 void compile(const std::string& filename, const std::string& output, const std::vector<std::string>& shared_libraries) {
-    auto bytes = ast::to_bytes(get_instructions(filename, shared_libraries));
+    auto bytes = Instruction::to_bytes(get_instructions(filename, shared_libraries));
     fileutils::write_bytes(bytes, output);
 }
 
 void compile_and_execute(const std::string& filename, const std::vector<std::string>& shared_libraries) {
-    Vm(ast::to_bytes(get_instructions(filename, shared_libraries)), shared_libraries).execute();
+    Vm(Instruction::to_bytes(get_instructions(filename, shared_libraries)), shared_libraries).execute();
 }
 
 void execute(const std::string& filename, const std::vector<std::string>& shared_libraries) {
@@ -30,7 +30,7 @@ void execute(const std::string& filename, const std::vector<std::string>& shared
 }
 
 void print_assembly(const std::string& filename, const std::vector<std::string>& shared_libraries) {
-    for (auto pair : ast::to_asm(get_instructions(filename, shared_libraries))) {
+    for (auto pair : Instruction::to_asm(get_instructions(filename, shared_libraries))) {
         std::cout << pair.first << "\t" << pair.second << std::endl;
     }
 }
