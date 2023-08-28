@@ -3,11 +3,8 @@ long b = 2;
 long c = 0;
 long n = 30;
 
-print a;
-print b;
 while (n > 0) {
     c = a + b;
-    print c;
     a = b;
     b = c;
     n -= 1;

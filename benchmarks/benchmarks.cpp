@@ -23,6 +23,7 @@ BENCHMARK(bm_##name) \
 
 NA_BENCHMARK(fib);
 NA_BENCHMARK(primes);
+NA_BENCHMARK(while_loop);
 
 // Run the benchmark
 BENCHMARK_MAIN();
