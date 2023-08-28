@@ -1,6 +1,4 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
-name: CMake on a single platform
+name: CI
 
 on:
   push:
@@ -36,19 +34,30 @@ jobs:
     - name: Test
       run: ${{github.workspace}}/build/banana_test
 
+  benchmark:
+    if: github.ref == 'refs/heads/master'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
     - name: Run benchmark
       run: ${{github.workspace}}/build/benchmarks --benchmark_format=json > ${{github.workspace}}/benchmarks/benchmark_results.json
 
     - name: Store benchmark results
       uses: benchmark-action/github-action-benchmark@v1
       with:
-        name: C++ Benchmark
+        name: Banana Benchmark
         tool: 'googlecpp'
         output-file-path: ${{github.workspace}}/benchmarks/benchmark_results.json
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{secrets.GITHUB_TOKEN}}
         auto-push: true
-        # Show alert with commit comment on detecting possible performance regression
-        alert-threshold: '200%'
-        comment-on-alert: true
-        fail-on-alert: true
-        alert-comment-cc-users: '@omaraflak'
