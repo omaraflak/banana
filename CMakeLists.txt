@@ -19,3 +19,8 @@ target_link_libraries(assembler -lffi banana_lib)
 add_subdirectory(lib/googletest)
 add_executable(banana_test src/banana_test.cpp)
 target_link_libraries(banana_test -lffi banana_lib gtest_main)
+
+file(GLOB BENCH_SOURCES "benchmarks/*.cpp")
+add_subdirectory(lib/benchmark)
+add_executable(benchmarks benchmarks/benchmarks.cpp)
+target_link_libraries(benchmarks -lffi banana_lib benchmark)
