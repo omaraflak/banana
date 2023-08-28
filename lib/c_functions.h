@@ -22,7 +22,7 @@ class CFunctions {
     std::vector<void*> handles;
     std::map<size_t, std::shared_ptr<CInterface>> functions_by_hash;
 
-    static std::hash<std::string> hasher;
+    inline static std::hash<std::string> hasher;
 };
 
 

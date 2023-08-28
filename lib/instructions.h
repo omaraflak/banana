@@ -320,7 +320,7 @@ class NativeInstruction: public Instruction {
     std::string function_name;
     uint64_t function_hash;
     
-    static std::hash<std::string> hasher;
+    inline static std::hash<std::string> hasher;
 };
 
 class HaltInstruction: public Instruction {

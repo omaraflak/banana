@@ -9,12 +9,12 @@
 #include "../lib/fileutils.h"
 
 std::string trim(const std::string& str, const std::string& character) {
-    int begin = str.find_first_not_of(character);
+    size_t begin = str.find_first_not_of(character);
     if (begin == std::string::npos) {
         return "";
     }
-    int end = str.find_last_not_of(character);
-    int range = end - begin + 1;
+    size_t end = str.find_last_not_of(character);
+    size_t range = end - begin + 1;
     return str.substr(begin, range);
 }
 
@@ -58,7 +58,7 @@ std::map<std::string, uint64_t> create_labels_map(const std::vector<std::string>
             continue;
         }
         std::shared_ptr<Instruction> instruction;
-        if (line.find('.') == -1) {
+        if (line.find('.') < 0) {
             instruction = Instruction::from_string(line);
         } else {
             std::string opstring = split_string(line)[0];
@@ -77,7 +77,7 @@ std::vector<std::string> resolve_labels(const std::vector<std::string>& lines) {
             continue;
         }
         std::vector<std::string> words = split_string(line);
-        for (int i = 0; i < words.size(); i++) {
+        for (size_t i = 0; i < words.size(); i++) {
             std::string word = words[i];
             if (word[0] == '.') {
                 words[i] = std::to_string(labels[word]);
