@@ -36,3 +36,19 @@ jobs:
     - name: Test
       run: ${{github.workspace}}/build/banana_test
 
+    - name: Run benchmark
+      run: ${{github.workspace}}/build/benchmarks --benchmark_format=json > benchmarks/benchmark_results.json
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        name: C++ Benchmark
+        tool: 'googlecpp'
+        output-file-path: benchmarks/benchmark_result.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        # Show alert with commit comment on detecting possible performance regression
+        alert-threshold: '200%'
+        comment-on-alert: true
+        fail-on-alert: true
+        alert-comment-cc-users: '@omaraflak'
