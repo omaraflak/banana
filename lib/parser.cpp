@@ -79,7 +79,7 @@ typedef struct {
 
 typedef struct {
     std::vector<Token> tokens;
-    int current;
+    size_t current;
     std::map<std::shared_ptr<AbstractSyntaxTree>, Frame> frames;
     std::stack<std::shared_ptr<AbstractSyntaxTree>> frame_stack;
     std::map<std::string, std::shared_ptr<FunctionNode>> functions;
@@ -159,7 +159,7 @@ bool match_sequence(Parser& parser, const std::vector<std::set<TokenType>>& type
     if (parser.current + types.size() >= parser.tokens.size()) {
         return false;
     }
-    for (int i = 0; i < types.size(); i++) {
+    for (size_t i = 0; i < types.size(); i++) {
         if (types[i].find(parser.tokens[parser.current + i].type) == types[i].end()) {
             return false;
         }
@@ -301,7 +301,7 @@ std::shared_ptr<AbstractSyntaxTree> binary_expression(
     Parser& parser,
     const std::vector<std::vector<TokenType>>& types,
     TokenType expected_type,
-    const int& index = 0
+    const size_t& index = 0
 ) {
     if (index == types.size()) {
         return unary_expression(parser, expected_type);
@@ -440,7 +440,7 @@ void check_native_function(
     
     bool same_parameters_type = expected_types.size() == actual_types.size();
     if (same_parameters_type) {
-        for (int i = 0; i < expected_types.size(); i++) {
+        for (size_t i = 0; i < expected_types.size(); i++) {
             if (C_TYPE_TO_AST_TYPE.at(expected_types.at(i)) != actual_types.at(i)->get_type()) {
                 same_parameters_type = false;
                 break;
@@ -454,7 +454,7 @@ void check_native_function(
     }
 
     std::cout << "Expected following function signature: " << C_TYPE_NAME.at(fun->get_return_type()) << " " << id << "(";
-    for (int i = 0; i < expected_types.size(); i++) {
+    for (size_t i = 0; i < expected_types.size(); i++) {
         std::cout << C_TYPE_NAME.at(expected_types.at(i));
         if (i + 1 < expected_types.size()) {
             std::cout << ", ";
@@ -463,7 +463,7 @@ void check_native_function(
     std::cout << ");";
 
     std::cout << std::endl << "But got this instead: " << AST_TYPE_NAME.at(node->get_return_type()) << " " << id << "(";
-    for (int i = 0; i < node->get_parameters_count(); i++) {
+    for (size_t i = 0; i < node->get_parameters_count(); i++) {
         std::cout << AST_TYPE_NAME.at(actual_types.at(i)->get_type());
         if (i + 1 < node->get_parameters_count()) {
             std::cout << ", ";
@@ -656,7 +656,7 @@ std::shared_ptr<BlockNode> block(Parser& parser) {
     std::shared_ptr<BlockNode> block(new BlockNode());
     push_scope(parser, block);
     const Frame& frame = parser.frames.at(current_frame(parser));
-    const int nest_level = frame.scope_stack.size();
+    const size_t nest_level = frame.scope_stack.size();
     while (
         !eof(parser) && (
             frame.scope_stack.size() != nest_level ||

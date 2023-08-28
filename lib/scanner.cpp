@@ -4,9 +4,9 @@
 namespace scanner {
 struct Scanner {
     std::string code;
-    int start;
-    int current;
-    int line;
+    size_t start;
+    size_t current;
+    size_t line;
 };
 
 Token create_token(const TokenType& type, const Scanner& scanner) {
@@ -26,7 +26,7 @@ bool is_character(const char& c) {
 }
 
 bool match_string(const Scanner& scanner, const std::string& str, const bool& keyword = false) {
-    for (int i = 0; i < str.size(); i++) {
+    for (size_t i = 0; i < str.size(); i++) {
         const char p = scanner.code[scanner.current + i];
         if (p == '\0' || p != str[i]) {
             return false;
@@ -39,7 +39,7 @@ bool match_string(const Scanner& scanner, const std::string& str, const bool& ke
 }
 
 int match_quote(const Scanner& scanner) {
-    int p = scanner.current + 1;
+    size_t p = scanner.current + 1;
     while (p < scanner.code.size() && scanner.code[p] != '\n') {
         if (scanner.code[p] == '\\') {
             p += 2;
@@ -70,7 +70,7 @@ int match_identifier(const Scanner& scanner) {
 }
 
 int next_line(const Scanner& scanner) {
-    int p = scanner.current;
+    size_t p = scanner.current;
     while (p < scanner.code.size() && scanner.code[p] != '\n') {
         p++;
     }
