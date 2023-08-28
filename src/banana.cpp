@@ -1,10 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include "../lib/ast.h"
-#include "../lib/scanner.h"
-#include "../lib/parser.h"
-#include "../lib/fileutils.h"
+#include "lib/ast.h"
+#include "lib/scanner.h"
+#include "lib/parser.h"
+#include "lib/fileutils.h"
 
 std::vector<std::unique_ptr<const Instruction>> get_instructions(
     const std::string& filename,

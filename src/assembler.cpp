@@ -4,9 +4,9 @@
 #include <vector>
 #include <map>
 #include <stdint.h>
-#include "../lib/instructions.h"
-#include "../lib/byteutils.h"
-#include "../lib/fileutils.h"
+#include "lib/instructions.h"
+#include "lib/byteutils.h"
+#include "lib/fileutils.h"
 
 std::string trim(const std::string& str, const std::string& character) {
     size_t begin = str.find_first_not_of(character);

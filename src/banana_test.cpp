@@ -1,9 +1,9 @@
 #include <iostream>
 #include <sstream>
-#include "../lib/ast.h"
-#include "../lib/scanner.h"
-#include "../lib/parser.h"
-#include "../lib/vm.h"
+#include "lib/ast.h"
+#include "lib/scanner.h"
+#include "lib/parser.h"
+#include "lib/vm.h"
 #include "gtest/gtest.h"
 
 namespace {

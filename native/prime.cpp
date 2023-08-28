@@ -1,4 +1,4 @@
-#include "../lib/c_interface.h"
+#include "../src/lib/c_interface.h"
 
 bool is_prime(const long& n) {
     for (long i=2; i<n; i++) {

@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 project (banana)
 
-file(GLOB SOURCES "lib/*.cpp")
+file(GLOB SOURCES "src/lib/*.cpp")
 add_library(banana_lib ${SOURCES})
 target_link_libraries(banana_lib -lffi)
 
