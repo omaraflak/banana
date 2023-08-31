@@ -28,7 +28,7 @@ sudo apt install g++ cmake libffi-dev
 Compile Banana:
 
 ```
-git clone --recurse-submodules git@github.com:omaraflak/banana.git
+git clone --recurse-submodules https://github.com/omaraflak/banana
 cd banana
 cmake .
 make
