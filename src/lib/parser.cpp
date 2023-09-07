@@ -34,6 +34,7 @@ const std::map<TokenType, ast::AstVarType> TOKEN_TO_AST = {
     {TOKEN_CHAR, ast::CHAR},
     {TOKEN_INT, ast::INT},
     {TOKEN_LONG, ast::LONG},
+    {TOKEN_VOID, ast::VOID},
 };
 
 const std::map<ast::AstVarType, TokenType> AST_TO_TOKEN = maputils::reverse(TOKEN_TO_AST);
@@ -42,11 +43,16 @@ const std::set<TokenType> TYPES = {
     TOKEN_BOOL, TOKEN_CHAR, TOKEN_INT, TOKEN_LONG
 };
 
+const std::set<TokenType> RETURN_TYPES = {
+    TOKEN_BOOL, TOKEN_CHAR, TOKEN_INT, TOKEN_LONG, TOKEN_VOID
+};
+
 const std::map<TokenType, std::string> TYPE_NAME = {
     {TOKEN_BOOL, "bool"},
     {TOKEN_CHAR, "char"},
     {TOKEN_INT, "int"},
     {TOKEN_LONG, "long"},
+    {TOKEN_VOID, "void"},
 };
 
 const std::map<cinterface::ArgType, std::string> C_TYPE_NAME = {
@@ -61,6 +67,7 @@ const std::map<ast::AstVarType, std::string> AST_TYPE_NAME = {
     {ast::CHAR, "char"},
     {ast::INT, "int"},
     {ast::LONG, "long"},
+    {ast::VOID, "void"},
 };
 
 const std::map<cinterface::ArgType, ast::AstVarType> C_TYPE_TO_AST_TYPE = {
@@ -642,7 +649,7 @@ std::shared_ptr<AbstractSyntaxTree> statement(Parser& parser) {
     if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_EQUAL}})) {
         return var_statement(parser, previous(parser, 3), previous(parser, 2));
     }
-    if (match_sequence(parser, {TYPES, {TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
+    if (match_sequence(parser, {RETURN_TYPES, {TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {
         return fun_statement(parser, previous(parser, 3), previous(parser, 2));
     }
     if (match_sequence(parser, {{TOKEN_IDENTIFIER}, {TOKEN_LEFT_PAREN}})) {

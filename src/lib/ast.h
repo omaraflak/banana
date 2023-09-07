@@ -32,7 +32,7 @@ class LiteralNode: public AbstractSyntaxTree {
 
 namespace ast {
 enum AstVarType {
-    BOOL, CHAR, INT, LONG,
+    BOOL, CHAR, INT, LONG, VOID
 };
 }
 

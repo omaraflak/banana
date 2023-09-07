@@ -374,6 +374,15 @@ std::vector<Token> scanner::scan(const std::string& code) {
                     tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
                 }
                 break;
+            case 'v':
+                if (match_string(scanner, "void", /* keyword */ true)) {
+                    scanner.current += 4;
+                    tokens.push_back(create_token(TOKEN_VOID, scanner));
+                } else {
+                    scanner.current = match_identifier(scanner);
+                    tokens.push_back(create_token(TOKEN_IDENTIFIER, scanner));
+                }
+                break;
             case '"': {
                 int quote = match_quote(scanner);
                 if (quote == -1) {

@@ -139,6 +139,10 @@ TEST(Function, NoParameters) {
   EXPECT_EQ("true\n", exe("int sayHello() { print true; return 1; } sayHello();"));
 }
 
+TEST(Function, Void) {
+  EXPECT_EQ("true\n", exe("void hello() { print true; } hello();"));
+}
+
 TEST(Function, ParametersConversion) {
   EXPECT_EQ("11\n", exe("long add(long x, long y) { return x + y; } int x = add(5, 6); print x;"));
   EXPECT_EQ("A\n", exe("long num() { return 65; } char z = num(); print z;"));

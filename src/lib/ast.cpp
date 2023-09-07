@@ -280,21 +280,23 @@ FunctionNode::FunctionNode(const bool& is_main) : AbstractSyntaxTree() {
 }
 
 void FunctionNode::write(std::vector<const Instruction*>& instructions) {
-    JumpInstruction* jump = nullptr;
-    if (!is_main) {
-        jump = new JumpInstruction();
-        instructions.push_back(jump);
+    if (is_main) {
+        AbstractSyntaxTree::write(instructions);
+        for (auto parameter : parameters) {
+            instructions.push_back(new StoreInstruction(parameter->get_address()));
+        }
+        body->write(instructions);
+        return;
     }
-
+    JumpInstruction* jump = jump = new JumpInstruction();
+    instructions.push_back(jump);
     AbstractSyntaxTree::write(instructions);
     for (auto parameter : parameters) {
         instructions.push_back(new StoreInstruction(parameter->get_address()));
     }
     body->write(instructions);
-
-    if (!is_main) {
-        jump->set_address(ast::count_bytes(instructions));
-    }
+    instructions.push_back(new RetInstruction(0));
+    jump->set_address(ast::count_bytes(instructions));
 }
 
 std::vector<std::shared_ptr<const VariableNode>> FunctionNode::get_parameters() const {
