@@ -21,8 +21,8 @@ std::string trim(const std::string& str, const std::string& character) {
 std::vector<std::string> trim_lines(const std::vector<std::string>& lines, const std::string& comment = ";") {
     std::vector<std::string> result;
     for (std::string line : lines) {
-        int index = line.find(comment);
-        if (index != -1) {
+        size_t index = line.find(comment);
+        if (index != std::string::npos) {
             line = line.substr(0, index);
         }
         line = trim(line, " ");
@@ -58,7 +58,7 @@ std::map<std::string, uint64_t> create_labels_map(const std::vector<std::string>
             continue;
         }
         std::shared_ptr<Instruction> instruction;
-        if (line.find('.') < 0) {
+        if (line.find('.') == std::string::npos) {
             instruction = Instruction::from_string(line);
         } else {
             std::string opstring = split_string(line)[0];
