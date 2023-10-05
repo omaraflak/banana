@@ -30,8 +30,8 @@ Compile Banana:
 ```
 git clone --recurse-submodules https://github.com/omaraflak/banana
 cd banana
-cmake .
-make
+cmake -B build
+cmake --build build
 ```
 
 Run program:
