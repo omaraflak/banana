@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1694097531952,
+  "lastUpdate": 1696509879589,
   "repoUrl": "https://github.com/omaraflak/banana",
   "entries": {
     "Banana Benchmark": [
@@ -330,6 +330,48 @@ window.BENCHMARK_DATA = {
             "value": 18136.461561500113,
             "unit": "ns/iter",
             "extra": "iterations: 83471\ncpu: 18107.331887721484 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aflakomar@gmail.com",
+            "name": "Omar Aflak",
+            "username": "omaraflak"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "19fc4595ceb5382c7934017512fc3e931fc70917",
+          "message": "Fix string find()",
+          "timestamp": "2023-10-05T14:41:52+02:00",
+          "tree_id": "580338e96dcbe71058ad3215df52e204de62559c",
+          "url": "https://github.com/omaraflak/banana/commit/19fc4595ceb5382c7934017512fc3e931fc70917"
+        },
+        "date": 1696509878138,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bm_fib",
+            "value": 78841561.88888861,
+            "unit": "ns/iter",
+            "extra": "iterations: 9\ncpu: 75408633.33333333 ns\nthreads: 1"
+          },
+          {
+            "name": "bm_primes",
+            "value": 507714770.00000685,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 507644300.00000006 ns\nthreads: 1"
+          },
+          {
+            "name": "bm_while_loop",
+            "value": 20296.904473727504,
+            "unit": "ns/iter",
+            "extra": "iterations: 79151\ncpu: 19954.561534282573 ns\nthreads: 1"
           }
         ]
       }
